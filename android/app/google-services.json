@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "675939737068",
+    "project_id": "salama-4e5af",
+    "storage_bucket": "salama-4e5af.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675939737068:android:c0b51011b9cd4c8836b4c9",
+        "android_client_info": {
+          "package_name": "com.example.nabeelaljirbi_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCO-sAtjkE71WHE5VriNK6wfyK9ZEXOkt0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675939737068:android:160c119c4cd7adc436b4c9",
+        "android_client_info": {
+          "package_name": "com.nabeelaljirbi.salama"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCO-sAtjkE71WHE5VriNK6wfyK9ZEXOkt0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
