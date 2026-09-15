@@ -9,6 +9,7 @@ import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/core/utils/currency_util.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/controller/doctor_profile_controller.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/view/doctor_edit_profile_screen.dart';
+import 'package:nabeelaljirbi_app/feature/doctor/profile/model/qualification_item_model.dart';
 
 class DoctorProfileInfoScreen extends StatelessWidget {
   const DoctorProfileInfoScreen({super.key});
@@ -174,86 +175,182 @@ class DoctorProfileInfoScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          if (controller
-                                      .doctorProfile
-                                      .value
-                                      ?.doctor
-                                      ?.biography !=
-                                  null &&
-                              controller
-                                  .doctorProfile
-                                  .value!
-                                  .doctor!
-                                  .biography!
-                                  .isNotEmpty)
-                            Container(
-                              width: double.infinity,
-                              height: 220,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: const Color(0xff94A3B8),
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  controller
-                                      .doctorProfile
-                                      .value!
-                                      .doctor!
-                                      .biography!,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Center(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(
-                                            Icons.description,
-                                            size: 44,
-                                            color: Color(0xff94A3B8),
+                          () {
+                            final bio = controller
+                                .doctorProfile
+                                .value
+                                ?.doctor
+                                ?.biography;
+                            final qualifications = QualificationData.parse(bio);
+
+                            if (qualifications.isNotEmpty) {
+                              return ListView.separated(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: qualifications.length,
+                                separatorBuilder: (context, index) =>
+                                    const SizedBox(height: 10),
+                                itemBuilder: (context, index) {
+                                  final q = qualifications[index];
+                                  return Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: const Color(0xff94A3B8),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primaryColor
+                                                .withOpacity(0.1),
+                                            shape: BoxShape.circle,
                                           ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            'unable_to_preview_file'.tr,
-                                            style: globalTextStyle(
-                                              fontSize: 14,
-                                              color: const Color(0xff94A3B8),
+                                          child: const Icon(
+                                            Icons.school,
+                                            size: 20,
+                                            color: AppColors.primaryColor,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              if (q.degree.isNotEmpty)
+                                                Text(
+                                                  q.degree,
+                                                  style: globalTextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: const Color(0xff1E293B),
+                                                  ),
+                                                ),
+                                              if (q.institute.isNotEmpty) ...[
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  q.institute,
+                                                  style: globalTextStyle(
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: const Color(0xff64748B),
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                        ),
+                                        if (q.year.isNotEmpty) ...[
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primaryColor
+                                                  .withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            child: Text(
+                                              q.year,
+                                              style: globalTextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColors.primaryColor,
+                                              ),
                                             ),
                                           ),
                                         ],
-                                      ),
-                                    );
-                                  },
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            } else if (bio == null || bio.isEmpty) {
+                              return Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
                                 ),
-                              ),
-                            )
-                          else
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: const Color(0xff94A3B8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: const Color(0xff94A3B8),
+                                  ),
                                 ),
-                              ),
-                              child: Text(
-                                'not_uploaded'.tr,
-                                style: globalTextStyle(
-                                  fontSize: 14,
-                                  color: const Color(0xff94A3B8),
+                                child: Text(
+                                  'not_uploaded'.tr,
+                                  style: globalTextStyle(
+                                    fontSize: 14,
+                                    color: const Color(0xff94A3B8),
+                                  ),
                                 ),
-                              ),
-                            ),
+                              );
+                            } else if (bio.startsWith('http')) {
+                              return Container(
+                                width: double.infinity,
+                                height: 220,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: const Color(0xff94A3B8),
+                                  ),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.network(
+                                    bio,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Center(
+                                        child: Text(
+                                          'unable_to_preview_file'.tr,
+                                          style: globalTextStyle(
+                                            fontSize: 14,
+                                            color: const Color(0xff94A3B8),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: const Color(0xff94A3B8),
+                                  ),
+                                ),
+                                child: Text(
+                                  bio,
+                                  style: globalTextStyle(
+                                    fontSize: 14,
+                                    color: const Color(0xff2D2D2D),
+                                  ),
+                                ),
+                              );
+                            }
+                          }(),
                         ],
                       ),
                       const SizedBox(height: 24),

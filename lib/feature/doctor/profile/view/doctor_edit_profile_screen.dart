@@ -6,6 +6,7 @@ import 'package:nabeelaljirbi_app/core/const/icons_path.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/controller/doctor_edit_profile_controller.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/controller/doctor_profile_controller.dart';
+import 'package:nabeelaljirbi_app/feature/doctor/profile/model/qualification_item_model.dart';
 
 class DoctorEditProfileScreen extends StatelessWidget {
   const DoctorEditProfileScreen({super.key});
@@ -188,131 +189,11 @@ class DoctorEditProfileScreen extends StatelessWidget {
                 forceLtr: true,
               ),
               const SizedBox(height: 16),
-              // Biography Section
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'biography'.tr,
-                    style: globalTextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xff2D2D2D),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  GestureDetector(
-                    onTap: controller.pickBiography,
-                    child: Obx(() {
-                      final selectedFile = controller.biographyImage.value;
-                      final currentUrl = Get.find<DoctorProfileController>()
-                          .doctorProfile
-                          .value
-                          ?.doctor
-                          ?.biography;
-
-                      return Container(
-                        width: double.infinity,
-                        height: 220,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xff94A3B8)),
-                        ),
-                        child: Stack(
-                          children: [
-                            if (selectedFile != null)
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.file(
-                                  selectedFile,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
-                              )
-                            else if (currentUrl != null &&
-                                currentUrl.isNotEmpty)
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  currentUrl,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Center(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(
-                                            Icons.description,
-                                            size: 44,
-                                            color: Color(0xff94A3B8),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            'unable_to_preview_file'.tr,
-                                            style: globalTextStyle(
-                                              fontSize: 14,
-                                              color: const Color(0xff94A3B8),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                              )
-                            else
-                              Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(
-                                      Icons.description,
-                                      size: 44,
-                                      color: Color(0xff94A3B8),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      'tap_to_select_file'.tr,
-                                      style: globalTextStyle(
-                                        fontSize: 14,
-                                        color: const Color(0xff94A3B8),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            Positioned(
-                              right: 12,
-                              bottom: 12,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xff137CCF),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  'select'.tr,
-                                  style: globalTextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-                  ),
-                ],
+              // Biography / Academic & Professional Qualifications Section
+              _buildQualificationsBuilder(
+                qualifications: controller.qualifications,
+                onAdd: controller.addQualification,
+                onRemove: controller.removeQualification,
               ),
               const SizedBox(height: 32),
               Obx(
@@ -367,6 +248,7 @@ class DoctorEditProfileScreen extends StatelessWidget {
     bool readOnly = false,
     VoidCallback? onTap,
     bool forceLtr = false,
+    int maxLines = 1,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -383,6 +265,7 @@ class DoctorEditProfileScreen extends StatelessWidget {
         TextField(
           controller: controller,
           keyboardType: inputType,
+          maxLines: maxLines,
           textDirection: forceLtr ? TextDirection.ltr : null,
           inputFormatters: inputType == TextInputType.number
               ? [FilteringTextInputFormatter.digitsOnly]
@@ -735,5 +618,231 @@ class DoctorEditProfileScreen extends StatelessWidget {
       ),
       isScrollControlled: true,
     );
+  }
+
+  Widget _buildQualificationsBuilder({
+    required RxList<QualificationItem> qualifications,
+    required VoidCallback onAdd,
+    required Function(int) onRemove,
+  }) {
+    return Obx(() {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'biography'.tr,
+                style: globalTextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xff2D2D2D),
+                ),
+              ),
+              InkWell(
+                onTap: onAdd,
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xff137CCF).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.add_circle_outline,
+                        size: 16,
+                        color: Color(0xff137CCF),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '+ Add Qualification',
+                        style: globalTextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xff137CCF),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          if (qualifications.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: Center(
+                child: Text(
+                  'No qualifications added yet. Tap + Add Qualification.',
+                  style: globalTextStyle(
+                    fontSize: 13,
+                    color: const Color(0xff636F85),
+                  ),
+                ),
+              ),
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: qualifications.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final item = qualifications[index];
+                return Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFCBD5E1)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xff137CCF).withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.school_outlined,
+                                  size: 16,
+                                  color: Color(0xff137CCF),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Qualification #${index + 1}',
+                                style: globalTextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xff1E293B),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (qualifications.length > 1)
+                            IconButton(
+                              constraints: const BoxConstraints(),
+                              padding: EdgeInsets.zero,
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                size: 20,
+                                color: Colors.redAccent,
+                              ),
+                              onPressed: () => onRemove(index),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: item.degreeController,
+                        style: globalTextStyle(
+                            fontSize: 14, color: const Color(0xff2D2D2D)),
+                        decoration: InputDecoration(
+                          labelText: 'Degree / Title (e.g. MBBS, FCPS)',
+                          labelStyle: globalTextStyle(
+                              fontSize: 12, color: const Color(0xff64748B)),
+                          hintText: 'Enter degree title',
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFE2E8F0)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: TextField(
+                              controller: item.instituteController,
+                              style: globalTextStyle(
+                                  fontSize: 14, color: const Color(0xff2D2D2D)),
+                              decoration: InputDecoration(
+                                labelText: 'Institute / University',
+                                labelStyle: globalTextStyle(
+                                    fontSize: 12, color: const Color(0xff64748B)),
+                                hintText: 'e.g. Dhaka Medical College',
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 10),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide:
+                                      const BorderSide(color: Color(0xFFE2E8F0)),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 1,
+                            child: TextField(
+                              controller: item.yearController,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(4),
+                              ],
+                              style: globalTextStyle(
+                                  fontSize: 14, color: const Color(0xff2D2D2D)),
+                              decoration: InputDecoration(
+                                labelText: 'Year',
+                                labelStyle: globalTextStyle(
+                                    fontSize: 12, color: const Color(0xff64748B)),
+                                hintText: 'e.g. 2018',
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 10),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide:
+                                      const BorderSide(color: Color(0xFFE2E8F0)),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+        ],
+      );
+    });
   }
 }

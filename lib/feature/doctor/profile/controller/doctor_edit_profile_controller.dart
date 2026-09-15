@@ -13,6 +13,7 @@ import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/core/network_caller/endpoints.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/controller/doctor_profile_controller.dart';
+import 'package:nabeelaljirbi_app/feature/doctor/profile/model/qualification_item_model.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/model/specialist_model.dart';
 
 class DoctorEditProfileController extends GetxController {
@@ -25,6 +26,20 @@ class DoctorEditProfileController extends GetxController {
   final licenseController = TextEditingController();
   final consultationFeeController = TextEditingController();
   final dobController = TextEditingController();
+  final biographyController = TextEditingController();
+
+  var qualifications = <QualificationItem>[].obs;
+
+  void addQualification() {
+    qualifications.add(QualificationItem());
+  }
+
+  void removeQualification(int index) {
+    if (index >= 0 && index < qualifications.length) {
+      final item = qualifications.removeAt(index);
+      item.dispose();
+    }
+  }
 
   var isLoading = false.obs;
   var selectedGender = ''.obs;
@@ -70,6 +85,8 @@ class DoctorEditProfileController extends GetxController {
       // specialtyController.text = data.doctor?.speciality ?? '';
       selectedSpecialty.value = data.doctor?.speciality ?? '';
       licenseController.text = data.doctor?.licenseNumber ?? '';
+      biographyController.text = data.doctor?.biography ?? '';
+      qualifications.value = QualificationItem.decodeList(data.doctor?.biography);
       consultationFeeController.text =
           data.doctor?.consultFee?.toString() ?? '';
       if (data.dateOfBirth != null) {
@@ -236,6 +253,13 @@ class DoctorEditProfileController extends GetxController {
       return;
     }
 
+    final qualError = QualificationItem.validateList(qualifications);
+    if (qualError != null) {
+      Get.snackbar('error'.tr, qualError,
+          backgroundColor: Colors.red, colorText: Colors.white);
+      return;
+    }
+
     if (isLoading.value) return;
 
     isLoading.value = true;
@@ -263,6 +287,7 @@ class DoctorEditProfileController extends GetxController {
         "licenseNumber": licenseController.text.trim(),
         "consultFee": int.tryParse(consultationFeeController.text) ?? 0,
         "clinicId": null,
+        "biography": QualificationItem.encodeList(qualifications),
       };
 
       request.fields['data'] = jsonEncode(profileData);

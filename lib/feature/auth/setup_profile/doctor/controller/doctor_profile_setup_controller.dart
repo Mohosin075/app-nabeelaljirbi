@@ -15,6 +15,7 @@ import 'package:nabeelaljirbi_app/feature/doctor/profile/model/clinic_list_model
 import 'package:nabeelaljirbi_app/feature/doctor/profile/model/specialist_model.dart';
 import 'package:nabeelaljirbi_app/core/const/cities_data.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
+import 'package:nabeelaljirbi_app/feature/doctor/profile/model/qualification_item_model.dart';
 import 'package:nabeelaljirbi_app/feature/auth/setup_profile/doctor/view/doctor_refer_screen.dart';
 
 class DoctorProfileSetupController extends GetxController {
@@ -29,6 +30,20 @@ class DoctorProfileSetupController extends GetxController {
   final TextEditingController licenseController = TextEditingController();
   final TextEditingController consultationFeeController =
       TextEditingController();
+  final TextEditingController biographyController = TextEditingController();
+
+  var qualifications = <QualificationItem>[QualificationItem()].obs;
+
+  void addQualification() {
+    qualifications.add(QualificationItem());
+  }
+
+  void removeQualification(int index) {
+    if (index >= 0 && index < qualifications.length) {
+      final item = qualifications.removeAt(index);
+      item.dispose();
+    }
+  }
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -353,6 +368,13 @@ class DoctorProfileSetupController extends GetxController {
       return;
     }
 
+    final qualError = QualificationItem.validateList(qualifications);
+    if (qualError != null) {
+      Get.snackbar('error'.tr, qualError,
+          backgroundColor: Colors.red, colorText: Colors.white);
+      return;
+    }
+
     if (!isCertified.value) {
       Get.snackbar('error'.tr, 'certification_required'.tr);
       return;
@@ -384,6 +406,7 @@ class DoctorProfileSetupController extends GetxController {
         "licenseNumber": licenseController.text.trim(),
         "consultFee": int.tryParse(consultationFeeController.text.trim()) ?? 0,
         "clinicId": selectedClinicId.value,
+        "biography": QualificationItem.encodeList(qualifications),
       };
 
       request.fields['data'] = jsonEncode(profileData);
