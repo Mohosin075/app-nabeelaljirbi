@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:nabeelaljirbi_app/core/const/icons_path.dart';
+import 'package:nabeelaljirbi_app/core/service/legal_service.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 
 class ClinicLegalScreen extends StatelessWidget {
@@ -29,48 +30,93 @@ class ClinicLegalScreen extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'terms_clinic_title'.tr,
-              style: globalTextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xff2D2D2D),
-              ),
+      body: FutureBuilder<LegalDocumentModel?>(
+        future: LegalService.fetchActiveDocument('CLINIC'),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          final doc = snapshot.data;
+          final title = doc?.localizedTitle ?? 'terms_clinic_title'.tr;
+          final content = doc?.localizedContent ?? 'terms_clinic_content'.tr;
+          final version = doc?.version ?? '1.0';
+          final isArabic = Get.locale?.languageCode == 'ar';
+
+          return Directionality(
+            textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: globalTextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xff2D2D2D),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'v$version',
+                        style: globalTextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF64748B),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  content,
+                  style: globalTextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xff636F85),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'privacy_policy'.tr,
+                  style: globalTextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xff2D2D2D),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'privacy_policy_desc'.tr,
+                  style: globalTextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xff636F85),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            Text(
-              'terms_clinic_content'.tr,
-              style: globalTextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: const Color(0xff636F85),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'privacy_policy'.tr,
-              style: globalTextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xff2D2D2D),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'privacy_policy_clinic_desc'.tr,
-              style: globalTextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: const Color(0xff636F85),
-              ),
-            ),
-          ],
-        ),
+          ),
+        );
+      },
       ),
     );
   }

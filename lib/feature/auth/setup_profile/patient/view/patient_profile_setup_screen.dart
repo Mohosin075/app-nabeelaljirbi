@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
 import 'package:nabeelaljirbi_app/core/const/icons_path.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
+import 'package:nabeelaljirbi_app/core/service/legal_service.dart';
 import 'package:nabeelaljirbi_app/feature/auth/setup_profile/patient/controller/patient_profile_setup_controller.dart';
 
 class PatientProfileSetupScreen extends StatelessWidget {
@@ -229,7 +230,66 @@ class PatientProfileSetupScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 16),
+                      // Legal Agreement Acceptance Checkbox
+                      Obx(
+                        () => Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: Checkbox(
+                                value: controller.isAgreedToTerms.value,
+                                onChanged: (val) {
+                                  controller.isAgreedToTerms.value = val ?? false;
+                                },
+                                activeColor: AppColors.primaryColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  Text(
+                                    "${'i_agree_to_terms'.tr} ",
+                                    style: globalTextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      color: const Color(0xff636F85),
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      LegalService.showLegalBottomSheet(
+                                        context,
+                                        role: 'PATIENT',
+                                        onAccepted: () {
+                                          controller.isAgreedToTerms.value = true;
+                                        },
+                                      );
+                                    },
+                                    child: Text(
+                                      'terms_and_legal_agreement'.tr,
+                                      style: globalTextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.primaryColor,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 28),
                       SizedBox(
                         width: double.infinity,
                         child: Obx(

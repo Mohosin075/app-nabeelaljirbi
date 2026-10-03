@@ -11,12 +11,16 @@ import 'package:geolocator/geolocator.dart';
 import 'package:nabeelaljirbi_app/core/const/cities_data.dart';
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/core/network_caller/endpoints.dart';
+import 'package:nabeelaljirbi_app/core/service/legal_service.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/feature/auth/setup_profile/patient/view/patient_refer_screen.dart';
 
 class PatientProfileSetupController extends GetxController {
   // Form Key
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  // Legal agreement acceptance
+  final RxBool isAgreedToTerms = true.obs;
 
   // Text Controllers
   final TextEditingController fullNameController = TextEditingController();
@@ -212,6 +216,11 @@ class PatientProfileSetupController extends GetxController {
       return;
     }
 
+    if (!isAgreedToTerms.value) {
+      Get.snackbar('error'.tr, 'agree_to_terms_required'.tr);
+      return;
+    }
+
     isLoading.value = true;
     try {
       final String token = SharedPrefHelper.getAccessToken() ?? '';
@@ -273,6 +282,19 @@ class PatientProfileSetupController extends GetxController {
             SharedPrefHelper.saveToken(responseData['data']['accessToken']);
             debugPrint('🔑 Access Token updated in SharedPrefs');
           }
+        }
+
+        // Record legal document acceptance for registration
+        try {
+          final activeDoc = await LegalService.fetchActiveDocument('PATIENT');
+          if (activeDoc != null) {
+            await LegalService.acceptAgreement(
+              activeDoc.id,
+              version: activeDoc.version,
+            );
+          }
+        } catch (e) {
+          debugPrint('Failed to record legal acceptance: $e');
         }
 
         Get.to(() => PatientReferScreen());

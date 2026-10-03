@@ -13,9 +13,12 @@ import 'package:http/http.dart' as http;
 import 'package:nabeelaljirbi_app/core/network_caller/endpoints.dart';
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/feature/auth/setup_profile/clinic/view/clinic_refer_screen.dart';
+import 'package:nabeelaljirbi_app/core/service/legal_service.dart';
 
 class ClinicProfileSetupController extends GetxController {
   final RxBool isLoading = false.obs;
+  // Legal agreement acceptance
+  final RxBool isAgreedToTerms = true.obs;
   // Reactive Text Values
   final RxString managerName = "".obs;
   final RxString managerPhone = "".obs;
@@ -248,6 +251,11 @@ class ClinicProfileSetupController extends GetxController {
       return;
     }
 
+    if (!isAgreedToTerms.value) {
+      Get.snackbar('error'.tr, 'agree_to_terms_required'.tr);
+      return;
+    }
+
     isLoading.value = true;
     try {
       final token = SharedPrefHelper.getAccessToken();
@@ -326,6 +334,19 @@ class ClinicProfileSetupController extends GetxController {
           }
         } catch (e) {
           debugPrint("⚠️ Error parsing role/token from response: $e");
+        }
+
+        // Record legal document acceptance for registration
+        try {
+          final activeDoc = await LegalService.fetchActiveDocument('CLINIC');
+          if (activeDoc != null) {
+            await LegalService.acceptAgreement(
+              activeDoc.id,
+              version: activeDoc.version,
+            );
+          }
+        } catch (e) {
+          debugPrint('Failed to record clinic legal acceptance: $e');
         }
 
         // Proceed to next step

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
 import 'package:nabeelaljirbi_app/core/const/icons_path.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
+import 'package:nabeelaljirbi_app/core/service/legal_service.dart';
 import 'package:nabeelaljirbi_app/feature/auth/setup_profile/doctor/controller/doctor_profile_setup_controller.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/model/qualification_item_model.dart';
 
@@ -356,7 +357,66 @@ class DoctorProfileSetupScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 16),
+                        // Legal Agreement Acceptance Checkbox
+                        Obx(
+                          () => Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: Checkbox(
+                                  value: controller.isAgreedToTerms.value,
+                                  onChanged: (val) {
+                                    controller.isAgreedToTerms.value = val ?? false;
+                                  },
+                                  activeColor: AppColors.primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    Text(
+                                      "${'i_agree_to_terms'.tr} ",
+                                      style: globalTextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: const Color(0xff636F85),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        LegalService.showLegalBottomSheet(
+                                          context,
+                                          role: 'DOCTOR',
+                                          onAccepted: () {
+                                            controller.isAgreedToTerms.value = true;
+                                          },
+                                        );
+                                      },
+                                      child: Text(
+                                        'terms_and_legal_agreement'.tr,
+                                        style: globalTextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.primaryColor,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 28),
 
                         SizedBox(
                           width: double.infinity,
@@ -977,7 +1037,7 @@ class DoctorProfileSetupScreen extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withOpacity(0.1),
+                    color: AppColors.primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -1039,7 +1099,7 @@ class DoctorProfileSetupScreen extends StatelessWidget {
                     border: Border.all(color: const Color(0xFFCBD5E1)),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
+                        color: Colors.black.withValues(alpha: 0.03),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -1056,7 +1116,7 @@ class DoctorProfileSetupScreen extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primaryColor.withOpacity(0.1),
+                                  color: AppColors.primaryColor.withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
