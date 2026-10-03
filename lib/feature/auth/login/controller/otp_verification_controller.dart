@@ -6,11 +6,13 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:nabeelaljirbi_app/core/const/app_colors.dart' show AppColors;
 import 'package:nabeelaljirbi_app/core/network_caller/endpoints.dart';
-import 'package:nabeelaljirbi_app/feature/auth/role_selection/view/role_selection_screen.dart';
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/feature/patient/nav_bar/view/patient_nav_bar_screen.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/nav_bar/view/doctor_nav_bar_screen.dart';
 import 'package:nabeelaljirbi_app/feature/clinic/nav_bar/view/clinic_nav_bar_screen.dart';
+import 'package:nabeelaljirbi_app/feature/auth/setup_profile/patient/view/patient_profile_setup_screen.dart';
+import 'package:nabeelaljirbi_app/feature/auth/setup_profile/doctor/view/doctor_profile_setup_screen.dart';
+import 'package:nabeelaljirbi_app/feature/auth/setup_profile/clinic/view/clinic_profile_setup_screen.dart';
 
 class OtpVerificationController extends GetxController {
   final TextEditingController otpController = TextEditingController();
@@ -24,6 +26,7 @@ class OtpVerificationController extends GetxController {
 
   late String phoneNumber;
   late String otpSender;
+  String? targetRole;
 
   Timer? _timer;
 
@@ -32,6 +35,7 @@ class OtpVerificationController extends GetxController {
     super.onInit();
     phoneNumber = Get.arguments['phoneNumber'] ?? '';
     otpSender = Get.arguments['otpSender'] ?? 'whatsapp';
+    targetRole = Get.arguments['targetRole'];
     startTimer();
     generateFcmToken();
   }
@@ -167,7 +171,9 @@ class OtpVerificationController extends GetxController {
           final bool profileCompleted = data['profileCompleted'] == true;
           final String? role = data['role'];
 
-          debugPrint('Profile Completed: $profileCompleted, Role: $role');
+          debugPrint(
+            'Profile Completed: $profileCompleted, Role: $role, TargetRole: $targetRole',
+          );
 
           if (profileCompleted && role != null) {
             // User has completed profile, save role and go to home
@@ -185,12 +191,24 @@ class OtpVerificationController extends GetxController {
                 Get.offAll(() => ClinicNavBarScreen());
                 break;
               default:
-                // Fallback to role selection if role is unknown
-                Get.offAll(() => RoleSelectionScreen());
+                // Default fallback is Patient experience
+                Get.offAll(() => PatientNavBarScreen());
             }
           } else {
-            // Profile not completed, go to role selection/registration
-            Get.offAll(() => RoleSelectionScreen());
+            // Profile not completed: Route to specific setup screen, defaulting to Patient
+            final String effectiveRole =
+                (targetRole != null && targetRole!.isNotEmpty)
+                    ? targetRole!.toLowerCase()
+                    : (role != null ? role.toLowerCase() : 'patient');
+
+            if (effectiveRole == 'doctor') {
+              Get.offAll(() => DoctorProfileSetupScreen());
+            } else if (effectiveRole == 'clinic') {
+              Get.offAll(() => ClinicProfileSetupScreen());
+            } else {
+              // Patient is the default entry point!
+              Get.offAll(() => PatientProfileSetupScreen());
+            }
           }
         } else {
           Get.snackbar('error'.tr, 'something_went_wrong'.tr);

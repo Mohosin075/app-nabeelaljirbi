@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 class RoleSelectionController extends GetxController {
-  RxString? selectedRole = ''.obs;
+  RxString? selectedRole = 'patient'.obs;
 
   void selectRole(String role) {
     selectedRole?.value = role;

@@ -8,13 +8,28 @@ import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/feature/auth/login/controller/login_controller.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  final String? targetRole; // null = Patient (default), 'doctor' = Doctor, 'clinic' = Clinic
+  const LoginScreen({super.key, this.targetRole});
 
   @override
   Widget build(BuildContext context) {
     final LoginController loginController = Get.put(LoginController());
 
-    return Scaffold(
+    if (targetRole != null && loginController.targetRole.value != targetRole) {
+      loginController.targetRole.value = targetRole;
+    }
+
+    return Obx(() {
+      final currentRole = loginController.targetRole.value;
+      return PopScope(
+        canPop: targetRole != null || currentRole == null,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          if (currentRole != null) {
+            loginController.setTargetRole(null);
+          }
+        },
+        child: Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
           final double screenHeight = constraints.maxHeight;
@@ -26,55 +41,187 @@ class LoginScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: GestureDetector(
-                        onTap: () {
-                          _showLanguageBottomSheet(context, loginController);
-                        },
-                        child: Obx(
-                          () => Text(
-                            loginController.selectedLanguage.value.tr,
-                            style: globalTextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryColor,
+                    Obx(() {
+                      final currentRole = loginController.targetRole.value;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              if (currentRole != null)
+                                GestureDetector(
+                                  onTap: () {
+                                    if (targetRole != null) {
+                                      Get.back();
+                                    } else {
+                                      loginController.setTargetRole(null);
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF1F5F9),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: SvgPicture.asset(
+                                      IconsPath.backArrow,
+                                      width: 20,
+                                      height: 20,
+                                    ),
+                                  ),
+                                )
+                              else
+                                const SizedBox.shrink(),
+                              GestureDetector(
+                                onTap: () {
+                                  _showLanguageBottomSheet(
+                                    context,
+                                    loginController,
+                                  );
+                                },
+                                child: Text(
+                                  loginController.selectedLanguage.value.tr,
+                                  style: globalTextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (currentRole == 'doctor') ...[
+                            SizedBox(height: screenHeight * 0.03),
+                            Center(
+                              child: Container(
+                                width: 72,
+                                height: 72,
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryColor.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: SvgPicture.asset(
+                                  IconsPath.doctorSelected,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.05),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 16,
-                      children: [
-                        SizedBox(
-                          height: 72,
-                          width: 72,
-                          child: SvgPicture.asset(IconsPath.appIcon),
-                        ),
-                        Text(
-                          "Salama",
-                          style: globalTextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryColor,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: screenHeight * 0.05),
-                    Text(
-                      "slogan".tr,
-                      textAlign: TextAlign.center,
-                      style: globalTextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xff2D2D2D),
-                      ),
-                    ),
+                            const SizedBox(height: 16),
+                            Center(
+                              child: Text(
+                                "doctor_portal".tr,
+                                style: globalTextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xff2D2D2D),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Center(
+                              child: Text(
+                                "doctor_login_subtitle".tr,
+                                textAlign: TextAlign.center,
+                                style: globalTextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color(0xff636F85),
+                                ),
+                              ),
+                            ),
+                          ] else if (currentRole == 'clinic') ...[
+                            SizedBox(height: screenHeight * 0.03),
+                            Center(
+                              child: Container(
+                                width: 72,
+                                height: 72,
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryColor.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: SvgPicture.asset(
+                                  IconsPath.clinicSelected,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Center(
+                              child: Text(
+                                "clinic_portal".tr,
+                                style: globalTextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xff2D2D2D),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Center(
+                              child: Text(
+                                "clinic_login_subtitle".tr,
+                                textAlign: TextAlign.center,
+                                style: globalTextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color(0xff636F85),
+                                ),
+                              ),
+                            ),
+                          ] else ...[
+                            SizedBox(height: screenHeight * 0.05),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: 72,
+                                  width: 72,
+                                  child: SvgPicture.asset(IconsPath.appIcon),
+                                ),
+                                const SizedBox(width: 16),
+                                Text(
+                                  "Salama",
+                                  style: globalTextStyle(
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: screenHeight * 0.04),
+                            Center(
+                              child: Text(
+                                "slogan".tr,
+                                textAlign: TextAlign.center,
+                                style: globalTextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xff2D2D2D),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Center(
+                              child: Text(
+                                "patient_login_subtitle".tr,
+                                textAlign: TextAlign.center,
+                                style: globalTextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color(0xff636F85),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      );
+                    }),
                     SizedBox(height: screenHeight * 0.04),
                     Text(
                       "phone_number".tr,
@@ -344,7 +491,12 @@ class LoginScreen extends StatelessWidget {
                         () => ElevatedButton(
                           onPressed: loginController.isLoading.value
                               ? null
-                              : () => loginController.sendOTP(),
+                              : () => loginController.sendOTP(
+                                  targetRole:
+                                      loginController.targetRole.value ??
+                                      targetRole ??
+                                      'patient',
+                                ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryColor,
                             shape: RoundedRectangleBorder(
@@ -375,6 +527,113 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
 
+                    // Legal Terms Note
+                    const SizedBox(height: 14),
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          "terms_and_privacy_consent".tr,
+                          textAlign: TextAlign.center,
+                          style: globalTextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xff94A3B8),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    Obx(() {
+                      final currentRole = loginController.targetRole.value;
+                      if (currentRole == null) {
+                        return Column(
+                          children: [
+                            const SizedBox(height: 28),
+                            Row(
+                              children: [
+                                const Expanded(
+                                  child: Divider(color: Color(0xFFE2E8F0)),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
+                                  child: Text(
+                                    "healthcare_providers".tr,
+                                    style: globalTextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: const Color(0xFF64748B),
+                                    ),
+                                  ),
+                                ),
+                                const Expanded(
+                                  child: Divider(color: Color(0xFFE2E8F0)),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildRoleCard(
+                                    icon: IconsPath.doctorSelected,
+                                    title: "doctor_login".tr,
+                                    subtitle: "for_doctors".tr,
+                                    onTap: () {
+                                      loginController.setTargetRole('doctor');
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _buildRoleCard(
+                                    icon: IconsPath.clinicSelected,
+                                    title: "clinic_login".tr,
+                                    subtitle: "for_clinics".tr,
+                                    onTap: () {
+                                      loginController.setTargetRole('clinic');
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      } else {
+                        return Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            Center(
+                              child: TextButton.icon(
+                                onPressed: () {
+                                  if (targetRole != null) {
+                                    Get.back();
+                                  } else {
+                                    loginController.setTargetRole(null);
+                                  }
+                                },
+                                icon: const Icon(
+                                  Icons.arrow_back,
+                                  size: 18,
+                                  color: AppColors.primaryColor,
+                                ),
+                                label: Text(
+                                  "back_to_patient_login".tr,
+                                  style: globalTextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                    }),
+
                     SizedBox(height: screenHeight * 0.05),
                   ],
                 ),
@@ -382,6 +641,89 @@ class LoginScreen extends StatelessWidget {
             ),
           );
         },
+      ),
+    ),
+  );
+});
+  }
+
+  Widget _buildRoleCard({
+    required String icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Ink(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: SvgPicture.asset(icon),
+                    ),
+                    const Spacer(),
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 13,
+                      color: Color(0xFF94A3B8),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: globalTextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF1E293B),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: globalTextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xFF64748B),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

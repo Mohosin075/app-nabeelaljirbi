@@ -21,6 +21,13 @@ class LoginController extends GetxController {
   late TextEditingController phoneController;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
+  // Target role for login ('doctor', 'clinic', or null for patient default)
+  final RxnString targetRole = RxnString();
+
+  void setTargetRole(String? role) {
+    targetRole.value = role;
+  }
+
   // Language Selection
   late RxString selectedLanguage;
   final List<String> languages = ['english', 'arabic'];
@@ -221,7 +228,7 @@ class LoginController extends GetxController {
 
   bool get canContinue => true;
 
-  Future<void> sendOTP() async {
+  Future<void> sendOTP({String? targetRole}) async {
     if (!formKey.currentState!.validate()) return;
 
     isLoading.value = true;
@@ -269,9 +276,15 @@ class LoginController extends GetxController {
           backgroundColor: AppColors.primaryColor,
           colorText: Colors.white,
         );
+        final String resolvedRole =
+            targetRole ?? this.targetRole.value ?? 'patient';
         Get.to(
           () => OtpVerificationScreen(),
-          arguments: {'phoneNumber': fullPhoneNumber, 'otpSender': otpSender},
+          arguments: {
+            'phoneNumber': fullPhoneNumber,
+            'otpSender': otpSender,
+            'targetRole': resolvedRole,
+          },
         );
       } else {
         Get.snackbar(
