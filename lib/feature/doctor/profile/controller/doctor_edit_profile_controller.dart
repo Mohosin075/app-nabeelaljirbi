@@ -81,12 +81,12 @@ class DoctorEditProfileController extends GetxController {
       fullNameController.text = data.fullName ?? '';
       addressController.text = data.address ?? '';
       experienceController.text = data.doctor?.experience ?? '';
-      experienceController.text = data.doctor?.experience ?? '';
       // specialtyController.text = data.doctor?.speciality ?? '';
       selectedSpecialty.value = data.doctor?.speciality ?? '';
       licenseController.text = data.doctor?.licenseNumber ?? '';
       biographyController.text = data.doctor?.biography ?? '';
-      qualifications.value = QualificationItem.decodeList(data.doctor?.biography);
+      qualifications.value = QualificationItem.decodeList(
+          data.doctor?.qualifications ?? data.doctor?.biography);
       consultationFeeController.text =
           data.doctor?.consultFee?.toString() ?? '';
       if (data.dateOfBirth != null) {
@@ -248,8 +248,53 @@ class DoctorEditProfileController extends GetxController {
   }
 
   Future<void> saveChanges() async {
+    if (fullNameController.text.trim().isEmpty) {
+      Get.snackbar(
+        'error'.tr,
+        'Please enter your full name',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (selectedSpecialty.value.trim().isEmpty) {
+      Get.snackbar(
+        'error'.tr,
+        'Please select your specialty',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
     if (selectedCity.value.trim().isEmpty) {
-      Get.snackbar('error'.tr, 'please_select_city'.tr);
+      Get.snackbar(
+        'error'.tr,
+        'please_select_city'.tr,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (experienceController.text.trim().isEmpty) {
+      Get.snackbar(
+        'error'.tr,
+        'Please enter your experience',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (licenseController.text.trim().isEmpty) {
+      Get.snackbar(
+        'error'.tr,
+        'Please enter your license number',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
       return;
     }
 
@@ -288,6 +333,7 @@ class DoctorEditProfileController extends GetxController {
         "consultFee": int.tryParse(consultationFeeController.text) ?? 0,
         "clinicId": null,
         "biography": QualificationItem.encodeList(qualifications),
+        "qualifications": QualificationItem.encodeList(qualifications),
       };
 
       request.fields['data'] = jsonEncode(profileData);
@@ -368,12 +414,46 @@ class DoctorEditProfileController extends GetxController {
           colorText: Colors.white,
         );
       } else {
-        final responseData = jsonDecode(response.body);
+        debugPrint('❌ PROFILE UPDATE FAILED [Status ${response.statusCode}]: ${response.body}');
+        String errorMessage = 'failed_to_update_profile'.tr;
+        try {
+          final responseData = jsonDecode(response.body);
+          if (responseData != null) {
+            if (responseData['errorMessages'] is List &&
+                (responseData['errorMessages'] as List).isNotEmpty) {
+              final list = responseData['errorMessages'] as List;
+              final messages = list
+                  .map((e) => (e is Map ? (e['message'] ?? e['path'] ?? e.toString()) : e.toString()))
+                  .where((m) => m.toString().isNotEmpty)
+                  .join('\n');
+              if (messages.isNotEmpty) errorMessage = messages;
+            } else if (responseData['errors'] is List &&
+                (responseData['errors'] as List).isNotEmpty) {
+              final list = responseData['errors'] as List;
+              final messages = list
+                  .map((e) => (e is Map ? (e['message'] ?? e['path'] ?? e.toString()) : e.toString()))
+                  .where((m) => m.toString().isNotEmpty)
+                  .join('\n');
+              if (messages.isNotEmpty) errorMessage = messages;
+            } else if (responseData['message'] != null &&
+                responseData['message'].toString().trim().isNotEmpty) {
+              errorMessage = responseData['message'].toString().trim();
+            } else if (responseData['err'] != null &&
+                responseData['err'] is Map &&
+                responseData['err']['message'] != null) {
+              errorMessage = responseData['err']['message'].toString();
+            }
+          }
+        } catch (err) {
+          debugPrint('Error parsing error response: $err');
+        }
+
         Get.snackbar(
           'error'.tr,
-          responseData['message'] ?? 'failed_to_update_profile'.tr,
+          errorMessage,
           backgroundColor: Colors.red,
           colorText: Colors.white,
+          duration: const Duration(seconds: 4),
         );
       }
     } catch (e) {

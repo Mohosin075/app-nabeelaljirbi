@@ -416,6 +416,7 @@ class DoctorProfileSetupController extends GetxController {
         "consultFee": int.tryParse(consultationFeeController.text.trim()) ?? 0,
         "clinicId": selectedClinicId.value,
         "biography": QualificationItem.encodeList(qualifications),
+        "qualifications": QualificationItem.encodeList(qualifications),
       };
 
       request.fields['data'] = jsonEncode(profileData);

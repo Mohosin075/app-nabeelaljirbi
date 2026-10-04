@@ -131,6 +131,7 @@ class Doctor {
   String? joinClinicDate;
   String? createdAt;
   String? biography;
+  String? qualifications;
   Clinic? clinic;
 
   Doctor({
@@ -142,6 +143,7 @@ class Doctor {
     this.joinClinicDate,
     this.createdAt,
     this.biography,
+    this.qualifications,
     this.clinic,
   });
 
@@ -154,6 +156,7 @@ class Doctor {
     joinClinicDate = json['joinClinicDate'];
     createdAt = json['createdAt'];
     biography = json['biography'];
+    qualifications = json['qualifications'];
     clinic = json['clinic'] != null ? Clinic.fromJson(json['clinic']) : null;
   }
 
@@ -167,6 +170,7 @@ class Doctor {
     data['joinClinicDate'] = joinClinicDate;
     data['createdAt'] = createdAt;
     data['biography'] = biography;
+    data['qualifications'] = qualifications;
     if (clinic != null) {
       data['clinic'] = clinic!.toJson();
     }
