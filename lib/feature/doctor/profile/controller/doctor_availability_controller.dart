@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/core/network_caller/endpoints.dart';
+import 'package:nabeelaljirbi_app/feature/doctor/profile/controller/doctor_profile_controller.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/model/working_hours_model.dart';
 
 class DoctorAvailabilityController extends GetxController {
@@ -27,9 +28,18 @@ class DoctorAvailabilityController extends GetxController {
   // Observable list for the current day's slots in the UI
   var currentSlots = <WorkingSlot>[].obs;
 
+  var selectedClinicId = ''.obs;
+
   @override
   void onInit() {
     super.onInit();
+    if (Get.isRegistered<DoctorProfileController>()) {
+      final profileController = Get.find<DoctorProfileController>();
+      final clinics = profileController.doctorProfile.value?.doctor?.doctorClinics ?? [];
+      if (clinics.isNotEmpty) {
+        selectedClinicId.value = clinics.first.clinic?.id ?? clinics.first.clinicId ?? '';
+      }
+    }
     fetchWorkingHours();
   }
 
@@ -38,11 +48,18 @@ class DoctorAvailabilityController extends GetxController {
     _updateUIFromSchedule();
   }
 
-  Future<void> fetchWorkingHours() async {
+  void selectClinic(String clinicId) {
+    selectedClinicId.value = clinicId;
+    fetchWorkingHours(clinicId: clinicId);
+  }
+
+  Future<void> fetchWorkingHours({String? clinicId}) async {
     isLoading.value = true;
     try {
       final token = SharedPrefHelper.getAccessToken() ?? '';
-      final url = '${Urls.baseUrl}/doctor/working-hours';
+      final targetClinic = clinicId ?? selectedClinicId.value;
+      final query = targetClinic.isNotEmpty ? '?clinicId=$targetClinic' : '';
+      final url = '${Urls.baseUrl}/doctor/working-hours$query';
 
       debugPrint('Fetching Working Hours: $url');
       final response = await http.get(
@@ -94,6 +111,7 @@ class DoctorAvailabilityController extends GetxController {
       final url = '${Urls.baseUrl}/doctor/working-hours';
 
       final body = {
+        if (selectedClinicId.value.isNotEmpty) "clinicId": selectedClinicId.value,
         "day": selectedDay.value,
         "slots": currentSlots
             .map(

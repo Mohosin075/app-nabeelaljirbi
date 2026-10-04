@@ -133,6 +133,8 @@ class Doctor {
   String? biography;
   String? qualifications;
   Clinic? clinic;
+  List<DoctorClinicItem>? doctorClinics;
+  List<JoinRequestItem>? joinRequests;
 
   Doctor({
     this.speciality,
@@ -145,6 +147,8 @@ class Doctor {
     this.biography,
     this.qualifications,
     this.clinic,
+    this.doctorClinics,
+    this.joinRequests,
   });
 
   Doctor.fromJson(Map<String, dynamic> json) {
@@ -158,6 +162,18 @@ class Doctor {
     biography = json['biography'];
     qualifications = json['qualifications'];
     clinic = json['clinic'] != null ? Clinic.fromJson(json['clinic']) : null;
+    if (json['doctorClinics'] != null) {
+      doctorClinics = <DoctorClinicItem>[];
+      json['doctorClinics'].forEach((v) {
+        doctorClinics!.add(DoctorClinicItem.fromJson(v));
+      });
+    }
+    if (json['joinRequests'] != null) {
+      joinRequests = <JoinRequestItem>[];
+      json['joinRequests'].forEach((v) {
+        joinRequests!.add(JoinRequestItem.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -178,7 +194,45 @@ class Doctor {
   }
 }
 
+class DoctorClinicItem {
+  String? id;
+  String? clinicId;
+  String? joinedAt;
+  Clinic? clinic;
+
+  DoctorClinicItem({this.id, this.clinicId, this.joinedAt, this.clinic});
+
+  DoctorClinicItem.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    clinicId = json['clinicId'];
+    joinedAt = json['joinedAt'];
+    clinic = json['clinic'] != null ? Clinic.fromJson(json['clinic']) : null;
+  }
+}
+
+class JoinRequestItem {
+  String? id;
+  String? clinicId;
+  String? status;
+  String? note;
+  String? createdAt;
+  Clinic? clinic;
+
+  JoinRequestItem({this.id, this.clinicId, this.status, this.note, this.createdAt, this.clinic});
+
+  JoinRequestItem.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    clinicId = json['clinicId'];
+    status = json['status'];
+    note = json['note'];
+    createdAt = json['createdAt'];
+    clinic = json['clinic'] != null ? Clinic.fromJson(json['clinic']) : null;
+  }
+}
+
 class Clinic {
+  String? id;
+  String? userId;
   String? logo;
   String? clinicName;
   String? about;
@@ -189,6 +243,8 @@ class Clinic {
   bool? adminVerified;
 
   Clinic({
+    this.id,
+    this.userId,
     this.logo,
     this.clinicName,
     this.about,
@@ -200,6 +256,8 @@ class Clinic {
   });
 
   Clinic.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    userId = json['userId'];
     logo = json['logo'];
     clinicName = json['clinicName'];
     about = json['about'];
@@ -212,6 +270,8 @@ class Clinic {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['userId'] = userId;
     data['logo'] = logo;
     data['clinicName'] = clinicName;
     data['about'] = about;

@@ -6,12 +6,17 @@ import 'package:nabeelaljirbi_app/core/const/icons_path.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/controller/doctor_availability_controller.dart';
 
+import 'package:nabeelaljirbi_app/feature/doctor/profile/controller/doctor_profile_controller.dart';
+
 class DoctorAvailabilityScreen extends StatelessWidget {
   const DoctorAvailabilityScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(DoctorAvailabilityController());
+    final profileController = Get.isRegistered<DoctorProfileController>()
+        ? Get.find<DoctorProfileController>()
+        : Get.put(DoctorProfileController());
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -49,6 +54,47 @@ class DoctorAvailabilityScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if ((profileController.doctorProfile.value?.doctor?.doctorClinics ?? []).isNotEmpty) ...[
+                        Text(
+                          'select_clinic'.tr,
+                          style: globalTextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xff2D2D2D),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: (profileController.doctorProfile.value?.doctor?.doctorClinics ?? []).map((item) {
+                              final clinicId = item.clinic?.id ?? item.clinicId ?? '';
+                              final clinicName = item.clinic?.clinicName ?? 'Clinic';
+                              final isSelected = controller.selectedClinicId.value == clinicId;
+
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: ChoiceChip(
+                                  label: Text(clinicName),
+                                  selected: isSelected,
+                                  selectedColor: AppColors.primaryColor,
+                                  backgroundColor: const Color(0xffF2F4F7),
+                                  labelStyle: TextStyle(
+                                    color: isSelected ? Colors.white : const Color(0xff2D2D2D),
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                  ),
+                                  onSelected: (selected) {
+                                    if (selected) {
+                                      controller.selectClinic(clinicId);
+                                    }
+                                  },
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
                       Text(
                         'select_working_day'.tr,
                         style: globalTextStyle(

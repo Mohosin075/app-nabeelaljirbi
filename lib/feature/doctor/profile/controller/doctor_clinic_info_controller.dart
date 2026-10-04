@@ -111,44 +111,25 @@ class DoctorClinicInfoController extends GetxController {
     isUpdating.value = true;
     try {
       final String token = SharedPrefHelper.getAccessToken() ?? '';
-      final String url = '${Urls.baseUrl}/doctor/profile-update';
+      final String url = '${Urls.baseUrl}/doctor/join-request';
 
-      final doctorData = _profileController.doctorProfile.value;
-      if (doctorData == null) return;
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'clinicId': clinicId}),
+      );
 
-      final Map<String, dynamic> profileData = {
-        "fullName": doctorData.fullName,
-        "gender": doctorData.gender?.toUpperCase(),
-        "dateOfBirth": doctorData.dateOfBirth != null
-            ? "${doctorData.dateOfBirth!.year}-${doctorData.dateOfBirth!.month.toString().padLeft(2, '0')}-${doctorData.dateOfBirth!.day.toString().padLeft(2, '0')}"
-            : null,
-        "country": doctorData.country,
-        "city": doctorData.city,
-        "address": doctorData.address,
-        "profileCompleted": true,
-        "speciality": doctorData.doctor?.speciality,
-        "experience": doctorData.doctor?.experience,
-        "licenseNumber": doctorData.doctor?.licenseNumber,
-        "consultFee": doctorData.doctor?.consultFee,
-        "clinicId": clinicId,
-      };
-
-      var request = http.MultipartRequest('PATCH', Uri.parse(url));
-      request.headers.addAll({'Authorization': token});
-      request.fields['data'] = jsonEncode(profileData);
-
-      debugPrint('Updating clinic selection: $clinicId');
-      var streamedResponse = await request.send();
-      var response = await http.Response.fromStream(streamedResponse);
-
-      debugPrint('Update Clinic Response Status: ${response.statusCode}');
-      debugPrint('Update Clinic Response Body: ${response.body}');
+      debugPrint('Join Request Response Status: ${response.statusCode}');
+      debugPrint('Join Request Response Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         Get.back(); // Close bottom sheet
         Get.snackbar(
           'success'.tr,
-          'clinic_updated_successfully'.tr,
+          'Join request sent to clinic! Waiting for clinic approval.',
           backgroundColor: AppColors.primaryColor,
           colorText: Colors.white,
         );
@@ -157,13 +138,13 @@ class DoctorClinicInfoController extends GetxController {
         final responseData = jsonDecode(response.body);
         Get.snackbar(
           'error'.tr,
-          responseData['message'] ?? 'failed_to_update_clinic'.tr,
+          responseData['message'] ?? 'Failed to send join request',
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
       }
     } catch (e) {
-      debugPrint('Error updating clinic: $e');
+      debugPrint('Error sending join request: $e');
       Get.snackbar(
         'error'.tr,
         'something_went_wrong'.tr,
