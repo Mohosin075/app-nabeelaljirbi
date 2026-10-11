@@ -14,6 +14,8 @@ import 'package:nabeelaljirbi_app/feature/clinic/profile/view/clinic_insurance_s
 import 'package:nabeelaljirbi_app/feature/clinic/profile/view/clinic_referral_program_screen.dart';
 import 'package:nabeelaljirbi_app/feature/clinic/profile/view/clinic_help_center_screen.dart';
 import 'package:nabeelaljirbi_app/feature/clinic/profile/view/clinic_legal_screen.dart';
+import 'package:nabeelaljirbi_app/core/widgets/blue_badge_widget.dart';
+import 'package:nabeelaljirbi_app/feature/common/verification/view/verification_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ClinicProfileScreen extends StatelessWidget {
@@ -121,13 +123,14 @@ class ClinicProfileScreen extends StatelessWidget {
                                           .clinicProfile
                                           .value
                                           ?.platformSubscriptionActive ==
+                                      true ||
+                                      controller
+                                          .clinicProfile
+                                          .value
+                                          ?.badgeActive ==
                                       true) ...[
                                     const SizedBox(width: 4),
-                                    const Icon(
-                                      Icons.verified,
-                                      size: 18,
-                                      color: Colors.blue,
-                                    ),
+                                    const BlueBadgeWidget(size: 18),
                                   ],
                                 ],
                               ),
@@ -218,6 +221,35 @@ class ClinicProfileScreen extends StatelessWidget {
                           onTap: () {
                             Get.to(() => ClinicInsuranceScreen());
                           },
+                        ),
+                        const Divider(color: Color(0xffF3F4F6)),
+                        ListTile(
+                          onTap: () => Get.to(() => const VerificationScreen()),
+                          contentPadding: EdgeInsets.zero,
+                          dense: true,
+                          leading: Container(
+                            width: 24,
+                            height: 24,
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.verified,
+                              size: 20,
+                              color: Color(0xff1D9BF0),
+                            ),
+                          ),
+                          title: Text(
+                            'blue_badge_verification'.tr,
+                            style: globalTextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xff101010),
+                            ),
+                          ),
+                          trailing: const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 16,
+                            color: Color(0xff94A3B8),
+                          ),
                         ),
                         const Divider(color: Color(0xffF3F4F6)),
                         _buildMenuItem(

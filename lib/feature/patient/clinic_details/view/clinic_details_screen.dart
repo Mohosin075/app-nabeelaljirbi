@@ -10,6 +10,7 @@ import 'package:nabeelaljirbi_app/core/utils/currency_util.dart';
 import 'package:nabeelaljirbi_app/feature/patient/clinic_details/controller/clinic_details_controller.dart';
 import 'package:nabeelaljirbi_app/core/route/routes.dart';
 import 'package:nabeelaljirbi_app/feature/patient/clinic_details/widget/doctor_search_bottom_sheet.dart';
+import 'package:nabeelaljirbi_app/core/widgets/blue_badge_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ClinicDetailsScreen extends StatelessWidget {
@@ -191,9 +192,9 @@ class ClinicDetailsScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              if (data.platformSubscriptionActive == true) ...[
+              if (data.badgeActive == true || (data.badgeActive == null && data.platformSubscriptionActive == true)) ...[
                 const SizedBox(width: 6),
-                const Icon(Icons.verified, size: 18, color: Colors.blue),
+                const BlueBadgeWidget(size: 18),
               ],
             ],
           ),

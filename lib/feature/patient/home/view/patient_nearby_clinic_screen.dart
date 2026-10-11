@@ -8,6 +8,7 @@ import 'package:nabeelaljirbi_app/core/route/routes.dart';
 import 'package:nabeelaljirbi_app/feature/patient/filter/widget/patient_filter_bottom_sheet.dart';
 import 'package:nabeelaljirbi_app/feature/patient/home/controller/nearby_clinics_controller.dart';
 import 'package:nabeelaljirbi_app/feature/patient/home/model/nearby_clinic_model.dart';
+import 'package:nabeelaljirbi_app/core/widgets/blue_badge_widget.dart';
 
 class PatientNearbyClinicScreen extends StatelessWidget {
   PatientNearbyClinicScreen({super.key});
@@ -232,13 +233,8 @@ class PatientNearbyClinicScreen extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      if (clinic.platformSubscriptionActive == true) ...[
-                        const SizedBox(width: 4),
-                        const Icon(
-                          Icons.verified,
-                          size: 14,
-                          color: Colors.blue,
-                        ),
+                      if (clinic.badgeActive == true || clinic.platformSubscriptionActive == true) ...[
+                        const BlueBadgeWidget(size: 14),
                       ],
                     ],
                   ),

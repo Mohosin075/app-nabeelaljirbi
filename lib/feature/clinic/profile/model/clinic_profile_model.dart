@@ -37,6 +37,7 @@ class ClinicProfileData {
   num? totalEarnings;
   num? currentEarnings;
   bool? platformSubscriptionActive;
+  bool? badgeActive;
   num? serviceFree;
   Clinic? clinic;
   ActiveSubscription? activeSubscription;
@@ -54,6 +55,7 @@ class ClinicProfileData {
     this.totalEarnings,
     this.currentEarnings,
     this.platformSubscriptionActive,
+    this.badgeActive,
     this.serviceFree,
     this.clinic,
     this.activeSubscription,
@@ -72,6 +74,7 @@ class ClinicProfileData {
     totalEarnings = json['totalEarnings'];
     currentEarnings = json['currentEarnings'];
     platformSubscriptionActive = json['platformSubscriptionActive'];
+    badgeActive = json['badgeActive'];
     serviceFree = json['serviceFree'];
     clinic = json['clinic'] != null ? Clinic.fromJson(json['clinic']) : null;
     activeSubscription = json['activeSubscription'] != null
@@ -93,6 +96,7 @@ class ClinicProfileData {
     data['totalEarnings'] = totalEarnings;
     data['currentEarnings'] = currentEarnings;
     data['platformSubscriptionActive'] = platformSubscriptionActive;
+    data['badgeActive'] = badgeActive;
     data['serviceFree'] = serviceFree;
     if (clinic != null) {
       data['clinic'] = clinic!.toJson();

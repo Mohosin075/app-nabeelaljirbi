@@ -135,6 +135,7 @@ class Doctor {
   Clinic? clinic;
   List<DoctorClinicItem>? doctorClinics;
   List<JoinRequestItem>? joinRequests;
+  bool? badgeActive;
 
   Doctor({
     this.speciality,
@@ -149,6 +150,7 @@ class Doctor {
     this.clinic,
     this.doctorClinics,
     this.joinRequests,
+    this.badgeActive,
   });
 
   Doctor.fromJson(Map<String, dynamic> json) {
@@ -161,6 +163,7 @@ class Doctor {
     createdAt = json['createdAt'];
     biography = json['biography'];
     qualifications = json['qualifications'];
+    badgeActive = json['badgeActive'];
     clinic = json['clinic'] != null ? Clinic.fromJson(json['clinic']) : null;
     if (json['doctorClinics'] != null) {
       doctorClinics = <DoctorClinicItem>[];

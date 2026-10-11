@@ -53,6 +53,7 @@ class Clinic {
   int? specialistCount;
   bool? platformSubscriptionActive;
   double? distance;
+  bool? badgeActive;
 
   String? country;
   String? city;
@@ -67,6 +68,7 @@ class Clinic {
     this.specialistCount,
     this.platformSubscriptionActive,
     this.distance,
+    this.badgeActive,
     this.country,
     this.city,
     this.location,
@@ -81,6 +83,7 @@ class Clinic {
     specialistCount = json['specialistCount'];
     platformSubscriptionActive = json['platformSubscriptionActive'];
     distance = (json['distance'] as num?)?.toDouble();
+    badgeActive = json['badgeActive'] == true;
     country = json['country'];
     city = json['city'];
     location = json['location'];

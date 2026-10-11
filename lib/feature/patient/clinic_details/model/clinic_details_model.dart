@@ -39,6 +39,8 @@ class ClinicData {
   List<Specialists>? specialists;
   int? views;
   bool? platformSubscriptionActive;
+  bool? badgeActive;
+  bool? adminVerified;
   String? createdAt;
 
   ClinicData({
@@ -98,6 +100,8 @@ class ClinicData {
     }
     views = json['views'];
     platformSubscriptionActive = json['platformSubscriptionActive'];
+    badgeActive = json['badgeActive'];
+    adminVerified = json['adminVerified'];
     createdAt = json['createdAt'];
   }
 

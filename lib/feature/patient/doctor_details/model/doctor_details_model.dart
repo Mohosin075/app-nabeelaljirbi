@@ -44,6 +44,8 @@ class DoctorDetailData {
   String? biography;
   String? clinicId;
   String? doctorId;
+  bool? badgeActive;
+  String? verificationStatus;
 
   DoctorDetailData({
     this.id,
@@ -97,6 +99,8 @@ class DoctorDetailData {
     biography = json['biography'];
     clinicId = json['clinicId'];
     doctorId = json['doctorId'];
+    badgeActive = json['badgeActive'];
+    verificationStatus = json['verificationStatus'];
   }
 
   Map<String, dynamic> toJson() {

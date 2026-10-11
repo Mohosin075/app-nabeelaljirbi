@@ -4,18 +4,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
 import 'package:nabeelaljirbi_app/core/const/icons_path.dart';
-
 import 'package:nabeelaljirbi_app/core/route/routes.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/core/utils/currency_util.dart';
+import 'package:nabeelaljirbi_app/core/widgets/blue_badge_widget.dart';
 import 'package:nabeelaljirbi_app/feature/patient/ai_chat/controller/ai_chat_controller.dart';
-
 import 'package:nabeelaljirbi_app/feature/patient/clinic_details/view/clinic_details_screen.dart';
 import 'package:nabeelaljirbi_app/feature/patient/doctor_details/view/doctor_details_screen.dart';
 import 'package:nabeelaljirbi_app/feature/patient/home/view/patient_nearby_clinic_screen.dart';
 import 'package:nabeelaljirbi_app/feature/patient/home/view/patient_popular_doctor_screen.dart';
 import 'package:nabeelaljirbi_app/feature/patient/home/widget/banner_slider.dart';
-
 import 'package:nabeelaljirbi_app/feature/patient/home/model/popular_doctor_model.dart';
 import 'package:nabeelaljirbi_app/feature/patient/home/controller/popular_doctors_controller.dart';
 import 'package:nabeelaljirbi_app/feature/patient/home/model/nearby_clinic_model.dart';
@@ -492,9 +490,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (clinic.platformSubscriptionActive == true) ...[
-                      const SizedBox(width: 4),
-                      const Icon(Icons.verified, size: 14, color: Colors.blue),
+                    if (clinic.badgeActive == true || clinic.platformSubscriptionActive == true) ...[
+                      const BlueBadgeWidget(size: 14),
                     ],
                   ],
                 ),
@@ -711,15 +708,26 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  doctor.name ?? 'unknown'.tr,
-                  style: globalTextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xff1A1A1A),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        doctor.name ?? 'unknown'.tr,
+                        style: globalTextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xff1A1A1A),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (doctor.badgeActive == true)
+                      BlueBadgeWidget(
+                        size: 15,
+                        padding: const EdgeInsets.only(left: 4),
+                      ),
+                  ],
                 ),
                 Text(
                   '${'from'.tr} ${doctor.city?.tr ?? ''}',

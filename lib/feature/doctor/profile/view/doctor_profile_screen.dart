@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
 import 'package:nabeelaljirbi_app/core/const/icons_path.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
+import 'package:nabeelaljirbi_app/core/widgets/blue_badge_widget.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/controller/doctor_profile_controller.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/view/doctor_profile_info_screen.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/view/doctor_clinic_info_screen.dart';
@@ -13,6 +14,7 @@ import 'package:nabeelaljirbi_app/feature/doctor/profile/view/doctor_referral_pr
 import 'package:nabeelaljirbi_app/feature/doctor/profile/view/doctor_help_center_screen.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/view/doctor_legal_screen.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/reports/view/doctor_reconciliation_screen.dart';
+import 'package:nabeelaljirbi_app/feature/common/verification/view/verification_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DoctorProfileScreen extends StatelessWidget {
@@ -93,34 +95,46 @@ class DoctorProfileScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 16),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              controller.doctorProfile.value?.fullName ?? '',
-                              style: globalTextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xff101010),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      controller.doctorProfile.value?.fullName ?? '',
+                                      style: globalTextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: const Color(0xff101010),
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (controller.doctorProfile.value?.doctor?.badgeActive == true) ...[
+                                    const SizedBox(width: 4),
+                                    const BlueBadgeWidget(size: 18),
+                                  ],
+                                ],
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              controller
-                                      .doctorProfile
-                                      .value
-                                      ?.doctor
-                                      ?.speciality ??
-                                  '',
-                              style: globalTextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xff636F85),
+                              const SizedBox(height: 4),
+                              Text(
+                                controller
+                                        .doctorProfile
+                                        .value
+                                        ?.doctor
+                                        ?.speciality ??
+                                    '',
+                                style: globalTextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color(0xff636F85),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                        const Spacer(),
                       ],
                     ),
                   ),
@@ -161,6 +175,9 @@ class DoctorProfileScreen extends StatelessWidget {
                             Get.to(() => const DoctorAvailabilityScreen());
                           },
                         ),
+                        const Divider(color: Color(0xffF3F4F6)),
+                        // Blue Badge Verification menu item
+                        _buildBlueBadgeMenuItem(context),
                         const Divider(color: Color(0xffF3F4F6)),
                         _buildMenuItem(
                           icon: IconsPath.legalAndPolicies,
@@ -350,6 +367,37 @@ class DoctorProfileScreen extends StatelessWidget {
               color: Color(0xff94A3B8),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBlueBadgeMenuItem(BuildContext context) {
+    return ListTile(
+      onTap: () => Get.to(() => const VerificationScreen()),
+      contentPadding: EdgeInsets.zero,
+      dense: true,
+      leading: Container(
+        width: 24,
+        height: 24,
+        alignment: Alignment.center,
+        child: const Icon(
+          Icons.verified_outlined,
+          size: 22,
+          color: Color(0xff1D9BF0),
+        ),
+      ),
+      title: Text(
+        'blue_badge_verification'.tr,
+        style: globalTextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: const Color(0xff1D9BF0),
+        ),
+      ),
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
+        size: 16,
+        color: Color(0xff94A3B8),
       ),
     );
   }

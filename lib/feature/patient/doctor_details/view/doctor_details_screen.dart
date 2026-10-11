@@ -9,6 +9,7 @@ import 'package:nabeelaljirbi_app/core/utils/currency_util.dart';
 import 'package:nabeelaljirbi_app/feature/patient/doctor_details/controller/doctor_details_controller.dart';
 import 'package:nabeelaljirbi_app/feature/patient/doctor_details/widget/doctor_timings_bottom_sheet.dart';
 import 'package:nabeelaljirbi_app/feature/patient/doctor_details/model/doctor_details_model.dart';
+import 'package:nabeelaljirbi_app/core/widgets/blue_badge_widget.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/model/qualification_item_model.dart';
 import 'package:intl/intl.dart';
 
@@ -162,7 +163,11 @@ class DoctorDetailsScreen extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    if (doctor.badgeActive == true) ...[
+                      const SizedBox(width: 4),
+                      const BlueBadgeWidget(size: 20),
+                    ],
+                    const SizedBox(width: 6),
                     Container(
                       width: 6,
                       height: 6,
@@ -621,7 +626,7 @@ class DoctorDetailsScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryColor.withOpacity(0.1),
+                          color: AppColors.primaryColor.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -666,7 +671,7 @@ class DoctorDetailsScreen extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withOpacity(0.1),
+                            color: AppColors.primaryColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(

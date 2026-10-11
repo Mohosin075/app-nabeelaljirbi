@@ -59,6 +59,7 @@ class Doctor {
   int? reviewCount;
   num? weightedScore;
   num? avgRating;
+  bool? badgeActive;
 
   Doctor({
     this.id,
@@ -74,6 +75,7 @@ class Doctor {
     this.reviewCount,
     this.weightedScore,
     this.avgRating,
+    this.badgeActive,
   });
 
   Doctor.fromJson(Map<String, dynamic> json) {
@@ -90,5 +92,6 @@ class Doctor {
     reviewCount = json['reviewCount'];
     weightedScore = json['weightedScore'];
     avgRating = json['avgRating'];
+    badgeActive = json['badgeActive'] == true;
   }
 }
