@@ -10,7 +10,7 @@ import 'package:nabeelaljirbi_app/feature/doctor/appointment/model/doctor_appoin
 import 'package:nabeelaljirbi_app/feature/doctor/home/controller/doctor_home_screen_controller.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/nav_bar/controller/doctor_nav_bar_controller.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/controller/doctor_profile_controller.dart';
-import 'package:nabeelaljirbi_app/feature/common/verification/view/verification_screen.dart';
+import 'package:nabeelaljirbi_app/core/widgets/blue_badge_widget.dart';
 
 class DoctorHomeScreen extends StatelessWidget {
   const DoctorHomeScreen({super.key});

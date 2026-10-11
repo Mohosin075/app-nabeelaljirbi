@@ -20,6 +20,12 @@ class BookingController extends GetxController {
   var serviceFee = 0.0.obs;
   var isServiceFeeLoading = true.obs;
 
+  // Family / Dependent booking fields
+  var bookedFor = 'SELF'.obs; // 'SELF' or 'FAMILY'
+  final TextEditingController familyMemberNameController = TextEditingController();
+  var selectedFamilyRelation = 'SPOUSE'.obs;
+  final List<String> familyRelations = ['SPOUSE', 'CHILD', 'PARENT', 'SIBLING', 'OTHER'];
+
   RxList<Map<String, dynamic>> dates = <Map<String, dynamic>>[].obs;
   RxList<Slot> availableSlots = <Slot>[].obs;
 
@@ -88,8 +94,9 @@ class BookingController extends GetxController {
   void _generateDates() {
     final now = DateTime.now();
     final List<Map<String, dynamic>> generatedDates = [];
-    for (int i = 0; i < 7; i++) {
-      // Find next 7 days
+    // Advance-booking window (Phase 1 default is 14 days)
+    const int advanceBookingDays = 14;
+    for (int i = 0; i < advanceBookingDays; i++) {
       final date = now.add(Duration(days: i));
       generatedDates.add({
         'day': DateFormat('EEE').format(date),
@@ -208,21 +215,34 @@ class BookingController extends GetxController {
       minutes,
     );
 
+    if (bookedFor.value == 'FAMILY' &&
+        familyMemberNameController.text.trim().isEmpty) {
+      Get.snackbar('Error', 'Please enter family member name'.tr);
+      return;
+    }
+
     // If time was parsed successfully, we send ISO.
-    // If not, we still send ISO but with midnight (as fallback).
-    // The backend seems to prefer ISO or at least a format it can set science on.
     final consultDateString = consultDateTime.toUtc().toIso8601String();
 
     isLoading.value = true;
     try {
       final token = SharedPrefHelper.getAccessToken();
       final url = '${Urls.baseUrl}/patient/appointment-booking';
-      final body = jsonEncode({
+      final Map<String, dynamic> payloadMap = {
         "clinicId": doctor.clinicId,
         "doctorId": doctor.doctorId,
         "workingSlotId": slot.id,
         "consultDate": consultDateString,
-      });
+        "bookedFor": bookedFor.value,
+      };
+
+      if (bookedFor.value == 'FAMILY') {
+        payloadMap["familyMemberName"] =
+            familyMemberNameController.text.trim();
+        payloadMap["familyMemberRelation"] = selectedFamilyRelation.value;
+      }
+
+      final body = jsonEncode(payloadMap);
 
       debugPrint('Booking Appointment: $url');
       debugPrint('Clinic ID: ${doctor.clinicId}');
@@ -246,7 +266,7 @@ class BookingController extends GetxController {
         final errorData = jsonDecode(response.body);
         Get.snackbar(
           'Error',
-          'Booking failed: ${errorData['message'] ?? 'Unknown error'}',
+          '${errorData['message'] ?? 'Booking failed'}',
         );
       }
     } catch (e) {
