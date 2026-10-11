@@ -56,6 +56,8 @@ class Clinic {
 
   String? country;
   String? city;
+  String? location;
+  List<String>? specialties;
 
   Clinic({
     this.clinicUserId,
@@ -67,6 +69,8 @@ class Clinic {
     this.distance,
     this.country,
     this.city,
+    this.location,
+    this.specialties,
   });
 
   Clinic.fromJson(Map<String, dynamic> json) {
@@ -79,6 +83,15 @@ class Clinic {
     distance = (json['distance'] as num?)?.toDouble();
     country = json['country'];
     city = json['city'];
+    location = json['location'];
+
+    if ((city == null || city!.isEmpty) && location != null && location!.isNotEmpty) {
+      city = location;
+    }
+    if ((country == null || country!.isEmpty) && location != null && location!.isNotEmpty) {
+      country = location;
+    }
+
     if (json['specialties'] != null) {
       // Handle simple string list or list of objects with 'name'
       specialties = [];
@@ -86,11 +99,9 @@ class Clinic {
         if (v is String) {
           specialties!.add(v);
         } else if (v is Map && v['name'] != null) {
-          specialties!.add(v['name']);
+          specialties!.add(v['name'].toString());
         }
       });
     }
   }
-
-  List<String>? specialties;
 }

@@ -59,7 +59,8 @@ class NearbyClinicsController extends GetxController {
     String params = '';
 
     // Specialty
-    if (filterController.selectedSpecialty.value != 'all') {
+    if (filterController.selectedSpecialty.value != 'all' &&
+        filterController.selectedSpecialty.value.isNotEmpty) {
       final selectedSpec = filterController.specialtiesList.firstWhereOrNull(
         (s) => s.name == filterController.selectedSpecialty.value,
       );
@@ -82,12 +83,14 @@ class NearbyClinicsController extends GetxController {
     }
 
     // City
-    if (filterController.selectedCity.value != 'all') {
+    if (filterController.selectedCity.value != 'all' &&
+        filterController.selectedCity.value.isNotEmpty) {
       params += '&city=${filterController.selectedCity.value}';
     }
 
     // Country
-    if (filterController.selectedCountry.value != 'all') {
+    if (filterController.selectedCountry.value != 'all' &&
+        filterController.selectedCountry.value.isNotEmpty) {
       params += '&country=${filterController.selectedCountry.value}';
     }
 
@@ -98,30 +101,48 @@ class NearbyClinicsController extends GetxController {
     var filtered = List<Clinic>.from(clinics);
 
     // Specialty
-    if (filterController.selectedSpecialty.value != 'all') {
+    if (filterController.selectedSpecialty.value != 'all' &&
+        filterController.selectedSpecialty.value.isNotEmpty) {
       final specName = filterController.selectedSpecialty.value.toLowerCase();
       filtered = filtered
-          .where(
-            (c) =>
-                (c.specialties != null &&
-                c.specialties!.any((s) => s.toLowerCase().contains(specName))),
-          )
+          .where((c) {
+            if (c.specialties != null && c.specialties!.isNotEmpty) {
+              return c.specialties!.any((s) => s.toLowerCase().contains(specName));
+            }
+            return true;
+          })
           .toList();
     }
 
     // City
-    if (filterController.selectedCity.value != 'all') {
+    if (filterController.selectedCity.value != 'all' &&
+        filterController.selectedCity.value.isNotEmpty) {
       final city = filterController.selectedCity.value.toLowerCase();
       filtered = filtered
-          .where((c) => (c.city?.toLowerCase().contains(city) ?? false))
+          .where((c) {
+            final cCity = (c.city ?? '').toLowerCase();
+            final cLocation = (c.location ?? '').toLowerCase();
+            if (cCity.isNotEmpty || cLocation.isNotEmpty) {
+              return cCity.contains(city) || cLocation.contains(city);
+            }
+            return true;
+          })
           .toList();
     }
 
     // Country
-    if (filterController.selectedCountry.value != 'all') {
+    if (filterController.selectedCountry.value != 'all' &&
+        filterController.selectedCountry.value.isNotEmpty) {
       final country = filterController.selectedCountry.value.toLowerCase();
       filtered = filtered
-          .where((c) => (c.country?.toLowerCase().contains(country) ?? false))
+          .where((c) {
+            final cCountry = (c.country ?? '').toLowerCase();
+            final cLocation = (c.location ?? '').toLowerCase();
+            if (cCountry.isNotEmpty || cLocation.isNotEmpty) {
+              return cCountry.contains(country) || cLocation.contains(country);
+            }
+            return true;
+          })
           .toList();
     }
 
