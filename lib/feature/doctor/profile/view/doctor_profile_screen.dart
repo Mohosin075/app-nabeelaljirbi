@@ -12,6 +12,7 @@ import 'package:nabeelaljirbi_app/feature/doctor/profile/view/doctor_availabilit
 import 'package:nabeelaljirbi_app/feature/doctor/profile/view/doctor_referral_program_screen.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/view/doctor_help_center_screen.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/view/doctor_legal_screen.dart';
+import 'package:nabeelaljirbi_app/feature/doctor/reports/view/doctor_reconciliation_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DoctorProfileScreen extends StatelessWidget {
@@ -160,14 +161,14 @@ class DoctorProfileScreen extends StatelessWidget {
                             Get.to(() => const DoctorAvailabilityScreen());
                           },
                         ),
-                        // const Divider(color: Color(0xffF3F4F6)),
-                        // _buildMenuItem(
-                        //   icon: IconsPath.insurance,
-                        //   title: 'insurance'.tr,
-                        //   onTap: () {
-                        //     Get.to(() => const DoctorInsuranceScreen());
-                        //   },
-                        // ),
+                        const Divider(color: Color(0xffF3F4F6)),
+                        _buildMenuItem(
+                          icon: IconsPath.legalAndPolicies,
+                          title: 'reconciliation_reports'.tr,
+                          onTap: () {
+                            Get.to(() => const DoctorReconciliationScreen());
+                          },
+                        ),
                         const Divider(color: Color(0xffF3F4F6)),
                         _buildMenuItem(
                           icon: IconsPath.referral,

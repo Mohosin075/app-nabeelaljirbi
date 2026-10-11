@@ -8,6 +8,7 @@ import 'package:nabeelaljirbi_app/core/utils/currency_util.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/subscription/view/doctor_subscription_screen.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/wallet/controller/doctor_wallet_controller.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/wallet/model/top_up_history_model.dart';
+import 'package:nabeelaljirbi_app/feature/doctor/reports/view/doctor_reconciliation_screen.dart';
 import 'package:intl/intl.dart';
 
 class DoctorWalletScreen extends StatelessWidget {
@@ -43,6 +44,8 @@ class DoctorWalletScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildBalanceCard(controller),
+              const SizedBox(height: 16),
+              _buildReconciliationCard(),
               const SizedBox(height: 16),
               _buildReferralSection(controller),
               const SizedBox(height: 24),
@@ -181,6 +184,108 @@ class DoctorWalletScreen extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReconciliationCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xffE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xffEFF6FF),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.receipt_long_rounded,
+                  color: Color(0xff1E88E5),
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'reconciliation_reports'.tr,
+                      style: globalTextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xff1E293B),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'reconcile_with_clinic'.tr,
+                      style: globalTextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xff64748B),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'reconciliation_notice'.tr,
+            style: globalTextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              color: const Color(0xff475569),
+              lineHeight: 1.4,
+            ),
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            height: 42,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Get.to(() => const DoctorReconciliationScreen());
+              },
+              icon: const Icon(Icons.analytics_outlined, size: 18),
+              label: Text(
+                'reconciliation_reports'.tr,
+                style: globalTextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xff1E88E5),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
             ),
