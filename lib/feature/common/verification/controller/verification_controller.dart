@@ -167,8 +167,8 @@ class VerificationController extends GetxController {
           licenseUploadedUrl.value = url;
         } else {
           Get.snackbar(
-            'Upload Error',
-            'Failed to upload license document. Please try again.',
+            'upload_error'.tr,
+            'upload_license_failed'.tr,
             backgroundColor: const Color(0xffFEE2E2),
             colorText: const Color(0xff991B1B),
             snackPosition: SnackPosition.BOTTOM,
@@ -198,8 +198,8 @@ class VerificationController extends GetxController {
           idUploadedUrl.value = url;
         } else {
           Get.snackbar(
-            'Upload Error',
-            'Failed to upload ID document. Please try again.',
+            'upload_error'.tr,
+            'upload_id_failed'.tr,
             backgroundColor: const Color(0xffFEE2E2),
             colorText: const Color(0xff991B1B),
             snackPosition: SnackPosition.BOTTOM,

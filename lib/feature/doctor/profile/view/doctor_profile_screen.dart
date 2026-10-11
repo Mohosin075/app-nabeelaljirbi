@@ -24,6 +24,9 @@ class DoctorProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Ensure controller is loaded
     final controller = Get.put(DoctorProfileController());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.fetchProfile();
+    });
 
     return Scaffold(
       backgroundColor: Color(0xffE5E9F2).withValues(alpha: 0.4),
@@ -112,7 +115,7 @@ class DoctorProfileScreen extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  if (controller.doctorProfile.value?.doctor?.badgeActive == true) ...[
+                                  if (controller.badgeActive.value || controller.doctorProfile.value?.doctor?.badgeActive == true) ...[
                                     const SizedBox(width: 4),
                                     const BlueBadgeWidget(size: 18),
                                   ],

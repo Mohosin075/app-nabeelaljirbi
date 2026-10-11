@@ -218,13 +218,12 @@ class VerificationScreen extends StatelessWidget {
           if (status == 'PENDING') ...[
             const SizedBox(height: 14),
             Text(
-              'طلبك قيد المراجعة لدى فريق الإدارة. سيتم إشعارك فور اكتمال التدقيق.',
+              'verification_under_review_desc'.tr,
               style: globalTextStyle(
                 fontSize: 12,
                 color: const Color(0xff92400E),
                 lineHeight: 1.6,
               ),
-              textDirection: TextDirection.rtl,
             ),
           ],
 
@@ -286,7 +285,7 @@ class VerificationScreen extends StatelessWidget {
               const Icon(Icons.folder_shared_outlined, color: AppColors.primaryColor, size: 20),
               const SizedBox(width: 8),
               Text(
-                'الوثائق المقدمة (Submitted Documents)',
+                'submitted_documents'.tr,
                 style: globalTextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -297,7 +296,7 @@ class VerificationScreen extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           ...controller.documents.map((doc) {
-            final title = doc['title'] ?? 'وثيقة رسمية';
+            final title = doc['title'] ?? 'official_document'.tr;
             final url = doc['url'] ?? '';
             return Container(
               margin: const EdgeInsets.only(bottom: 10),
@@ -342,7 +341,7 @@ class VerificationScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'تم الرفع بنجاح (Uploaded)',
+                          'uploaded_successfully'.tr,
                           style: globalTextStyle(fontSize: 11, color: const Color(0xff16A34A)),
                         ),
                       ],
@@ -415,21 +414,20 @@ class VerificationScreen extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          'الرجاء التقاط أو اختيار الوثائق الرسمية المطلوبة للتحقق والتوثيق.',
+          'upload_documents_instruction'.tr,
           style: globalTextStyle(
             fontSize: 13,
             color: const Color(0xff64748B),
             lineHeight: 1.5,
           ),
-          textDirection: TextDirection.rtl,
         ),
         const SizedBox(height: 16),
 
         // Document 1: License Card
         Obx(() => _buildNativeDocumentCard(
               context: context,
-              title: isClinic ? 'Clinic Operating License' : 'medical_license_doc'.tr,
-              subtitle: 'رخصة مزاولة المهنة أو ترخيص العيادة الرسمي',
+              title: isClinic ? 'clinic_license_doc'.tr : 'medical_license_doc'.tr,
+              subtitle: isClinic ? 'clinic_license_desc'.tr : 'doctor_license_desc'.tr,
               icon: Icons.medical_information_outlined,
               iconColor: const Color(0xff0369A1),
               isUploading: controller.isUploadingLicense.value,
@@ -446,8 +444,8 @@ class VerificationScreen extends StatelessWidget {
         // Document 2: ID / Registration Card
         Obx(() => _buildNativeDocumentCard(
               context: context,
-              title: isClinic ? 'Commercial Registration' : 'id_proof_doc'.tr,
-              subtitle: 'بطاقة الهوية الوطنية أو السجل التجاري',
+              title: isClinic ? 'commercial_registration_doc'.tr : 'id_proof_doc'.tr,
+              subtitle: isClinic ? 'commercial_registration_desc'.tr : 'doctor_id_desc'.tr,
               icon: Icons.badge_outlined,
               iconColor: const Color(0xff7C3AED),
               isUploading: controller.isUploadingId.value,
@@ -471,9 +469,8 @@ class VerificationScreen extends StatelessWidget {
           child: TextField(
             controller: notesController,
             maxLines: 3,
-            textDirection: TextDirection.rtl,
             decoration: InputDecoration(
-              hintText: 'ملاحظات إضافية للإدارة (اختياري)...',
+              hintText: 'optional_notes_hint'.tr,
               hintStyle: globalTextStyle(
                 fontSize: 13,
                 color: const Color(0xffA0AEC0),
@@ -524,7 +521,7 @@ class VerificationScreen extends StatelessWidget {
 
                       if (success) {
                         Get.snackbar(
-                          'تم الإرسال بنجاح',
+                          'submitted_successfully'.tr,
                           'verification_submitted_success'.tr,
                           backgroundColor: const Color(0xffF0FDF4),
                           colorText: const Color(0xff15803D),
@@ -532,8 +529,8 @@ class VerificationScreen extends StatelessWidget {
                         );
                       } else {
                         Get.snackbar(
-                          'خطأ',
-                          'حدث خطأ أثناء الإرسال. الرجاء المحاولة مرة أخرى.',
+                          'error'.tr,
+                          'submission_failed_try_again'.tr,
                           backgroundColor: const Color(0xffFEE2E2),
                           colorText: const Color(0xff991B1B),
                           snackPosition: SnackPosition.BOTTOM,
@@ -670,7 +667,7 @@ class VerificationScreen extends StatelessWidget {
                         const Icon(Icons.check_circle, size: 12, color: Color(0xff16A34A)),
                         const SizedBox(width: 4),
                         Text(
-                          'Ready',
+                          'ready'.tr,
                           style: globalTextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -700,7 +697,7 @@ class VerificationScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'جاري رفع الوثيقة بأمان إلى السحابة...',
+                    'uploading_doc_securely'.tr,
                     style: globalTextStyle(fontSize: 12, color: const Color(0xff64748B)),
                   ),
                 ],
@@ -745,7 +742,7 @@ class VerificationScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Document Attached',
+                          'document_attached'.tr,
                           style: globalTextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -756,7 +753,7 @@ class VerificationScreen extends StatelessWidget {
                         GestureDetector(
                           onTap: () => _showImagePreviewDialog(context, uploadedUrl, title),
                           child: Text(
-                            'اضغط للمعاينة الكاملة',
+                            'tap_for_full_preview'.tr,
                             style: globalTextStyle(
                               fontSize: 11,
                               color: AppColors.primaryColor,
@@ -771,7 +768,7 @@ class VerificationScreen extends StatelessWidget {
                     onPressed: onTapPick,
                     icon: const Icon(Icons.refresh, size: 14, color: Color(0xff475569)),
                     label: Text(
-                      'تغيير',
+                      'change'.tr,
                       style: globalTextStyle(fontSize: 11, color: const Color(0xff475569)),
                     ),
                   ),
@@ -810,7 +807,7 @@ class VerificationScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'اضغط لرفع الوثيقة (كاميرا / استوديو)',
+                          'tap_to_upload_doc'.tr,
                           style: globalTextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -819,7 +816,7 @@ class VerificationScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'JPG, PNG • الحد الأقصى 15MB',
+                          'file_size_limit'.tr,
                           style: globalTextStyle(
                             fontSize: 10,
                             color: const Color(0xff94A3B8),
@@ -865,7 +862,7 @@ class VerificationScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                'اختيار مصدر الوثيقة (Upload Document)',
+                'select_doc_source'.tr,
                 style: globalTextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
@@ -884,11 +881,11 @@ class VerificationScreen extends StatelessWidget {
                   child: const Icon(Icons.camera_alt_outlined, color: AppColors.primaryColor),
                 ),
                 title: Text(
-                  'التقاط صورة بالكاميرا (Camera)',
+                  'capture_with_camera'.tr,
                   style: globalTextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
-                  'تصوير الوثيقة مباشرة',
+                  'capture_directly'.tr,
                   style: globalTextStyle(fontSize: 11, color: const Color(0xff64748B)),
                 ),
                 onTap: () {
@@ -908,11 +905,11 @@ class VerificationScreen extends StatelessWidget {
                   child: const Icon(Icons.photo_library_outlined, color: Color(0xff16A34A)),
                 ),
                 title: Text(
-                  'اختيار من الاستوديو (Gallery)',
+                  'select_from_gallery'.tr,
                   style: globalTextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
-                  'اختيار ملف أو صورة محفوظة',
+                  'select_saved_file'.tr,
                   style: globalTextStyle(fontSize: 11, color: const Color(0xff64748B)),
                 ),
                 onTap: () {
@@ -985,7 +982,7 @@ class VerificationScreen extends StatelessWidget {
                     child: TextButton(
                       onPressed: () => Navigator.pop(ctx),
                       child: Text(
-                        'إغلاق (Close)',
+                        'close'.tr,
                         style: globalTextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -1035,17 +1032,14 @@ class VerificationScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Directionality(
-            textDirection: TextDirection.rtl,
-            child: Text(
-              'verification_notice_content'.tr,
-              style: globalTextStyle(
-                fontSize: 11,
-                color: const Color(0xff64748B),
-                lineHeight: 1.6,
-              ),
-              textAlign: TextAlign.justify,
+          Text(
+            'verification_notice_content'.tr,
+            style: globalTextStyle(
+              fontSize: 11,
+              color: const Color(0xff64748B),
+              lineHeight: 1.6,
             ),
+            textAlign: TextAlign.justify,
           ),
         ],
       ),

@@ -10,6 +10,7 @@ import 'package:nabeelaljirbi_app/feature/doctor/appointment/model/doctor_appoin
 import 'package:nabeelaljirbi_app/feature/doctor/home/controller/doctor_home_screen_controller.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/nav_bar/controller/doctor_nav_bar_controller.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/controller/doctor_profile_controller.dart';
+import 'package:nabeelaljirbi_app/feature/common/verification/view/verification_screen.dart';
 
 class DoctorHomeScreen extends StatelessWidget {
   const DoctorHomeScreen({super.key});
@@ -93,15 +94,26 @@ class DoctorHomeScreen extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '${'welcome'.tr}, ${profileController.name.value}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: globalTextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            '${'welcome'.tr}, ${profileController.name.value}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: globalTextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        if (profileController.badgeActive.value ||
+                            profileController.doctorProfile.value?.doctor?.badgeActive == true) ...[
+                          const SizedBox(width: 4),
+                          const BlueBadgeWidget(size: 18),
+                        ],
+                      ],
                     ),
                     Row(
                       children: [

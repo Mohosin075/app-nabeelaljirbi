@@ -75,25 +75,22 @@ class BlueBadgeWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 // Verbatim Notice Content (Rendered in RTL Arabic / English fallback)
-                Directionality(
-                  textDirection: TextDirection.rtl,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xffF8FAFC),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xffE2E8F0)),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffF8FAFC),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xffE2E8F0)),
+                  ),
+                  child: Text(
+                    'verification_notice_content'.tr,
+                    style: globalTextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xff334155),
+                      lineHeight: 1.6,
                     ),
-                    child: Text(
-                      'verification_notice_content'.tr,
-                      style: globalTextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xff334155),
-                        lineHeight: 1.6,
-                      ),
-                      textAlign: TextAlign.justify,
-                    ),
+                    textAlign: TextAlign.justify,
                   ),
                 ),
                 const SizedBox(height: 18),

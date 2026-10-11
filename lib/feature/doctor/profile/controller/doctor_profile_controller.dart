@@ -19,6 +19,7 @@ class DoctorProfileController extends GetxController {
   var name = ''.obs;
   var role = ''.obs;
   var profileImage = ''.obs;
+  var badgeActive = false.obs;
 
   // Settings
   var isDarkTheme = false.obs;
@@ -57,6 +58,7 @@ class DoctorProfileController extends GetxController {
           name.value = model.data!.fullName ?? '';
           role.value = model.data!.doctor?.speciality ?? '';
           profileImage.value = model.data!.profileImage ?? '';
+          badgeActive.value = model.data!.doctor?.badgeActive ?? false;
           if (model.data!.country != null) {
             selectedCountry.value = model.data!.country!;
           }
