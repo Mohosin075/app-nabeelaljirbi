@@ -8,7 +8,10 @@ import 'package:nabeelaljirbi_app/core/route/routes.dart';
 import 'package:nabeelaljirbi_app/feature/patient/doctor_details/controller/doctor_details_controller.dart';
 import 'package:nabeelaljirbi_app/feature/patient/doctor_details/model/doctor_details_model.dart';
 import 'package:flutter/material.dart';
+import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
+import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/feature/patient/booking/model/patient_service_fee_model.dart';
+import 'package:nabeelaljirbi_app/feature/patient/wallet/view/patient_wallet_screen.dart';
 
 class BookingController extends GetxController {
   final DoctorDetailsController doctorController =
@@ -261,18 +264,341 @@ class BookingController extends GetxController {
       debugPrint('Response Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        if (Get.isBottomSheetOpen == true) {
+          Get.back();
+        }
         Get.offNamed(AppRoutes.bookingConfirmation);
       } else {
-        final errorData = jsonDecode(response.body);
-        Get.snackbar(
-          'Error',
-          '${errorData['message'] ?? 'Booking failed'}',
-        );
+        String rawMsg = 'booking_failed_generic'.tr;
+        try {
+          final errorData = jsonDecode(response.body);
+          if (errorData is Map && errorData['message'] != null) {
+            rawMsg = errorData['message'].toString();
+          }
+        } catch (_) {}
+        _handleBookingError(rawMsg);
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      _handleBookingError(e.toString());
     } finally {
       isLoading.value = false;
     }
   }
+
+  void _handleBookingError(String rawMsg) {
+    if (Get.isBottomSheetOpen == true) {
+      Get.back();
+    }
+
+    final lower = rawMsg.toLowerCase();
+    if (lower.contains('insufficient wallet balance') ||
+        (lower.contains('wallet') && lower.contains('balance'))) {
+      String? requiredHold;
+      String? availableBal;
+      final holdMatch =
+          RegExp(r'Required hold:\s*([0-9.]+)', caseSensitive: false)
+              .firstMatch(rawMsg);
+      if (holdMatch != null) {
+        requiredHold = holdMatch.group(1);
+      }
+      final availMatch =
+          RegExp(r'Available balance:\s*([0-9.]+)', caseSensitive: false)
+              .firstMatch(rawMsg);
+      if (availMatch != null) {
+        availableBal = availMatch.group(1);
+      }
+
+      Get.dialog(
+        Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFFF3E0),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.account_balance_wallet_outlined,
+                    color: Color(0xFFF57C00),
+                    size: 34,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'insufficient_wallet_title'.tr,
+                  style: globalTextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF1A1A1A),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'insufficient_wallet_desc'.tr,
+                  style: globalTextStyle(
+                    fontSize: 13,
+                    color: const Color(0xFF636F85),
+                    lineHeight: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                if (requiredHold != null || availableBal != null) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8F9FA),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFE9ECEF)),
+                    ),
+                    child: Column(
+                      children: [
+                        if (requiredHold != null)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'required_hold_amount'.tr,
+                                style: globalTextStyle(
+                                  fontSize: 12,
+                                  color: const Color(0xFF636F85),
+                                ),
+                              ),
+                              Text(
+                                '$requiredHold ${'lyd'.tr}',
+                                style: globalTextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFFD9480F),
+                                ),
+                              ),
+                            ],
+                          ),
+                        if (requiredHold != null && availableBal != null)
+                          const Divider(height: 16),
+                        if (availableBal != null)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'available_balance'.tr,
+                                style: globalTextStyle(
+                                  fontSize: 12,
+                                  color: const Color(0xFF636F85),
+                                ),
+                              ),
+                              Text(
+                                '$availableBal ${'lyd'.tr}',
+                                style: globalTextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF495057),
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Get.back();
+                      Get.to(() => PatientWalletScreen());
+                    },
+                    icon: const Icon(
+                      Icons.add_card,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      'top_up_wallet'.tr,
+                      style: globalTextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: Text(
+                    'cancel'.tr,
+                    style: globalTextStyle(
+                      fontSize: 13,
+                      color: const Color(0xFF636F85),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } else if (lower.contains('capacity') && lower.contains('full')) {
+      Get.dialog(
+        Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFFEBEE),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.event_busy,
+                    color: Color(0xFFD32F2F),
+                    size: 34,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'booking_failed_title'.tr,
+                  style: globalTextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF1A1A1A),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'slot_fully_booked'.tr,
+                  style: globalTextStyle(
+                    fontSize: 13,
+                    color: const Color(0xFF636F85),
+                    lineHeight: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Get.back(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'close'.tr,
+                      style: globalTextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } else {
+      Get.dialog(
+        Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFFEBEE),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.error_outline_rounded,
+                    color: Color(0xFFD32F2F),
+                    size: 34,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'booking_failed_title'.tr,
+                  style: globalTextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF1A1A1A),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  rawMsg,
+                  style: globalTextStyle(
+                    fontSize: 13,
+                    color: const Color(0xFF636F85),
+                    lineHeight: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Get.back(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'close'.tr,
+                      style: globalTextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+  }
 }
+

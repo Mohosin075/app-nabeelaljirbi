@@ -22,6 +22,16 @@ class PatientWalletScreen extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         automaticallyImplyLeading: false,
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_ios_new,
+                  size: 20,
+                  color: Color(0xff1A1A1A),
+                ),
+                onPressed: () => Get.back(),
+              )
+            : null,
         title: Text(
           'my_wallet'.tr,
           style: globalTextStyle(

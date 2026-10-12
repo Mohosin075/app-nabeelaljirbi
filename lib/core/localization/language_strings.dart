@@ -1287,6 +1287,16 @@ class AppLanguages extends Translations {
       'upload_error': 'Upload Error',
       'upload_license_failed': 'Failed to upload license document. Please try again.',
       'upload_id_failed': 'Failed to upload ID document. Please try again.',
+      'insufficient_wallet_title': 'Insufficient Wallet Balance',
+      'insufficient_wallet_desc':
+          'Your wallet balance is insufficient to place this booking request on hold. Please top up your wallet to continue.',
+      'required_hold_amount': 'Required Hold Amount',
+      'available_balance': 'Available Balance',
+      'slot_fully_booked':
+          'This time period is fully booked. Please select another slot or date.',
+      'booking_failed_title': 'Booking Failed',
+      'booking_failed_generic':
+          'Could not submit booking request. Please try again.',
     },
     'ar_SA': {
       'language': 'اللغة',
@@ -2550,6 +2560,15 @@ class AppLanguages extends Translations {
       'upload_error': 'خطأ في الرفع',
       'upload_license_failed': 'فشل في رفع وثيقة الترخيص. يرجى المحاولة مرة أخرى.',
       'upload_id_failed': 'فشل في رفع وثيقة الهوية. يرجى المحاولة مرة أخرى.',
+      'insufficient_wallet_title': 'رصيد المحفظة غير كافٍ',
+      'insufficient_wallet_desc':
+          'رصيد محفظتك الحالي لا يكفي لتجميد مبلغ الحجز المطلوب. يرجى شحن محفظتك للمتابعة.',
+      'required_hold_amount': 'المبلغ المطلوب تجميده',
+      'available_balance': 'الرصيد المتاح',
+      'slot_fully_booked':
+          'هذه الفترة محجوزة بالكامل. يرجى اختيار فترة أو تاريخ آخر.',
+      'booking_failed_title': 'فشل إرسال طلب الحجز',
+      'booking_failed_generic': 'تعذر إرسال طلب الحجز. يرجى المحاولة مرة أخرى.',
     },
   };
 }
