@@ -98,17 +98,15 @@ class DoctorProfileScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
+                            Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
-                                Flexible(
-                                  child: Text(
-                                    controller.doctorProfile.value?.fullName ?? '',
-                                    style: globalTextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xff101010),
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                                Text(
+                                  controller.doctorProfile.value?.fullName ?? '',
+                                  style: globalTextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xff101010),
                                   ),
                                 ),
                                 if (controller.badgeActive.value || controller.doctorProfile.value?.doctor?.badgeActive == true) ...[

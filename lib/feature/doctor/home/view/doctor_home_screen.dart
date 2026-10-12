@@ -96,18 +96,15 @@ class DoctorHomeScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
+                        Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            Flexible(
-                              child: Text(
-                                '${'welcome'.tr}, ${profileController.name.value}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: globalTextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                ),
+                            Text(
+                              '${'welcome'.tr}, ${profileController.name.value}',
+                              style: globalTextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
                               ),
                             ),
                             if (profileController.badgeActive.value ||

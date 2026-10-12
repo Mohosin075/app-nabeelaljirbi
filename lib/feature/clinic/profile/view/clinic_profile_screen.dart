@@ -100,23 +100,20 @@ class ClinicProfileScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
                                 children: [
-                                  Flexible(
-                                    child: Text(
-                                      controller
-                                              .clinicProfile
-                                              .value
-                                              ?.clinic
-                                              ?.clinicName ??
-                                          '',
-                                      style: globalTextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                        color: const Color(0xff101010),
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                                  Text(
+                                    controller
+                                            .clinicProfile
+                                            .value
+                                            ?.clinic
+                                            ?.clinicName ??
+                                        '',
+                                    style: globalTextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xff101010),
                                     ),
                                   ),
                                   if (controller
