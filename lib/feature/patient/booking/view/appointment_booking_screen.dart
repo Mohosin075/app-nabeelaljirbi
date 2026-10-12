@@ -218,7 +218,14 @@ class AppointmentBookingScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Check if user has premium access before proceeding
+                    if (controller.selectedSlotIndex.value == -1) {
+                      Get.snackbar(
+                        'error'.tr,
+                        'choose_time_slot'.tr,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                      return;
+                    }
 
                     showModalBottomSheet(
                       context: context,

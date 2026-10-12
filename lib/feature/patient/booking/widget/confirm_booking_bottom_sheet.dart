@@ -179,68 +179,74 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Obx(
-                      () => Row(
+                    Obx(() {
+                      final isSelf = bookingController.bookedFor.value == 'SELF';
+                      return Row(
                         children: [
                           Expanded(
-                            child: ChoiceChip(
-                              label: Center(
-                                child: Text(
-                                  'book_for_myself'.tr,
-                                  style: globalTextStyle(
-                                    fontSize: 13,
-                                    fontWeight:
-                                        bookingController.bookedFor.value == 'SELF'
-                                            ? FontWeight.w700
-                                            : FontWeight.w500,
-                                    color: bookingController.bookedFor.value == 'SELF'
-                                        ? Colors.white
-                                        : Colors.black87,
+                            child: GestureDetector(
+                              onTap: () {
+                                bookingController.bookedFor.value = 'SELF';
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: isSelf
+                                      ? AppColors.primaryColor
+                                      : const Color(0xFFF1F3F5),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'book_for_myself'.tr,
+                                    style: globalTextStyle(
+                                      fontSize: 13,
+                                      fontWeight: isSelf
+                                          ? FontWeight.w700
+                                          : FontWeight.w500,
+                                      color: isSelf
+                                          ? Colors.white
+                                          : Colors.black87,
+                                    ),
                                   ),
                                 ),
                               ),
-                              selected:
-                                  bookingController.bookedFor.value == 'SELF',
-                              selectedColor: AppColors.primaryColor,
-                              backgroundColor: const Color(0xFFF1F3F5),
-                              showCheckmark: false,
-                              onSelected: (val) {
-                                if (val) bookingController.bookedFor.value = 'SELF';
-                              },
                             ),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: ChoiceChip(
-                              label: Center(
-                                child: Text(
-                                  'book_for_family'.tr,
-                                  style: globalTextStyle(
-                                    fontSize: 13,
-                                    fontWeight:
-                                        bookingController.bookedFor.value == 'FAMILY'
-                                            ? FontWeight.w700
-                                            : FontWeight.w500,
-                                    color: bookingController.bookedFor.value ==
-                                            'FAMILY'
-                                        ? Colors.white
-                                        : Colors.black87,
+                            child: GestureDetector(
+                              onTap: () {
+                                bookingController.bookedFor.value = 'FAMILY';
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: !isSelf
+                                      ? AppColors.primaryColor
+                                      : const Color(0xFFF1F3F5),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'book_for_family'.tr,
+                                    style: globalTextStyle(
+                                      fontSize: 13,
+                                      fontWeight: !isSelf
+                                          ? FontWeight.w700
+                                          : FontWeight.w500,
+                                      color: !isSelf
+                                          ? Colors.white
+                                          : Colors.black87,
+                                    ),
                                   ),
                                 ),
                               ),
-                              selected:
-                                  bookingController.bookedFor.value == 'FAMILY',
-                              selectedColor: AppColors.primaryColor,
-                              backgroundColor: const Color(0xFFF1F3F5),
-                              showCheckmark: false,
-                              onSelected: (val) {
-                                if (val) bookingController.bookedFor.value = 'FAMILY';
-                              },
                             ),
                           ),
                         ],
-                      ),
-                    ),
+                      );
+                    }),
 
                     // Dependent Details Input
                     Obx(() {
@@ -297,38 +303,52 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 6),
-                            Wrap(
-                              spacing: 6,
+                            Obx(() => Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
                               children: bookingController.familyRelations
-                                  .map((rel) => ChoiceChip(
-                                        label: Text(
+                                  .map((rel) {
+                                    final isSelected = bookingController
+                                            .selectedFamilyRelation.value ==
+                                        rel;
+                                    return GestureDetector(
+                                      onTap: () {
+                                        bookingController
+                                            .selectedFamilyRelation.value = rel;
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: isSelected
+                                              ? AppColors.primaryColor
+                                              : Colors.white,
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: isSelected
+                                                ? AppColors.primaryColor
+                                                : const Color(0xFFCED4DA),
+                                          ),
+                                        ),
+                                        child: Text(
                                           rel.toLowerCase().tr,
                                           style: globalTextStyle(
                                             fontSize: 12,
-                                            color: bookingController
-                                                        .selectedFamilyRelation
-                                                        .value ==
-                                                    rel
+                                            fontWeight: isSelected
+                                                ? FontWeight.w600
+                                                : FontWeight.w400,
+                                            color: isSelected
                                                 ? Colors.white
                                                 : Colors.black87,
                                           ),
                                         ),
-                                        selected: bookingController
-                                                .selectedFamilyRelation.value ==
-                                            rel,
-                                        selectedColor: AppColors.primaryColor,
-                                        backgroundColor: Colors.white,
-                                        showCheckmark: false,
-                                        onSelected: (val) {
-                                          if (val) {
-                                            bookingController
-                                                .selectedFamilyRelation
-                                                .value = rel;
-                                          }
-                                        },
-                                      ))
+                                      ),
+                                    );
+                                  })
                                   .toList(),
-                            ),
+                            )),
                           ],
                         ),
                       );
