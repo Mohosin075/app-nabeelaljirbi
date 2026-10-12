@@ -70,80 +70,85 @@ class DoctorHomeScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Obx(
-            () => Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: Image.network(
-                    profileController.profileImage.value.isNotEmpty
-                        ? profileController.profileImage.value
-                        : 'https://img.freepik.com/free-photo/portrait-smiling-handsome-male-doctor-man_171337-1491.jpg',
-                    width: 48,
-                    height: 48,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
+          Expanded(
+            child: Obx(
+              () => Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Image.network(
+                      profileController.profileImage.value.isNotEmpty
+                          ? profileController.profileImage.value
+                          : 'https://img.freepik.com/free-photo/portrait-smiling-handsome-male-doctor-man_171337-1491.jpg',
                       width: 48,
                       height: 48,
-                      color: Colors.grey[200],
-                      child: const Icon(Icons.person, color: Colors.grey),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: 48,
+                        height: 48,
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.person, color: Colors.grey),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Flexible(
-                          child: Text(
-                            '${'welcome'.tr}, ${profileController.name.value}',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: globalTextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                '${'welcome'.tr}, ${profileController.name.value}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: globalTextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
-                          ),
+                            if (profileController.badgeActive.value ||
+                                profileController.doctorProfile.value?.doctor?.badgeActive == true) ...[
+                              const SizedBox(width: 4),
+                              const BlueBadgeWidget(size: 18),
+                            ],
+                          ],
                         ),
-                        if (profileController.badgeActive.value ||
-                            profileController.doctorProfile.value?.doctor?.badgeActive == true) ...[
-                          const SizedBox(width: 4),
-                          const BlueBadgeWidget(size: 18),
-                        ],
+                        Row(
+                          children: [
+                            SvgPicture.asset(IconsPath.star, width: 12, height: 12),
+                            const SizedBox(width: 4),
+                            Text(
+                              profileController.doctorProfile.value?.weightedRating
+                                      ?.toStringAsFixed(1) ??
+                                  '0.0',
+                              style: globalTextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xff2D2D2D),
+                              ),
+                            ),
+                            Text(
+                              '  (${profileController.doctorProfile.value?.reviewCount ?? 0})',
+                              style: globalTextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xff94A3B8),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                    Row(
-                      children: [
-                        SvgPicture.asset(IconsPath.star, width: 12, height: 12),
-                        const SizedBox(width: 4),
-                        Text(
-                          profileController.doctorProfile.value?.weightedRating
-                                  ?.toStringAsFixed(1) ??
-                              '0.0',
-                          style: globalTextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xff2D2D2D),
-                          ),
-                        ),
-                        Text(
-                          '  (${profileController.doctorProfile.value?.reviewCount ?? 0})',
-                          style: globalTextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            color: const Color(0xff94A3B8),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
+          const SizedBox(width: 12),
           GestureDetector(
             onTap: () => Get.toNamed(AppRoutes.doctorNotification),
             child: SvgPicture.asset(

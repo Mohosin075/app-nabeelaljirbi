@@ -24,9 +24,6 @@ class DoctorProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Ensure controller is loaded
     final controller = Get.put(DoctorProfileController());
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.fetchProfile();
-    });
 
     return Scaffold(
       backgroundColor: Color(0xffE5E9F2).withValues(alpha: 0.4),
@@ -60,86 +57,84 @@ class DoctorProfileScreen extends StatelessWidget {
             child: Column(
               children: [
                 // Profile Header
-                Obx(
-                  () => Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xffE2E8F0)),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 64,
-                          height: 64,
-                          decoration: const BoxDecoration(
-                            color: Color(0xffF1F5F9),
-                            shape: BoxShape.circle,
-                          ),
-                          child: ClipOval(
-                            child: controller.profileImage.value.isNotEmpty
-                                ? Image.network(
-                                    controller.profileImage.value,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const Icon(
-                                        Icons.person,
-                                        size: 40,
-                                        color: Color(0xff94A3B8),
-                                      );
-                                    },
-                                  )
-                                : const Icon(
-                                    Icons.person,
-                                    size: 40,
-                                    color: Color(0xff94A3B8),
-                                  ),
-                          ),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xffE2E8F0)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 64,
+                        height: 64,
+                        decoration: const BoxDecoration(
+                          color: Color(0xffF1F5F9),
+                          shape: BoxShape.circle,
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      controller.doctorProfile.value?.fullName ?? '',
-                                      style: globalTextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                        color: const Color(0xff101010),
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  if (controller.badgeActive.value || controller.doctorProfile.value?.doctor?.badgeActive == true) ...[
-                                    const SizedBox(width: 4),
-                                    const BlueBadgeWidget(size: 18),
-                                  ],
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                controller
-                                        .doctorProfile
-                                        .value
-                                        ?.doctor
-                                        ?.speciality ??
-                                    '',
-                                style: globalTextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: const Color(0xff636F85),
+                        child: ClipOval(
+                          child: controller.profileImage.value.isNotEmpty
+                              ? Image.network(
+                                  controller.profileImage.value,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Icon(
+                                      Icons.person,
+                                      size: 40,
+                                      color: Color(0xff94A3B8),
+                                    );
+                                  },
+                                )
+                              : const Icon(
+                                  Icons.person,
+                                  size: 40,
+                                  color: Color(0xff94A3B8),
                                 ),
-                              ),
-                            ],
-                          ),
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    controller.doctorProfile.value?.fullName ?? '',
+                                    style: globalTextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xff101010),
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (controller.badgeActive.value || controller.doctorProfile.value?.doctor?.badgeActive == true) ...[
+                                  const SizedBox(width: 4),
+                                  const BlueBadgeWidget(size: 18),
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              controller
+                                      .doctorProfile
+                                      .value
+                                      ?.doctor
+                                      ?.speciality ??
+                                  '',
+                              style: globalTextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xff636F85),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
