@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -5,9 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:nabeelaljirbi_app/core/const/app_colors.dart' show AppColors;
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/core/network_caller/endpoints.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import '../../home/model/appointment_model.dart';
 import '../../home/model/booking_history_model.dart';
-
 import '../../doctors/controller/clinic_doctor_controller.dart';
 
 class ClinicAppointmentController extends GetxController {
@@ -16,9 +18,8 @@ class ClinicAppointmentController extends GetxController {
   final RxnString selectedDoctorId = RxnString();
   final Rxn<DateTime> selectedDate = Rxn<DateTime>();
 
-  // Use the doctors from ClinicDoctorController
-  final ClinicDoctorController _doctorController =
-      Get.find<ClinicDoctorController>();
+  // Use the doctors from ClinicDoctorController if registered
+  ClinicDoctorController? _doctorController;
 
   // Pagination
   var currentPage = 1.obs;
@@ -34,24 +35,77 @@ class ClinicAppointmentController extends GetxController {
     'pending',
     'confirmed',
     'arrived',
+    'in_progress',
     'completed',
+    'no_show',
     'cancelled',
-    'unresolved',
   ];
 
   List<String> get doctorNames {
+    if (_doctorController == null) return ['all_doctors'];
     return [
       'all_doctors',
-      ..._doctorController.doctors.map((d) => d.name ?? ''),
+      ..._doctorController!.doctors.map((d) => d.name ?? ''),
     ];
   }
 
   final RxList<AppointmentModel> allAppointments = <AppointmentModel>[].obs;
+  WebSocketChannel? _wsChannel;
+  Timer? _periodicTimer;
 
   @override
   void onInit() {
     super.onInit();
+    try {
+      _doctorController = Get.find<ClinicDoctorController>();
+    } catch (_) {
+      // ClinicDoctorController might not be initialized yet
+    }
     fetchBookingHistory();
+    _connectWebSocket();
+    _startPeriodicSync();
+  }
+
+  @override
+  void onClose() {
+    _wsChannel?.sink.close();
+    _periodicTimer?.cancel();
+    super.onClose();
+  }
+
+  void _startPeriodicSync() {
+    // 15-second background sync fallback
+    _periodicTimer = Timer.periodic(const Duration(seconds: 15), (_) {
+      fetchBookingHistory(silent: true);
+    });
+  }
+
+  void _connectWebSocket() {
+    try {
+      final token = SharedPrefHelper.getAccessToken();
+      if (token == null || token.isEmpty) return;
+
+      final wsUrl = Urls.baseUrl
+          .replaceFirst('https://', 'wss://')
+          .replaceFirst('http://', 'ws://')
+          .replaceFirst('/api/v1', '/ws/?token=$token');
+
+      _wsChannel = IOWebSocketChannel.connect(
+        Uri.parse(wsUrl),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      _wsChannel?.stream.listen((message) {
+        try {
+          final data = jsonDecode(message);
+          if (data['type'] == 'BOOKING_STATUS_CHANGED' ||
+              data['type'] == 'NEW_BOOKING_REQUEST' ||
+              data['type'] == 'BOOKING_CANCELLED') {
+            fetchBookingHistory(silent: true);
+          }
+        } catch (_) {}
+      }, onError: (_) {});
+    } catch (_) {}
   }
 
   /// Convert tab name to API status values
@@ -63,12 +117,14 @@ class ClinicAppointmentController extends GetxController {
         return ['CONFIRMED'];
       case 'arrived':
         return ['ARRIVED'];
+      case 'in_progress':
+        return ['INPROGRESS'];
       case 'completed':
         return ['COMPLETE'];
+      case 'no_show':
+        return ['NOT_SHOW'];
       case 'cancelled':
-        return ['CANCELLED'];
-      case 'unresolved':
-        return ['NOT_UPDATED', 'NOT_SHOW'];
+        return ['CANCELLED', 'REJECTED'];
       default:
         return ['PENDING'];
     }
@@ -79,15 +135,22 @@ class ClinicAppointmentController extends GetxController {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
-  Future<void> fetchBookingHistory({bool loadMore = false}) async {
+  Future<void> fetchBookingHistory({
+    bool loadMore = false,
+    bool silent = false,
+  }) async {
     if (loadMore) {
       if (!hasMore.value || isLoadingMore.value) return;
       isLoadingMore.value = true;
       currentPage.value++;
     } else {
-      isLoading.value = true;
+      if (!silent) {
+        isLoading.value = true;
+      }
       currentPage.value = 1;
-      allAppointments.clear();
+      if (!silent) {
+        allAppointments.clear();
+      }
       hasMore.value = true;
     }
 
@@ -100,7 +163,6 @@ class ClinicAppointmentController extends GetxController {
       bool anyHasMore = false;
 
       for (final status in statuses) {
-        // Build URL with optional filters
         var url =
             '${Urls.baseUrl}/clinic/booking-history?status=$status&page=${currentPage.value}&limit=$itemsPerPage';
 
@@ -108,21 +170,15 @@ class ClinicAppointmentController extends GetxController {
           url += '&doctorId=${selectedDoctorId.value}';
         }
 
-        // Only add date parameter if date filter is applied
         if (selectedDate.value != null) {
           final dateStr = _formatDateForApi(selectedDate.value!);
           url += '&consultDate=$dateStr';
         }
 
-        debugPrint('Booking History Request URL: $url');
-
         final response = await http.get(
           Uri.parse(url),
           headers: {'Authorization': token},
         );
-
-        debugPrint('Booking History Status Code: ${response.statusCode}');
-        debugPrint('Booking History Response Body: ${response.body}');
 
         if (response.statusCode == 200) {
           final parsedResponse = BookingHistoryResponse.fromJson(
@@ -153,12 +209,11 @@ class ClinicAppointmentController extends GetxController {
         allAppointments.assignAll(combinedAppointments);
       }
 
-      // Update pagination info
       totalItems.value = combinedTotal;
       totalPages.value = (combinedTotal / itemsPerPage).ceil();
       hasMore.value = anyHasMore;
     } catch (e) {
-      debugPrint('Error fetching booking history: $e');
+      debugPrint('Error fetching clinic booking history: $e');
     } finally {
       isLoading.value = false;
       isLoadingMore.value = false;
@@ -166,25 +221,23 @@ class ClinicAppointmentController extends GetxController {
   }
 
   List<AppointmentModel> get filteredAppointments {
-    // Since we fetch by status from API, just return all
     return allAppointments;
   }
 
   void changeTab(String tab) {
     selectedTab.value = tab;
-    fetchBookingHistory(); // Re-fetch when tab changes
+    fetchBookingHistory();
   }
 
   void changeDoctor(String? doctorName) {
     if (doctorName == null) return;
     selectedDoctor.value = doctorName;
 
-    if (doctorName == 'all_doctors') {
+    if (doctorName == 'all_doctors' || _doctorController == null) {
       selectedDoctorId.value = null;
     } else {
-      // Find doctor ID by name
       try {
-        final doc = _doctorController.doctors.firstWhere(
+        final doc = _doctorController!.doctors.firstWhere(
           (d) => d.name == doctorName,
         );
         selectedDoctorId.value = doc.doctorId;
@@ -197,22 +250,32 @@ class ClinicAppointmentController extends GetxController {
 
   void selectDate(DateTime? date) {
     selectedDate.value = date;
-    fetchBookingHistory(); // Re-fetch when date changes
+    fetchBookingHistory();
   }
 
   void clearDateFilter() {
     selectedDate.value = null;
-    fetchBookingHistory(); // Re-fetch when date filter is cleared
+    fetchBookingHistory();
   }
 
-  Future<void> updateAppointmentStatus(String bookingId, String status) async {
+  Future<void> updateAppointmentStatus(
+    String bookingId,
+    String status, {
+    String? reason,
+  }) async {
     try {
       final token = SharedPrefHelper.getAccessToken() ?? '';
       final url = '${Urls.baseUrl}/clinic/update/appointment-status';
 
-      final body = {'bookingId': bookingId, 'status': status};
-      debugPrint('Updating Appointment: $url');
-      debugPrint('Body: $body');
+      final Map<String, dynamic> body = {
+        'bookingId': bookingId,
+        'status': status,
+      };
+      if (reason != null && reason.trim().isNotEmpty) {
+        body['reason'] = reason.trim();
+      }
+
+      debugPrint('Updating Appointment: $url with body: $body');
 
       final response = await http.patch(
         Uri.parse(url),
@@ -220,8 +283,7 @@ class ClinicAppointmentController extends GetxController {
         body: jsonEncode(body),
       );
 
-      debugPrint('Update Status Code: ${response.statusCode}');
-      debugPrint('Update Response: ${response.body}');
+      debugPrint('Update Response: ${response.statusCode} ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
@@ -232,7 +294,7 @@ class ClinicAppointmentController extends GetxController {
             backgroundColor: AppColors.primaryColor,
             colorText: Colors.white,
           );
-          fetchBookingHistory(); // Refresh list
+          fetchBookingHistory();
         } else {
           Get.snackbar(
             'error'.tr,

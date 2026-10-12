@@ -50,6 +50,7 @@ class Appointment {
   String? status;
   String? startTime;
   String? endTime;
+  String? approximateEstimatedTime;
   Doctor? doctor;
   List<DoctorRating>? doctorRatings;
   Clinic? clinic;
@@ -61,6 +62,7 @@ class Appointment {
     this.status,
     this.startTime,
     this.endTime,
+    this.approximateEstimatedTime,
     this.doctor,
     this.doctorRatings,
     this.clinic,
@@ -73,6 +75,7 @@ class Appointment {
     status = json['status'];
     startTime = json['startTime'];
     endTime = json['endTime'];
+    approximateEstimatedTime = json['approximateEstimatedTime'];
     doctor = json['doctor'] != null ? Doctor.fromJson(json['doctor']) : null;
     if (json['doctorRatings'] != null) {
       doctorRatings = <DoctorRating>[];

@@ -84,6 +84,12 @@ class Appointment {
   String? status;
   String? createdAt;
   String? updatedAt;
+  String? approximateEstimatedTime;
+  String? cancellationReason;
+  String? rejectionReason;
+  String? bookedFor;
+  String? familyMemberName;
+  String? familyMemberRelation;
   Patient? patient;
   Clinic? clinic;
   List<DoctorRatings>? doctorRatings;
@@ -100,6 +106,12 @@ class Appointment {
     this.status,
     this.createdAt,
     this.updatedAt,
+    this.approximateEstimatedTime,
+    this.cancellationReason,
+    this.rejectionReason,
+    this.bookedFor,
+    this.familyMemberName,
+    this.familyMemberRelation,
     this.patient,
     this.clinic,
     this.doctorRatings,
@@ -117,6 +129,12 @@ class Appointment {
     status = json['status'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
+    approximateEstimatedTime = json['approximateEstimatedTime'];
+    cancellationReason = json['cancellationReason'] ?? json['noShowReason'];
+    rejectionReason = json['rejectionReason'];
+    bookedFor = json['bookedFor'];
+    familyMemberName = json['familyMemberName'];
+    familyMemberRelation = json['familyMemberRelation'];
     patient = json['patient'] != null
         ? Patient.fromJson(json['patient'])
         : null;
@@ -138,6 +156,16 @@ class Appointment {
     data['consultDate'] = consultDate;
     data['startTime'] = startTime;
     data['endTime'] = endTime;
+    data['serialNumber'] = serialNumber;
+    data['status'] = status;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
+    data['approximateEstimatedTime'] = approximateEstimatedTime;
+    data['cancellationReason'] = cancellationReason;
+    data['rejectionReason'] = rejectionReason;
+    data['bookedFor'] = bookedFor;
+    data['familyMemberName'] = familyMemberName;
+    data['familyMemberRelation'] = familyMemberRelation;
     data['serialNumber'] = serialNumber;
     data['status'] = status;
     data['createdAt'] = createdAt;

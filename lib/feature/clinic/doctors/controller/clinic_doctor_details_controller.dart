@@ -242,12 +242,22 @@ class ClinicDoctorDetailsController extends GetxController {
     }
   }
 
-  Future<void> updateAppointmentStatus(String bookingId, String status) async {
+  Future<void> updateAppointmentStatus(
+    String bookingId,
+    String status, {
+    String? reason,
+  }) async {
     try {
       final token = SharedPrefHelper.getAccessToken() ?? '';
       final url = '${Urls.baseUrl}/clinic/update/appointment-status';
 
-      final body = {'bookingId': bookingId, 'status': status};
+      final Map<String, dynamic> body = {
+        'bookingId': bookingId,
+        'status': status,
+      };
+      if (reason != null && reason.trim().isNotEmpty) {
+        body['reason'] = reason.trim();
+      }
       debugPrint('Updating Appointment: $url');
       debugPrint('Body: $body');
 

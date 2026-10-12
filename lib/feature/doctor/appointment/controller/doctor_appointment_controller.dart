@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,9 +8,12 @@ import 'package:nabeelaljirbi_app/core/const/app_colors.dart' show AppColors;
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/core/network_caller/endpoints.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/appointment/model/doctor_appointment_model.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class DoctorAppointmentController extends GetxController {
-  var selectedTab = 0.obs; // 0: Pending, 1: Upcoming, 2: Arrived, 3: Completed
+  // 0: Pending, 1: Confirmed, 2: Arrived, 3: In Progress, 4: Completed, 5: No Show, 6: Cancelled
+  var selectedTab = 0.obs;
   var selectedDate = Rxn<DateTime>();
   var isLoading = false.obs;
   var isMoreLoading = false.obs;
@@ -19,19 +23,60 @@ class DoctorAppointmentController extends GetxController {
   // Pagination Variables
   var currentPage = 1;
   var hasNextPage = true.obs;
-  final int limit = 10;
+  final int limit = 20;
+
+  WebSocketChannel? _wsChannel;
+  Timer? _periodicTimer;
 
   @override
   void onInit() {
     super.onInit();
     scrollController.addListener(_scrollListener);
     getDoctorAppointments();
+    _connectWebSocket();
+    _startPeriodicSync();
   }
 
   @override
   void onClose() {
     scrollController.dispose();
+    _wsChannel?.sink.close();
+    _periodicTimer?.cancel();
     super.onClose();
+  }
+
+  void _startPeriodicSync() {
+    _periodicTimer = Timer.periodic(const Duration(seconds: 15), (_) {
+      getDoctorAppointments(silent: true);
+    });
+  }
+
+  void _connectWebSocket() {
+    try {
+      final token = SharedPrefHelper.getAccessToken();
+      if (token == null || token.isEmpty) return;
+
+      final wsUrl = Urls.baseUrl
+          .replaceFirst('https://', 'wss://')
+          .replaceFirst('http://', 'ws://')
+          .replaceFirst('/api/v1', '/ws/?token=$token');
+
+      _wsChannel = IOWebSocketChannel.connect(
+        Uri.parse(wsUrl),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      _wsChannel?.stream.listen((message) {
+        try {
+          final data = jsonDecode(message);
+          if (data['type'] == 'BOOKING_STATUS_CHANGED' ||
+              data['type'] == 'NEW_BOOKING_REQUEST' ||
+              data['type'] == 'BOOKING_CANCELLED') {
+            getDoctorAppointments(silent: true);
+          }
+        } catch (_) {}
+      }, onError: (_) {});
+    } catch (_) {}
   }
 
   void _scrollListener() {
@@ -49,7 +94,6 @@ class DoctorAppointmentController extends GetxController {
       if (scrollController.hasClients) {
         scrollController.jumpTo(0);
       }
-      getDoctorAppointments();
     }
   }
 
@@ -63,14 +107,33 @@ class DoctorAppointmentController extends GetxController {
       final status = apt.status?.toUpperCase() ?? 'PENDING';
       bool matchesStatus = false;
 
-      if (selectedTab.value == 0) {
-        matchesStatus = status == 'PENDING';
-      } else if (selectedTab.value == 1) {
-        matchesStatus = status == 'CONFIRMED' || status == 'INPROGRESS';
-      } else if (selectedTab.value == 2) {
-        matchesStatus = status == 'ARRIVED';
-      } else {
-        matchesStatus = status == 'COMPLETE';
+      switch (selectedTab.value) {
+        case 0: // Pending
+          matchesStatus = status == 'PENDING';
+          break;
+        case 1: // Confirmed
+          matchesStatus = status == 'CONFIRMED';
+          break;
+        case 2: // Arrived
+          matchesStatus = status == 'ARRIVED';
+          break;
+        case 3: // In Progress
+          matchesStatus = status == 'INPROGRESS';
+          break;
+        case 4: // Completed
+          matchesStatus = status == 'COMPLETE' || status == 'COMPLETED';
+          break;
+        case 5: // No Show
+          matchesStatus = status == 'NOT_SHOW' ||
+              status == 'NOTSHOWN' ||
+              status == 'NOT_SHOWN' ||
+              status == 'NO_SHOW';
+          break;
+        case 6: // Cancelled / Rejected
+          matchesStatus = status == 'CANCELLED' || status == 'REJECTED';
+          break;
+        default:
+          matchesStatus = true;
       }
 
       if (!matchesStatus) return false;
@@ -89,12 +152,17 @@ class DoctorAppointmentController extends GetxController {
     }).toList();
   }
 
-  Future<void> getDoctorAppointments({bool isLoadMore = false}) async {
+  Future<void> getDoctorAppointments({
+    bool isLoadMore = false,
+    bool silent = false,
+  }) async {
     if (isLoadMore) {
       if (isMoreLoading.value || !hasNextPage.value) return;
       isMoreLoading.value = true;
     } else {
-      isLoading.value = true;
+      if (!silent) {
+        isLoading.value = true;
+      }
       currentPage = 1;
       hasNextPage.value = true;
     }
@@ -130,7 +198,6 @@ class DoctorAppointmentController extends GetxController {
             allAppointments.assignAll(model.data!.data!);
           }
 
-          // Update pagination status
           final meta = model.data!.meta;
           if (meta != null) {
             final total = meta.total ?? 0;
@@ -145,21 +212,33 @@ class DoctorAppointmentController extends GetxController {
           }
         }
       } else {
-        debugPrint('Failed to fetch appointments: ${response.statusCode}');
+        debugPrint('Failed to fetch doctor appointments: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint('Error fetching appointments: $e');
+      debugPrint('Error fetching doctor appointments: $e');
     } finally {
       isLoading.value = false;
       isMoreLoading.value = false;
     }
   }
 
-  Future<void> updateAppointmentStatus(String bookingId, String status) async {
+  Future<void> updateAppointmentStatus(
+    String bookingId,
+    String status, {
+    String? reason,
+  }) async {
     isLoading.value = true;
     try {
       final token = SharedPrefHelper.getAccessToken();
       final url = '${Urls.baseUrl}/clinic/update/appointment-status';
+
+      final Map<String, dynamic> body = {
+        'bookingId': bookingId,
+        'status': status,
+      };
+      if (reason != null && reason.trim().isNotEmpty) {
+        body['reason'] = reason.trim();
+      }
 
       final response = await http.patch(
         Uri.parse(url),
@@ -167,32 +246,27 @@ class DoctorAppointmentController extends GetxController {
           'Authorization': token ?? '',
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({"bookingId": bookingId, "status": status}),
+        body: jsonEncode(body),
       );
 
-      if (response.statusCode == 200) {
-        String statusKey = status.toLowerCase();
-        if (status == 'CONFIRMED') statusKey = 'upcoming';
-        if (status == 'COMPLETE') statusKey = 'completed';
-        if (status == 'INPROGRESS') statusKey = 'in_progress';
-
+      if (response.statusCode == 200 || response.statusCode == 201) {
         Get.snackbar(
           'success'.tr,
-          '${'appointment_status_updated_to'.tr} ${statusKey.tr}',
+          'status_updated_successfully'.tr,
           backgroundColor: AppColors.primaryColor,
           colorText: Colors.white,
         );
         await getDoctorAppointments();
       } else {
-        final body = jsonDecode(response.body);
+        final resData = jsonDecode(response.body);
         Get.snackbar(
           'error'.tr,
-          body['message'] ?? 'failed_to_update_status'.tr,
+          resData['message'] ?? 'failed_to_update_status'.tr,
         );
       }
     } catch (e) {
       debugPrint('Error updating status: $e');
-      Get.snackbar('error'.tr, 'error_updating_status'.tr);
+      Get.snackbar('error'.tr, 'something_went_wrong'.tr);
     } finally {
       isLoading.value = false;
     }

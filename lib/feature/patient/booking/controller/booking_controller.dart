@@ -172,7 +172,7 @@ class BookingController extends GetxController {
 
   Future<void> bookAppointment() async {
     if (selectedSlotIndex.value == -1) {
-      Get.snackbar('Error', 'Please select a time slot');
+      Get.snackbar('error'.tr, 'please_select_time_slot'.tr);
       return;
     }
 
@@ -220,7 +220,7 @@ class BookingController extends GetxController {
 
     if (bookedFor.value == 'FAMILY' &&
         familyMemberNameController.text.trim().isEmpty) {
-      Get.snackbar('Error', 'Please enter family member name'.tr);
+      Get.snackbar('error'.tr, 'please_enter_family_member_name'.tr);
       return;
     }
 

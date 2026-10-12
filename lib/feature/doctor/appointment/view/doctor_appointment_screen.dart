@@ -22,14 +22,14 @@ class DoctorAppointmentScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(context, controller),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Divider(
-              color: Color(0xffE5E9F2).withValues(alpha: 0.7),
-              thickness: 8,
+              color: const Color(0xffE5E9F2).withValues(alpha: 0.7),
+              thickness: 6,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             _buildTabs(controller),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Expanded(child: _buildAppointmentList(controller)),
           ],
         ),
@@ -42,51 +42,61 @@ class DoctorAppointmentScreen extends StatelessWidget {
     DoctorAppointmentController controller,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            child: Obx(() {
-              final hasDate = controller.selectedDate.value != null;
-              final dateStr = hasDate
-                  ? DateFormat(
-                      'MMM dd, yyyy',
-                      Get.locale?.languageCode == 'ar' ? 'ar' : 'en_US',
-                    ).format(controller.selectedDate.value!)
-                  : 'my_appointment'.tr;
-              return Row(
-                children: [
-                  Text(
-                    dateStr,
-                    style: globalTextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xff2D2D2D),
+          Row(
+            children: [
+              if (Navigator.of(context).canPop())
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_ios, size: 20),
+                  onPressed: () => Navigator.of(context).pop(),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              if (Navigator.of(context).canPop()) const SizedBox(width: 8),
+              Obx(() {
+                final hasDate = controller.selectedDate.value != null;
+                final dateStr = hasDate
+                    ? DateFormat(
+                        'MMM dd, yyyy',
+                        Get.locale?.languageCode == 'ar' ? 'ar' : 'en_US',
+                      ).format(controller.selectedDate.value!)
+                    : 'my_appointment'.tr;
+                return Row(
+                  children: [
+                    Text(
+                      dateStr,
+                      style: globalTextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xff2D2D2D),
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (hasDate) ...[
-                    const SizedBox(width: 8),
-                    InkWell(
-                      onTap: () => controller.selectDate(null),
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.close,
-                          size: 14,
-                          color: Colors.red,
+                    if (hasDate) ...[
+                      const SizedBox(width: 8),
+                      InkWell(
+                        onTap: () => controller.selectDate(null),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.close,
+                            size: 14,
+                            color: Colors.red,
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ],
-                ],
-              );
-            }),
+                );
+              }),
+            ],
           ),
           IconButton(
             icon: Obx(
@@ -117,95 +127,81 @@ class DoctorAppointmentScreen extends StatelessWidget {
 
   Widget _buildTabs(DoctorAppointmentController controller) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-      ),
+      height: 42,
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Obx(() {
         final pendingCount = controller.allAppointments
             .where((apt) => apt.status?.toUpperCase() == 'PENDING')
             .length;
-        final upcomingCount = controller.allAppointments
-            .where(
-              (apt) =>
-                  apt.status?.toUpperCase() == 'CONFIRMED' ||
-                  apt.status?.toUpperCase() == 'INPROGRESS',
-            )
+        final confirmedCount = controller.allAppointments
+            .where((apt) => apt.status?.toUpperCase() == 'CONFIRMED')
             .length;
         final arrivedCount = controller.allAppointments
             .where((apt) => apt.status?.toUpperCase() == 'ARRIVED')
             .length;
+        final inProgressCount = controller.allAppointments
+            .where((apt) => apt.status?.toUpperCase() == 'INPROGRESS')
+            .length;
         final completedCount = controller.allAppointments
-            .where((apt) => apt.status?.toUpperCase() == 'COMPLETE')
+            .where((apt) =>
+                apt.status?.toUpperCase() == 'COMPLETE' ||
+                apt.status?.toUpperCase() == 'COMPLETED')
+            .length;
+        final noShowCount = controller.allAppointments
+            .where((apt) =>
+                apt.status?.toUpperCase() == 'NOT_SHOW' ||
+                apt.status?.toUpperCase() == 'NOTSHOWN' ||
+                apt.status?.toUpperCase() == 'NOT_SHOWN' ||
+                apt.status?.toUpperCase() == 'NO_SHOW')
+            .length;
+        final cancelledCount = controller.allAppointments
+            .where((apt) =>
+                apt.status?.toUpperCase() == 'CANCELLED' ||
+                apt.status?.toUpperCase() == 'REJECTED')
             .length;
 
-        return Row(
-          children: [
-            Expanded(
-              child: _buildTabItem(
-                '${'pending'.tr} ($pendingCount)',
-                0,
-                controller.selectedTab.value == 0,
-                () => controller.selectTab(0),
+        final tabsData = [
+          {'label': 'pending'.tr, 'count': pendingCount, 'index': 0},
+          {'label': 'confirmed'.tr, 'count': confirmedCount, 'index': 1},
+          {'label': 'arrived'.tr, 'count': arrivedCount, 'index': 2},
+          {'label': 'in_progress'.tr, 'count': inProgressCount, 'index': 3},
+          {'label': 'completed'.tr, 'count': completedCount, 'index': 4},
+          {'label': 'no_show'.tr, 'count': noShowCount, 'index': 5},
+          {'label': 'cancelled'.tr, 'count': cancelledCount, 'index': 6},
+        ];
+
+        return ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: tabsData.length,
+          separatorBuilder: (context, index) => const SizedBox(width: 8),
+          itemBuilder: (context, index) {
+            final tab = tabsData[index];
+            final tabIndex = tab['index'] as int;
+            final isSelected = controller.selectedTab.value == tabIndex;
+            return GestureDetector(
+              onTap: () => controller.selectTab(tabIndex),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color:
+                      isSelected ? const Color(0xff137CCF) : const Color(0xffEDEEF4),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '${tab['label']} (${tab['count']})',
+                  style: globalTextStyle(
+                    fontSize: 12,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected ? Colors.white : const Color(0xff636F85),
+                  ),
+                ),
               ),
-            ),
-            Expanded(
-              child: _buildTabItem(
-                '${'upcoming'.tr} ($upcomingCount)',
-                1,
-                controller.selectedTab.value == 1,
-                () => controller.selectTab(1),
-              ),
-            ),
-            Expanded(
-              child: _buildTabItem(
-                '${'arrived'.tr} ($arrivedCount)',
-                2,
-                controller.selectedTab.value == 2,
-                () => controller.selectTab(2),
-              ),
-            ),
-            Expanded(
-              child: _buildTabItem(
-                '${'completed'.tr} ($completedCount)',
-                3,
-                controller.selectedTab.value == 3,
-                () => controller.selectTab(3),
-              ),
-            ),
-          ],
+            );
+          },
         );
       }),
-    );
-  }
-
-  Widget _buildTabItem(
-    String label,
-    int index,
-    bool isSelected,
-    VoidCallback onTap,
-  ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xff137CCF) : Color(0xffEDEEF4),
-          borderRadius: isSelected
-              ? BorderRadius.circular(6)
-              : BorderRadius.circular(0),
-        ),
-        child: Text(
-          label,
-          style: globalTextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: isSelected ? Colors.white : const Color(0xff636F85),
-          ),
-        ),
-      ),
     );
   }
 
@@ -220,13 +216,12 @@ class DoctorAppointmentScreen extends StatelessWidget {
       return RefreshIndicator(
         onRefresh: () => controller.getDoctorAppointments(),
         color: AppColors.primaryColor,
-
         child: controller.filteredAppointments.isEmpty
             ? ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
                   SizedBox(
-                    height: MediaQuery.of(Get.context!).size.height * 0.6,
+                    height: MediaQuery.of(Get.context!).size.height * 0.5,
                     child: Center(
                       child: Text(
                         'no_appointments_found'.tr,
@@ -242,8 +237,7 @@ class DoctorAppointmentScreen extends StatelessWidget {
             : ListView.builder(
                 controller: controller.scrollController,
                 physics: const AlwaysScrollableScrollPhysics(),
-                itemCount:
-                    controller.filteredAppointments.length +
+                itemCount: controller.filteredAppointments.length +
                     (controller.isMoreLoading.value ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index < controller.filteredAppointments.length) {
@@ -276,47 +270,57 @@ class DoctorAppointmentScreen extends StatelessWidget {
     Color statusColor;
     Color statusBgColor;
     String statusValue = apt.status?.toUpperCase() ?? 'PENDING';
-    String statusDisplayLabel = statusValue
-        .toLowerCase()
-        .replaceAll(' ', '_')
-        .tr;
+    String statusDisplayLabel;
 
-    // Mapping based on BookingStatus Enum
-    // Mapping based on BookingStatus Enum
     switch (statusValue) {
       case 'PENDING':
-        statusColor = const Color(0xFF2196F3); // Blue
-        statusBgColor = const Color(0xFFE3F2FD);
+        statusColor = const Color(0xFF2563EB);
+        statusBgColor = const Color(0xFFEFF6FF);
         statusDisplayLabel = 'pending'.tr;
         break;
       case 'CONFIRMED':
-        statusColor = const Color(0xFFFF9800); // Orange
-        statusBgColor = const Color(0xFFFFF3E0);
-        statusDisplayLabel = 'upcoming'.tr;
-        break;
-      case 'INPROGRESS':
-        statusColor = const Color(0xFF039BE5); // Light Blue
-        statusBgColor = const Color(0xFFE1F5FE);
-        statusDisplayLabel = 'in_progress'.tr;
+        statusColor = const Color(0xFF0284C7);
+        statusBgColor = const Color(0xFFE0F2FE);
+        statusDisplayLabel = 'confirmed'.tr;
         break;
       case 'ARRIVED':
-        statusColor = const Color(0xFF9C27B0); // Purple
-        statusBgColor = const Color(0xFFF3E5F5);
+        statusColor = const Color(0xFF7C3AED);
+        statusBgColor = const Color(0xFFF5F3FF);
         statusDisplayLabel = 'arrived'.tr;
         break;
+      case 'INPROGRESS':
+        statusColor = const Color(0xFF0D9488);
+        statusBgColor = const Color(0xFFCCFBF1);
+        statusDisplayLabel = 'in_progress'.tr;
+        break;
       case 'COMPLETE':
-        statusColor = const Color(0xFF4CAF50); // Green
-        statusBgColor = const Color(0xFFE8F5E9);
+      case 'COMPLETED':
+        statusColor = const Color(0xFF10B981);
+        statusBgColor = const Color(0xFFD1FAE5);
         statusDisplayLabel = 'completed'.tr;
         break;
+      case 'NOT_SHOW':
+      case 'NOTSHOWN':
+      case 'NOT_SHOWN':
+      case 'NO_SHOW':
+        statusColor = const Color(0xFFD97706);
+        statusBgColor = const Color(0xFFFEF3C7);
+        statusDisplayLabel = 'no_show'.tr;
+        break;
       case 'CANCELLED':
-        statusColor = const Color(0xFFEF5350); // Red
-        statusBgColor = const Color(0xFFFFEBEE);
+        statusColor = const Color(0xFFEF4444);
+        statusBgColor = const Color(0xFFFEE2E2);
         statusDisplayLabel = 'cancelled'.tr;
+        break;
+      case 'REJECTED':
+        statusColor = const Color(0xFFDC2626);
+        statusBgColor = const Color(0xFFFEE2E2);
+        statusDisplayLabel = 'rejected'.tr;
         break;
       default:
         statusColor = Colors.grey;
         statusBgColor = Colors.grey[200]!;
+        statusDisplayLabel = statusValue;
     }
 
     final patientUser = apt.patient?.user;
@@ -326,11 +330,19 @@ class DoctorAppointmentScreen extends StatelessWidget {
         "${_formatTime(apt.startTime)} - ${_formatTime(apt.endTime)}";
     final dateFormatted = _formatDate(apt.consultDate);
 
+    final hasReason = (statusValue == 'NOT_SHOW' ||
+            statusValue == 'NOTSHOWN' ||
+            statusValue == 'CANCELLED' ||
+            statusValue == 'REJECTED') &&
+        ((apt.cancellationReason != null &&
+                apt.cancellationReason!.isNotEmpty) ||
+            (apt.rejectionReason != null && apt.rejectionReason!.isNotEmpty));
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xffF9F9FB),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xffE2E8F0)),
         boxShadow: [
@@ -344,65 +356,87 @@ class DoctorAppointmentScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Row: Status Badge and Queue Number
+          // Header Row: Status Badge and Queue Number / Estimated Time
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: statusBgColor,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: statusColor),
+                  border: Border.all(color: statusColor.withValues(alpha: 0.4)),
                 ),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: statusColor,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: statusColor),
-                      ),
-                    ),
+                    CircleAvatar(radius: 3.5, backgroundColor: statusColor),
                     const SizedBox(width: 6),
                     Text(
                       statusDisplayLabel,
                       style: globalTextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                         color: statusColor,
                       ),
                     ),
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: Color(0xffF9F9FB),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xff137CCF)),
-                ),
-                child: Text(
-                  '${'queue'.tr} #${apt.serialNumber ?? 0}',
-                  style: globalTextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xff137CCF),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffF0F7FF),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: const Color(0xff137CCF).withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Text(
+                      '${'queue_label'.tr} #${apt.serialNumber ?? 0}',
+                      style: globalTextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xff137CCF),
+                      ),
+                    ),
                   ),
-                ),
+                  if (apt.approximateEstimatedTime != null &&
+                      apt.approximateEstimatedTime!.isNotEmpty) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEF3C7),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: const Color(0xFFD97706).withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Text(
+                        '~${apt.approximateEstimatedTime}',
+                        style: globalTextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFFB45309),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
+
           // Patient Info Row
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -432,24 +466,50 @@ class DoctorAppointmentScreen extends StatelessWidget {
                     Text(
                       patientName,
                       style: globalTextStyle(
-                        fontSize: 18,
+                        fontSize: 17,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xff2D2D2D),
+                        color: const Color(0xff1E293B),
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    if (apt.bookedFor == 'FAMILY_MEMBER' &&
+                        apt.familyMemberName != null) ...[
+                      const SizedBox(height: 3),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F3FF),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color:
+                                const Color(0xFF7C3AED).withValues(alpha: 0.2),
+                          ),
+                        ),
+                        child: Text(
+                          '${'booked_for_family'.tr}: ${apt.familyMemberName} (${apt.familyMemberRelation ?? ''})',
+                          style: globalTextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF6D28D9),
+                          ),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.access_time_outlined,
                           color: Color(0xff636F85),
-                          size: 20,
+                          size: 16,
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '$timeRange $dateFormatted',
+                          '$timeRange  •  $dateFormatted',
                           style: globalTextStyle(
-                            fontSize: 14,
+                            fontSize: 13,
                             fontWeight: FontWeight.w500,
                             color: const Color(0xff636F85),
                           ),
@@ -461,108 +521,135 @@ class DoctorAppointmentScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
 
-          // Action Buttons for INPROGRESS status
-          if (statusValue == 'INPROGRESS') ...[
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _showCancelConfirmationDialog(
-                        context,
-                        apt.id ?? '',
-                        controller,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: Colors.red, width: 1.5),
-                      ),
-                      elevation: 0,
-                    ),
+          if (apt.clinic != null && apt.clinic!.clinicName != null) ...[
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 60),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.location_on_outlined,
+                    size: 14,
+                    color: Color(0xFF64748B),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
                     child: Text(
-                      'cancel'.tr,
+                      '${apt.clinic!.clinicName}${apt.clinic!.location != null ? ' - ${apt.clinic!.location}' : ''}',
                       style: globalTextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.red,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFF64748B),
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _showConfirmAppointmentDialog(
-                        context,
-                        apt.id ?? '',
-                        controller,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      'confirm'.tr,
-                      style: globalTextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
 
-          // Action Button or Review
-          if (statusValue == 'COMPLETE') ...[
-            Column(
-              children: [
-                Divider(color: Color(0xffE2E8F0), thickness: 1),
-                Row(
-                  children: [
-                    Text(
-                      'review'.tr,
-                      style: globalTextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xff2D2D2D),
-                      ),
-                    ),
-                    const Spacer(),
-                    if (apt.doctorRatings != null &&
-                        apt.doctorRatings!.isNotEmpty)
-                      Row(
-                        children: List.generate(
-                          apt.doctorRatings!.first.rating ?? 0,
-                          (index) => Padding(
-                            padding: const EdgeInsets.only(left: 4.0),
-                            child: SvgPicture.asset(
-                              IconsPath.star,
-                              width: 24,
-                              height: 24,
-                              colorFilter: ColorFilter.mode(
-                                Colors.amber,
-                                BlendMode.srcIn,
-                              ),
+          // Reason display for No Show, Cancelled, Rejected
+          if (hasReason) ...[
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: statusValue.contains('SHOW')
+                    ? const Color(0xFFFFFBEB)
+                    : const Color(0xFFFEF2F2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: statusValue.contains('SHOW')
+                      ? const Color(0xFFFDE68A)
+                      : const Color(0xFFFECACA),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: statusValue.contains('SHOW')
+                        ? const Color(0xFFD97706)
+                        : const Color(0xFFEF4444),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '${'reason_label'.tr}: ',
+                            style: globalTextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: statusValue.contains('SHOW')
+                                  ? const Color(0xFF92400E)
+                                  : const Color(0xFF991B1B),
                             ),
                           ),
+                          TextSpan(
+                            text: apt.cancellationReason ??
+                                apt.rejectionReason ??
+                                '',
+                            style: globalTextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: statusValue.contains('SHOW')
+                                  ? const Color(0xFF92400E)
+                                  : const Color(0xFF991B1B),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          // Lifecycle Action Buttons
+          const SizedBox(height: 14),
+          _buildDoctorActionButtons(context, apt, controller, statusValue),
+
+          // Rating display if Complete
+          if ((statusValue == 'COMPLETE' || statusValue == 'COMPLETED') &&
+              apt.doctorRatings != null &&
+              apt.doctorRatings!.isNotEmpty) ...[
+            const Divider(color: Color(0xffE2E8F0), thickness: 1),
+            Row(
+              children: [
+                Text(
+                  'review'.tr,
+                  style: globalTextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xff2D2D2D),
+                  ),
+                ),
+                const Spacer(),
+                Row(
+                  children: List.generate(
+                    apt.doctorRatings!.first.rating ?? 0,
+                    (index) => Padding(
+                      padding: const EdgeInsets.only(left: 4.0),
+                      child: SvgPicture.asset(
+                        IconsPath.star,
+                        width: 20,
+                        height: 20,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.amber,
+                          BlendMode.srcIn,
                         ),
                       ),
-                  ],
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -572,7 +659,530 @@ class DoctorAppointmentScreen extends StatelessWidget {
     );
   }
 
-  // Removed _showStatusUpdateDialog as it is no longer needed
+  Widget _buildDoctorActionButtons(
+    BuildContext context,
+    Appointment apt,
+    DoctorAppointmentController controller,
+    String statusValue,
+  ) {
+    final bookingId = apt.id ?? '';
+
+    switch (statusValue) {
+      case 'PENDING':
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            OutlinedButton(
+              onPressed: () => _promptReasonDialog(
+                context,
+                title: 'reject_appointment_title'.tr,
+                actionLabel: 'yes_reject'.tr,
+                actionColor: const Color(0xFFEF4444),
+                onConfirm: (reason) => controller.updateAppointmentStatus(
+                  bookingId,
+                  'REJECTED',
+                  reason: reason,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFFEF4444)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              ),
+              child: Text(
+                'reject'.tr,
+                style: globalTextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFFEF4444),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton(
+              onPressed: () => _confirmDialog(
+                context,
+                title: 'confirm_appointment_title'.tr,
+                message: 'confirm_appointment_message'.tr,
+                actionLabel: 'yes_confirm'.tr,
+                actionColor: const Color(0xFF137CCF),
+                onConfirm: () =>
+                    controller.updateAppointmentStatus(bookingId, 'CONFIRMED'),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF137CCF),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              ),
+              child: Text(
+                'confirm'.tr,
+                style: globalTextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case 'CONFIRMED':
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.end,
+          children: [
+            OutlinedButton(
+              onPressed: () => _promptReasonDialog(
+                context,
+                title: 'cancel_appointment_title'.tr,
+                actionLabel: 'yes_cancel'.tr,
+                actionColor: const Color(0xFFEF4444),
+                onConfirm: (reason) => controller.updateAppointmentStatus(
+                  bookingId,
+                  'CANCELLED',
+                  reason: reason,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFFEF4444)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'cancel'.tr,
+                style: globalTextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFFEF4444),
+                ),
+              ),
+            ),
+            OutlinedButton(
+              onPressed: () => _promptReasonDialog(
+                context,
+                title: 'no_show_appointment_title'.tr,
+                actionLabel: 'yes_mark_no_show'.tr,
+                actionColor: const Color(0xFFD97706),
+                showNotice: true,
+                onConfirm: (reason) => controller.updateAppointmentStatus(
+                  bookingId,
+                  'NOT_SHOW',
+                  reason: reason,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFFD97706)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'no_show'.tr,
+                style: globalTextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFFD97706),
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => _confirmDialog(
+                context,
+                title: 'mark_arrived'.tr,
+                message: 'update_status_arrived_message'.tr,
+                actionLabel: 'yes_update'.tr,
+                actionColor: const Color(0xFF7C3AED),
+                onConfirm: () =>
+                    controller.updateAppointmentStatus(bookingId, 'ARRIVED'),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF7C3AED),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'mark_arrived'.tr,
+                style: globalTextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => _confirmDialog(
+                context,
+                title: 'start_consultation'.tr,
+                message: 'start_consultation_message'.tr,
+                actionLabel: 'yes_start'.tr,
+                actionColor: const Color(0xFF137CCF),
+                onConfirm: () => controller.updateAppointmentStatus(
+                  bookingId,
+                  'INPROGRESS',
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF137CCF),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'start_consultation'.tr,
+                style: globalTextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case 'ARRIVED':
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.end,
+          children: [
+            OutlinedButton(
+              onPressed: () => _promptReasonDialog(
+                context,
+                title: 'no_show_appointment_title'.tr,
+                actionLabel: 'yes_mark_no_show'.tr,
+                actionColor: const Color(0xFFD97706),
+                showNotice: true,
+                onConfirm: (reason) => controller.updateAppointmentStatus(
+                  bookingId,
+                  'NOT_SHOW',
+                  reason: reason,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFFD97706)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'no_show'.tr,
+                style: globalTextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFFD97706),
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => _confirmDialog(
+                context,
+                title: 'start_consultation'.tr,
+                message: 'start_consultation_message'.tr,
+                actionLabel: 'yes_start'.tr,
+                actionColor: const Color(0xFF137CCF),
+                onConfirm: () => controller.updateAppointmentStatus(
+                  bookingId,
+                  'INPROGRESS',
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF137CCF),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'start_consultation'.tr,
+                style: globalTextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            // One-tap complete
+            ElevatedButton(
+              onPressed: () =>
+                  controller.updateAppointmentStatus(bookingId, 'COMPLETE'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF10B981),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'complete'.tr,
+                style: globalTextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case 'INPROGRESS':
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.end,
+          children: [
+            OutlinedButton(
+              onPressed: () => _promptReasonDialog(
+                context,
+                title: 'cancel_appointment_title'.tr,
+                actionLabel: 'yes_cancel'.tr,
+                actionColor: const Color(0xFFEF4444),
+                onConfirm: (reason) => controller.updateAppointmentStatus(
+                  bookingId,
+                  'CANCELLED',
+                  reason: reason,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFFEF4444)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'cancel'.tr,
+                style: globalTextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFFEF4444),
+                ),
+              ),
+            ),
+            OutlinedButton(
+              onPressed: () => _promptReasonDialog(
+                context,
+                title: 'no_show_appointment_title'.tr,
+                actionLabel: 'yes_mark_no_show'.tr,
+                actionColor: const Color(0xFFD97706),
+                showNotice: true,
+                onConfirm: (reason) => controller.updateAppointmentStatus(
+                  bookingId,
+                  'NOT_SHOW',
+                  reason: reason,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFFD97706)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'no_show'.tr,
+                style: globalTextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFFD97706),
+                ),
+              ),
+            ),
+            // One-tap complete
+            ElevatedButton(
+              onPressed: () =>
+                  controller.updateAppointmentStatus(bookingId, 'COMPLETE'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF10B981),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'complete'.tr,
+                style: globalTextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
+  void _confirmDialog(
+    BuildContext context, {
+    required String title,
+    required String message,
+    required String actionLabel,
+    required Color actionColor,
+    required VoidCallback onConfirm,
+  }) {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          title,
+          style: globalTextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1E293B),
+          ),
+        ),
+        content: Text(
+          message,
+          style: globalTextStyle(
+            fontSize: 14,
+            color: const Color(0xFF64748B),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'no'.tr,
+              style: globalTextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF64748B),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              onConfirm();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: actionColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              actionLabel,
+              style: globalTextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _promptReasonDialog(
+    BuildContext context, {
+    required String title,
+    required String actionLabel,
+    required Color actionColor,
+    bool showNotice = false,
+    required Function(String reason) onConfirm,
+  }) {
+    final textController = TextEditingController();
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          title,
+          style: globalTextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1E293B),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (showNotice)
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF3C7),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info, size: 16, color: Color(0xFFD97706)),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        'reason_stays_visible_to_patient'.tr,
+                        style: globalTextStyle(
+                          fontSize: 12,
+                          color: const Color(0xFF92400E),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            TextField(
+              controller: textController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'enter_reason'.tr,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'cancel'.tr,
+              style: globalTextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF64748B),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final reason = textController.text.trim();
+              if (reason.isEmpty) {
+                Get.snackbar('error'.tr, 'please_enter_reason'.tr);
+                return;
+              }
+              Get.back();
+              onConfirm(reason);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: actionColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              actionLabel,
+              style: globalTextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   String _formatTime(String? time) {
     if (time == null) return "";
@@ -591,8 +1201,8 @@ class DoctorAppointmentScreen extends StatelessWidget {
       final displayHour = hour > 12
           ? hour - 12
           : hour == 0
-          ? 12
-          : hour;
+              ? 12
+              : hour;
 
       return "$displayHour:${minute.toString().padLeft(2, '0')} $period";
     } catch (e) {
@@ -604,151 +1214,13 @@ class DoctorAppointmentScreen extends StatelessWidget {
     if (dateStr == null) return "";
     try {
       final dt = DateTime.parse(dateStr);
-      final dayName = DateFormat('E').format(dt).toLowerCase(); // e.g. tue
-      final monthName = DateFormat('MMM').format(dt).toLowerCase(); // e.g. feb
+      final dayName = DateFormat('E').format(dt).toLowerCase();
+      final monthName = DateFormat('MMM').format(dt).toLowerCase();
       final dayNum = dt.day;
 
       return "${dayName.tr}, ${monthName.tr} $dayNum";
     } catch (e) {
       return dateStr;
     }
-  }
-
-  void _showCancelConfirmationDialog(
-    BuildContext context,
-    String bookingId,
-    DoctorAppointmentController controller,
-  ) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(
-            'cancel_appointment'.tr,
-            style: globalTextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xff2D2D2D),
-            ),
-          ),
-          content: Text(
-            'cancel_appointment_confirmation'.tr,
-            style: globalTextStyle(
-              fontSize: 14,
-              color: const Color(0xff636F85),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'no'.tr,
-                style: globalTextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xff636F85),
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                controller.updateAppointmentStatus(bookingId, 'CANCELLED');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                'yes_cancel'.tr,
-                style: globalTextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showConfirmAppointmentDialog(
-    BuildContext context,
-    String bookingId,
-    DoctorAppointmentController controller,
-  ) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(
-            'confirm_appointment'.tr,
-            style: globalTextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xff2D2D2D),
-            ),
-          ),
-          content: Text(
-            'confirm_appointment_message'.tr,
-            style: globalTextStyle(
-              fontSize: 14,
-              color: const Color(0xff636F85),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'no'.tr,
-                style: globalTextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xff636F85),
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                controller.updateAppointmentStatus(bookingId, 'CONFIRMED');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                'yes_confirm'.tr,
-                style: globalTextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

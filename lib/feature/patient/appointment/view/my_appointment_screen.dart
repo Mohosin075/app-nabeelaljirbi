@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
+import 'package:nabeelaljirbi_app/core/const/icons_path.dart';
+import 'package:nabeelaljirbi_app/core/route/routes.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/feature/patient/appointment/controller/appointment_controller.dart';
 import 'package:nabeelaljirbi_app/feature/patient/appointment/model/appointment_history_model.dart';
 import 'package:nabeelaljirbi_app/feature/patient/appointment/widget/review_bottom_sheet.dart';
+import 'package:nabeelaljirbi_app/feature/patient/profile/view/patient_help_center_screen.dart';
 
 class MyAppointmentScreen extends StatelessWidget {
   MyAppointmentScreen({super.key});
@@ -20,7 +24,21 @@ class MyAppointmentScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            IconsPath.backArrow,
+            width: 24,
+            height: 24,
+            colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+          ),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Get.back();
+            } else {
+              Get.offAllNamed(AppRoutes.patientNavBar);
+            }
+          },
+        ),
         title: Text(
           'my_appointment'.tr,
           style: globalTextStyle(
@@ -224,24 +242,31 @@ class MyAppointmentScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildStatusBadge(status),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.primaryColor),
-                  ),
-                  child: Text(
-                    '${'queue'.tr} $queue',
-                    style: globalTextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primaryColor,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.primaryColor),
+                      ),
+                      child: Text(
+                        '${'queue'.tr} $queue',
+                        style: globalTextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primaryColor,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    _buildComplaintButton(context, apt),
+                  ],
                 ),
               ],
             ),
@@ -313,6 +338,62 @@ class MyAppointmentScreen extends StatelessWidget {
                 ),
               ],
             ),
+            if (apt.clinic?.location != null && apt.clinic!.location!.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(
+                    Icons.location_on_outlined,
+                    size: 16,
+                    color: Color(0xFF636F85),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      '${apt.clinic?.clinicName != null ? '${apt.clinic!.clinicName} - ' : ''}${apt.clinic!.location}',
+                      style: globalTextStyle(
+                        fontSize: 12,
+                        color: const Color(0xff636F85),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            if (apt.approximateEstimatedTime != null &&
+                apt.approximateEstimatedTime!.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEBF5FF),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFFD0EBFF)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.access_time_filled,
+                      size: 14,
+                      color: AppColors.primaryColor,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${'approx_est_time'.tr}: ${_formatTime(apt.approximateEstimatedTime)} (${'estimate'.tr})',
+                      style: globalTextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             if (status.toUpperCase() == 'PENDING') ...[
               const SizedBox(height: 16),
               SizedBox(
@@ -666,54 +747,65 @@ class MyAppointmentScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildStatusBadge(status),
-              if (status.toUpperCase() == 'COMPLETE' ||
-                  status.toUpperCase() == 'COMPLETED')
-                Builder(
-                  builder: (context) {
-                    final hasReview =
-                        (apt.doctorRatings != null &&
-                        apt.doctorRatings!.isNotEmpty);
-                    if (hasReview) {
-                      return const SizedBox.shrink();
-                    }
-                    return TextButton(
-                      onPressed: () {
-                        controller.selectedReviewRating.value = 0;
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) =>
-                              ReviewBottomSheet(appointment: apt),
-                        );
-                      },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          side: const BorderSide(color: AppColors.primaryColor),
-                        ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildStatusBadge(status),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (status.toUpperCase() == 'COMPLETE' ||
+                        status.toUpperCase() == 'COMPLETED')
+                      Builder(
+                        builder: (context) {
+                          final hasReview =
+                              (apt.doctorRatings != null &&
+                              apt.doctorRatings!.isNotEmpty);
+                          if (hasReview) {
+                            return const SizedBox.shrink();
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: TextButton(
+                              onPressed: () {
+                                controller.selectedReviewRating.value = 0;
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (context) =>
+                                      ReviewBottomSheet(appointment: apt),
+                                );
+                              },
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 6,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                  side: const BorderSide(
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                'review'.tr,
+                                style: globalTextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                      child: Text(
-                        'review'.tr,
-                        style: globalTextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.primaryColor,
-                        ),
-                      ),
-                    );
-                  },
+                    _buildComplaintButton(context, apt),
+                  ],
                 ),
-            ],
-          ),
+              ],
+            ),
           const SizedBox(height: 16),
 
           Text(
@@ -783,6 +875,31 @@ class MyAppointmentScreen extends StatelessWidget {
               ),
             ],
           ),
+          if (apt.clinic?.location != null && apt.clinic!.location!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.location_on_outlined,
+                  size: 16,
+                  color: Color(0xFF636F85),
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    '${apt.clinic?.clinicName != null ? '${apt.clinic!.clinicName} - ' : ''}${apt.clinic!.location}',
+                    style: globalTextStyle(
+                      fontSize: 12,
+                      color: const Color(0xff636F85),
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ],
           if ((status.toUpperCase() == 'COMPLETE' ||
                   status.toUpperCase() == 'COMPLETED') &&
               (apt.doctorRatings != null && apt.doctorRatings!.isNotEmpty)) ...[
@@ -932,14 +1049,252 @@ class MyAppointmentScreen extends StatelessWidget {
     }
   }
 
+  Widget _buildComplaintButton(BuildContext context, Appointment apt) {
+    return InkWell(
+      onTap: () => _showComplaintBottomSheet(context, apt),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF0F0),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFFFD1D1)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.flag_outlined,
+              size: 13,
+              color: Color(0xFFD32F2F),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              'complaint'.tr,
+              style: globalTextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFFD32F2F),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showComplaintBottomSheet(BuildContext context, Appointment apt) {
+    final doctorName = apt.doctor?.user?.fullName ?? 'doctor'.tr;
+    final clinicName = apt.clinic?.clinicName ?? '';
+    final reasons = [
+      'complaint_long_wait',
+      'complaint_doctor_absent',
+      'complaint_service_quality',
+      'complaint_billing_issue',
+      'complaint_other',
+    ];
+    final selectedReason = 'complaint_long_wait'.obs;
+    final textController = TextEditingController();
+
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.flag,
+                        color: Color(0xFFD32F2F),
+                        size: 22,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'submit_complaint'.tr,
+                        style: globalTextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xff1A1A1A),
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.grey),
+                    onPressed: () => Get.back(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${'consultation_with'.tr} $doctorName ${clinicName.isNotEmpty ? '($clinicName)' : ''}',
+                style: globalTextStyle(
+                  fontSize: 13,
+                  color: const Color(0xff636F85),
+                ),
+              ),
+              const Divider(height: 24),
+              Text(
+                'complaint_reason'.tr,
+                style: globalTextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xff1A1A1A),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Obx(() => Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: reasons.map((reason) {
+                      final isSelected = selectedReason.value == reason;
+                      return ChoiceChip(
+                        label: Text(reason.tr),
+                        selected: isSelected,
+                        selectedColor: AppColors.primaryColor,
+                        labelStyle: globalTextStyle(
+                          fontSize: 12,
+                          color: isSelected ? Colors.white : Colors.black87,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                        ),
+                        onSelected: (val) {
+                          if (val) selectedReason.value = reason;
+                        },
+                      );
+                    }).toList(),
+                  )),
+              const SizedBox(height: 16),
+              Text(
+                'complaint_desc'.tr,
+                style: globalTextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xff1A1A1A),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: textController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'enter_complaint_details'.tr,
+                  hintStyle: globalTextStyle(
+                    fontSize: 13,
+                    color: Colors.grey,
+                  ),
+                  filled: true,
+                  fillColor: const Color(0xFFF8F9FA),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFE9ECEF)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFE9ECEF)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Get.back();
+                    final refId =
+                        'REF-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+                    Get.dialog(
+                      AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        title: Row(
+                          children: [
+                            const Icon(
+                              Icons.check_circle,
+                              color: Colors.green,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'complaint_submitted'.tr,
+                              style: globalTextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                        content: Text(
+                          '${'complaint_submitted_desc'.tr} $refId',
+                          style: globalTextStyle(
+                            fontSize: 13,
+                            color: const Color(0xFF636F85),
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Get.back(),
+                            child: Text('close'.tr),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Get.back();
+                              Get.to(() => const PatientHelpCenterScreen());
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryColor,
+                            ),
+                            child: Text(
+                              'contact_support'.tr,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFD32F2F),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'submit_complaint'.tr,
+                    style: globalTextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
   String _formatDate(String? dateStr) {
     if (dateStr == null) return "";
     try {
       final dt = DateTime.parse(dateStr);
-      // Format: DayName, MonthName DayNumber (e.g., Tue, Feb 20)
-      // We manually construct this to ensure localization
-      final dayName = DateFormat('E').format(dt).toLowerCase(); // e.g. tue
-      final monthName = DateFormat('MMM').format(dt).toLowerCase(); // e.g. feb
+      final dayName = DateFormat('E').format(dt).toLowerCase();
+      final monthName = DateFormat('MMM').format(dt).toLowerCase();
       final dayNum = dt.day;
 
       return "${dayName.tr}, ${monthName.tr} $dayNum";

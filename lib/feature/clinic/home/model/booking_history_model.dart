@@ -63,8 +63,15 @@ class BookingItem {
   final int serialNumber;
   final String? startTime;
   final String? endTime;
+  final String? approximateEstimatedTime;
+  final String? cancellationReason;
+  final String? rejectionReason;
+  final String? bookedFor;
+  final String? familyMemberName;
+  final String? familyMemberRelation;
   final BookingDoctor? doctor;
   final BookingPatient? patient;
+  final BookingClinic? clinic;
 
   BookingItem({
     required this.id,
@@ -73,8 +80,15 @@ class BookingItem {
     required this.serialNumber,
     this.startTime,
     this.endTime,
+    this.approximateEstimatedTime,
+    this.cancellationReason,
+    this.rejectionReason,
+    this.bookedFor,
+    this.familyMemberName,
+    this.familyMemberRelation,
     this.doctor,
     this.patient,
+    this.clinic,
   });
 
   factory BookingItem.fromJson(Map<String, dynamic> json) {
@@ -87,11 +101,20 @@ class BookingItem {
       serialNumber: json['serialNumber'] ?? 0,
       startTime: json['startTime'],
       endTime: json['endTime'],
+      approximateEstimatedTime: json['approximateEstimatedTime'],
+      cancellationReason: json['cancellationReason'] ?? json['noShowReason'],
+      rejectionReason: json['rejectionReason'],
+      bookedFor: json['bookedFor'],
+      familyMemberName: json['familyMemberName'],
+      familyMemberRelation: json['familyMemberRelation'],
       doctor: json['doctor'] != null
           ? BookingDoctor.fromJson(json['doctor'])
           : null,
       patient: json['patient'] != null
           ? BookingPatient.fromJson(json['patient'])
+          : null,
+      clinic: json['clinic'] != null
+          ? BookingClinic.fromJson(json['clinic'])
           : null,
     );
   }
@@ -105,6 +128,8 @@ class BookingItem {
         return AppointmentStatus.confirmed;
       case 'ARRIVED':
         return AppointmentStatus.arrived;
+      case 'INPROGRESS':
+        return AppointmentStatus.inProgress;
       case 'NOTSHOWN':
       case 'NOT_SHOWN':
       case 'NO_SHOW':
@@ -116,6 +141,8 @@ class BookingItem {
       case 'COMPLETE':
       case 'COMPLETED':
         return AppointmentStatus.completed;
+      case 'REJECTED':
+        return AppointmentStatus.rejected;
       case 'CANCELLED':
         return AppointmentStatus.cancelled;
       default:
@@ -135,6 +162,14 @@ class BookingItem {
       doctorName: doctor?.user?.fullName ?? 'Unknown Doctor',
       status: appointmentStatus,
       queueNo: serialNumber,
+      approximateEstimatedTime: approximateEstimatedTime,
+      cancellationReason: cancellationReason,
+      rejectionReason: rejectionReason,
+      clinicName: clinic?.clinicName,
+      clinicLocation: clinic?.location,
+      bookedFor: bookedFor,
+      familyMemberName: familyMemberName,
+      familyMemberRelation: familyMemberRelation,
     );
   }
 
@@ -192,6 +227,32 @@ class BookingPatient {
   factory BookingPatient.fromJson(Map<String, dynamic> json) {
     return BookingPatient(
       user: json['user'] != null ? BookingUser.fromJson(json['user']) : null,
+    );
+  }
+}
+
+class BookingClinic {
+  final String? id;
+  final String? clinicName;
+  final String? location;
+  final String? logo;
+  final String? contactPhone;
+
+  BookingClinic({
+    this.id,
+    this.clinicName,
+    this.location,
+    this.logo,
+    this.contactPhone,
+  });
+
+  factory BookingClinic.fromJson(Map<String, dynamic> json) {
+    return BookingClinic(
+      id: json['id'],
+      clinicName: json['clinicName'],
+      location: json['location'],
+      logo: json['logo'],
+      contactPhone: json['contactPhone'],
     );
   }
 }

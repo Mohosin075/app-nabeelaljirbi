@@ -2,8 +2,10 @@ enum AppointmentStatus {
   pending,
   confirmed,
   arrived,
+  inProgress,
   completed,
   cancelled,
+  rejected,
   notShown,
   notUpdated,
 }
@@ -19,6 +21,14 @@ class AppointmentModel {
   final AppointmentStatus status;
   final int queueNo;
   final double? rating;
+  final String? approximateEstimatedTime;
+  final String? cancellationReason;
+  final String? rejectionReason;
+  final String? clinicName;
+  final String? clinicLocation;
+  final String? bookedFor;
+  final String? familyMemberName;
+  final String? familyMemberRelation;
 
   AppointmentModel({
     required this.id,
@@ -31,6 +41,14 @@ class AppointmentModel {
     required this.status,
     required this.queueNo,
     this.rating,
+    this.approximateEstimatedTime,
+    this.cancellationReason,
+    this.rejectionReason,
+    this.clinicName,
+    this.clinicLocation,
+    this.bookedFor,
+    this.familyMemberName,
+    this.familyMemberRelation,
   });
 }
 
