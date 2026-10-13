@@ -156,9 +156,9 @@ class AppLanguages extends Translations {
       'payment_options_title': 'What are the payment options?',
       'payment_options_desc':
           'We accept various payment methods including credit cards, debit cards, and mobile payment options for your convenience.',
-      'cancel_reschedule_title': 'How can I cancel or reschedule?',
+      'cancel_reschedule_title': 'How can I cancel or change an appointment?',
       'cancel_reschedule_desc':
-          'You can cancel or reschedule your appointment from the appointments section. Please note our cancellation policy for any applicable fees.',
+          'There is no direct rescheduling; you can cancel and rebook up to 12 hours before the scheduled time from My Appointments. Any cancellation before this cutoff receives a 100% full refund of both the consultation amount and the service fee.',
       'referral_program': 'Referral Program',
       'referral_program_desc': 'Invite friends and earn 1 LYD for each signup!',
       'your_referral_code': 'Your Referral Code',
@@ -456,6 +456,11 @@ class AppLanguages extends Translations {
       'failed_to_cancel_appointment': 'Failed to cancel appointment',
       'cancel_appointment_confirmation':
           'Are you sure you want to cancel this appointment?',
+      'cancel_refund_notice':
+          'Are you sure you want to cancel this appointment? A full 100% refund of both consultation and service fee will be credited to your wallet balance. You can re-book for another time.',
+      'cancellation_locked_title': 'Cancellation Locked',
+      'cancellation_locked_desc':
+          'Appointments can only be cancelled at least 12 hours prior to the scheduled time.',
       'yes_confirm': 'Yes, Confirm',
       'mark_as_arrived': 'Mark as Arrived',
       'confirm_arrival_message':
@@ -551,7 +556,7 @@ class AppLanguages extends Translations {
       'no_doctors_found': 'No doctors found',
       'managing_appointments_title': 'Managing Appointments',
       'managing_appointments_desc':
-          'Doctors can view incoming appointments, accept or reschedule them, and update their status (pending, in-progress, completed) directly from the dashboard.',
+          'Doctors can view incoming appointments, confirm or cancel them, and update their status (pending, in-progress, completed) directly from the dashboard.',
       'update_profile_title': 'Update Profile',
       'update_profile_desc':
           'Keep your profile updated with your latest specialties, experience, and consultation fees to attract more patients.',
@@ -1475,9 +1480,9 @@ class AppLanguages extends Translations {
       'payment_options_title': 'ما هي خيارات الدفع؟',
       'payment_options_desc':
           'نقبل طرق دفع مختلفة بما في ذلك بطاقات الائتمان وبطاقات الخصم وخيارات الدفع عبر الهاتف المحمول لراحتك.',
-      'cancel_reschedule_title': 'كيف يمكنني إلغاء أو إعادة جدولة الموعد؟',
+      'cancel_reschedule_title': 'كيف يمكنني إلغاء أو تغيير الموعد؟',
       'cancel_reschedule_desc':
-          'يمكنك إلغاء أو إعادة جدولة موعدك من قسم المواعيد. يرجى ملاحظة سياسة الإلغاء الخاصة بنا لأي رسوم مطبقة.',
+          'لا توجد إعادة جدولة مباشرة؛ يمكنك الإلغاء ثم إعادة الحجز حتى 12 ساعة قبل الموعد من قسم مواعيدي. أي إلغاء قبل هذا الموعد النهائي يمنح استرداداً كاملاً بنسبة 100% لكل من قيمة الكشف ورسوم الخدمة.',
       'referral_program': 'برنامج الإحالة',
       'referral_program_desc': 'ادعُ أصدقاءك واكسب 1 دينار عن كل اشتراك!',
       'your_referral_code': 'رمز الإحالة الخاص بك',
@@ -1790,6 +1795,11 @@ class AppLanguages extends Translations {
       'failed_to_cancel_appointment': 'فشل في إلغاء الموعد',
       'cancel_appointment_confirmation':
           'هل أنت متأكد أنك تريد إلغاء هذا الموعد؟',
+      'cancel_refund_notice':
+          'هل أنت متأكد أنك تريد إلغاء هذا الموعد؟ سيتم استرداد كامل المبلغ (رسوم الكشف والخدمة) بنسبة 100% إلى محفظتك. يمكنك إعادة الحجز في وقت آخر.',
+      'cancellation_locked_title': 'تم قفل الإلغاء',
+      'cancellation_locked_desc':
+          'لا يمكن إلغاء المواعيد إلا قبل 12 ساعة على الأقل من وقت الموعد المحدد.',
       'yes_confirm': 'نعم، تأكيد',
       'mark_as_arrived': 'تحديد كـ "وصل"',
       'confirm_arrival_message':
@@ -1866,7 +1876,7 @@ class AppLanguages extends Translations {
       'failed_to_confirm_appointment': 'فشل في تأكيد الموعد',
       'managing_appointments_title': 'إدارة المواعيد',
       'managing_appointments_desc':
-          'يمكن للأطباء عرض المواعيد الواردة، وقبولها أو إعادة جدولتها، وتحديث حالتها (قيد الانتظار، قيد التنفيذ، مكتمل) مباشرة من لوحة التحكم.',
+          'يمكن للأطباء عرض المواعيد الواردة، وتأكيدها أو إلغائها، وتحديث حالتها (قيد الانتظار، قيد التنفيذ، مكتمل) مباشرة من لوحة التحكم.',
       'update_profile_title': 'تحديث الملف الشخصي',
       'update_profile_desc':
           'حافظ على تحديث ملفك الشخصي بأحدث تخصصاتك وخبراتك ورسوم الاستشارة لجذب المزيد من المرضى.',

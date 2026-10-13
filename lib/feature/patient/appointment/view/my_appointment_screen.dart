@@ -604,6 +604,158 @@ class MyAppointmentScreen extends StatelessWidget {
                   );
                 }),
               ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: Builder(builder: (context) {
+                  final hoursUntil = _calculateHoursUntilAppointment(apt);
+                  final canCancel = hoursUntil >= 12.0;
+
+                  return Obx(() {
+                    final isCancelling =
+                        controller.cancellingAppointmentId.value == apt.id;
+                    return OutlinedButton(
+                      onPressed: isCancelling
+                          ? null
+                          : () {
+                              if (!canCancel) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    title: Text(
+                                      'cancellation_locked_title'.tr,
+                                      style: globalTextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: const Color(0xff2D2D2D),
+                                      ),
+                                    ),
+                                    content: Text(
+                                      'cancellation_locked_desc'.tr,
+                                      style: globalTextStyle(
+                                        fontSize: 14,
+                                        color: const Color(0xff636F85),
+                                      ),
+                                    ),
+                                    actions: [
+                                      ElevatedButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppColors.primaryColor,
+                                        ),
+                                        child: Text(
+                                          'ok'.tr,
+                                          style: const TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                return;
+                              }
+
+                              if (apt.id != null) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    title: Text(
+                                      'cancel_appointment'.tr,
+                                      style: globalTextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: const Color(0xff2D2D2D),
+                                      ),
+                                    ),
+                                    content: Text(
+                                      'cancel_refund_notice'.tr,
+                                      style: globalTextStyle(
+                                        fontSize: 14,
+                                        color: const Color(0xff636F85),
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text(
+                                          'no'.tr,
+                                          style: globalTextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xff636F85),
+                                          ),
+                                        ),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          controller.cancelAppointment(apt.id!);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                            vertical: 12,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'yes'.tr,
+                                          style: globalTextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                            },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: canCancel
+                              ? Colors.red.shade300
+                              : const Color(0xFFE5E9F2),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: isCancelling
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.primaryColor,
+                              ),
+                            )
+                          : Text(
+                              canCancel
+                                  ? 'cancel_appointment'.tr
+                                  : '${'cancel_appointment'.tr} (<12h ${'locked'.tr.isNotEmpty ? 'locked'.tr : 'Locked'})',
+                              style: globalTextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: canCancel
+                                    ? Colors.red.shade700
+                                    : const Color(0xffA0AEC0),
+                              ),
+                            ),
+                    );
+                  });
+                }),
+              ),
             ],
             if (status.toUpperCase() == 'ARRIVED') ...[
               const SizedBox(height: 16),
@@ -1046,6 +1198,31 @@ class MyAppointmentScreen extends StatelessWidget {
       return "$displayHour:${minute.toString().padLeft(2, '0')} $period";
     } catch (e) {
       return time;
+    }
+  }
+
+  double _calculateHoursUntilAppointment(Appointment apt) {
+    if (apt.consultDate == null) return 0;
+    try {
+      final parsedDate = DateTime.parse(apt.consultDate!);
+      int hour = 0;
+      int minute = 0;
+      if (apt.startTime != null && apt.startTime!.contains(':')) {
+        final parts = apt.startTime!.split(':');
+        hour = int.tryParse(parts[0]) ?? 0;
+        minute = int.tryParse(parts[1]) ?? 0;
+      }
+      final appointmentMoment = DateTime.utc(
+        parsedDate.year,
+        parsedDate.month,
+        parsedDate.day,
+        hour,
+        minute,
+      );
+      final nowUtc = DateTime.now().toUtc();
+      return appointmentMoment.difference(nowUtc).inMinutes / 60.0;
+    } catch (e) {
+      return 0;
     }
   }
 
