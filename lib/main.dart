@@ -13,11 +13,7 @@ import 'package:nabeelaljirbi_app/core/localization/language_strings.dart';
 import 'package:nabeelaljirbi_app/core/route/routes.dart';
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/firebase_options.dart';
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  debugPrint("Background message: ${message.messageId}");
-}
+import 'package:nabeelaljirbi_app/core/service/notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +21,12 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await SharedPrefHelper.init();
   await initializeDateFormatting();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Background message handler
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+  // Initialize FCM notifications across Open, Background, Terminated states
+  await FCMNotificationService.initialize();
 
   Get.put(LanguageService());
 

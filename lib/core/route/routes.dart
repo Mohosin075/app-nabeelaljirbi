@@ -8,6 +8,7 @@ import 'package:nabeelaljirbi_app/feature/patient/doctor_details/view/doctor_det
 import 'package:nabeelaljirbi_app/feature/patient/booking/view/appointment_booking_screen.dart';
 import 'package:nabeelaljirbi_app/feature/patient/booking/view/booking_confirmation_screen.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/home/view/doctor_notification_screen.dart';
+import 'package:nabeelaljirbi_app/feature/patient/notification/view/patient_notification_screen.dart';
 import 'package:nabeelaljirbi_app/feature/patient/subscription/view/patient_subscription_screen.dart';
 import 'package:nabeelaljirbi_app/feature/clinic/subscription/view/clinic_subscription_screen.dart';
 
@@ -20,6 +21,7 @@ class AppRoutes {
   static const String bookAppointment = '/bookAppointment';
   static const String bookingConfirmation = '/bookingConfirmation';
   static const String doctorNotification = '/doctorNotification';
+  static const String patientNotification = '/patientNotification';
   static const String patientSubscription = '/patientSubscription';
   static const String clinicSubscription = '/clinicSubscription';
 
@@ -49,6 +51,11 @@ class AppRoutes {
     GetPage(
       name: doctorNotification,
       page: () => const DoctorNotificationScreen(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: patientNotification,
+      page: () => const PatientNotificationScreen(),
       transition: Transition.rightToLeft,
     ),
     GetPage(

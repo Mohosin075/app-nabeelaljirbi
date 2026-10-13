@@ -21,6 +21,7 @@ import 'package:nabeelaljirbi_app/feature/patient/home/controller/nearby_clinics
 import 'package:nabeelaljirbi_app/feature/patient/home/controller/banner_controller.dart';
 import 'package:nabeelaljirbi_app/feature/patient/profile/controller/patient_profile_controller.dart';
 import 'package:nabeelaljirbi_app/feature/patient/nav_bar/controller/patient_nav_bar_controller.dart';
+import 'package:nabeelaljirbi_app/feature/patient/notification/controller/patient_notification_controller.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   const PatientHomeScreen({super.key});
@@ -94,14 +95,88 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
           ),
         ),
         actions: [
-          Obx(
-            () => SvgPicture.asset(
-              profileController.getSelectedCountrySvg(),
-              width: 24,
-              height: 24,
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () => Get.toNamed(AppRoutes.patientNotification),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color(0xFFE2E8F0),
+                          width: 1,
+                        ),
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            IconsPath.notification,
+                            width: 22,
+                            height: 22,
+                          ),
+                          Obx(() {
+                            final notifCtrl =
+                                Get.isRegistered<PatientNotificationController>()
+                                    ? Get.find<PatientNotificationController>()
+                                    : null;
+                            final count = notifCtrl?.notifications.length ?? 0;
+                            if (count > 0) {
+                              return Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFEF4444),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          }),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Obx(
+                  () => Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.06),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: SvgPicture.asset(
+                      profileController.getSelectedCountrySvg(),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+              ],
             ),
           ),
-          const SizedBox(width: 16),
         ],
       ),
       backgroundColor: Colors.white,
