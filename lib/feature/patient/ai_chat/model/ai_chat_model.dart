@@ -4,6 +4,10 @@ class AiChatHistoryResponse {
   int? limit;
   int? totalCount;
   int? totalPages;
+  int? remainingCount;
+  int? usedCount;
+  int? chatLimit;
+  bool? isEnable;
   List<AiChatHistoryMessage>? messages;
 
   AiChatHistoryResponse({
@@ -12,6 +16,10 @@ class AiChatHistoryResponse {
     this.limit,
     this.totalCount,
     this.totalPages,
+    this.remainingCount,
+    this.usedCount,
+    this.chatLimit,
+    this.isEnable,
     this.messages,
   });
 
@@ -22,6 +30,10 @@ class AiChatHistoryResponse {
       limit: json['limit'],
       totalCount: json['totalCount'],
       totalPages: json['totalPages'],
+      remainingCount: json['remainingCount'],
+      usedCount: json['usedCount'],
+      chatLimit: json['chatLimit'],
+      isEnable: json['isEnable'],
       messages: json['messages'] != null
           ? (json['messages'] as List)
                 .map((i) => AiChatHistoryMessage.fromJson(i))
@@ -38,6 +50,7 @@ class AiChatHistoryMessage {
   String? answer;
   String? doctorId;
   String? createdAt;
+  Map<String, dynamic>? doctor;
 
   AiChatHistoryMessage({
     this.id,
@@ -46,6 +59,7 @@ class AiChatHistoryMessage {
     this.answer,
     this.doctorId,
     this.createdAt,
+    this.doctor,
   });
 
   factory AiChatHistoryMessage.fromJson(Map<String, dynamic> json) {
@@ -56,6 +70,7 @@ class AiChatHistoryMessage {
       answer: json['answer'],
       doctorId: json['doctorId'],
       createdAt: json['createdAt'],
+      doctor: json['doctor'] != null ? Map<String, dynamic>.from(json['doctor']) : null,
     );
   }
 }

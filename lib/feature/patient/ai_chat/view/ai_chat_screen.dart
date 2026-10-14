@@ -35,6 +35,7 @@ class AiChatScreen extends StatelessWidget {
       body: Column(
         children: [
           _buildDisclaimerBanner(),
+          _buildQuotaBanner(),
           Expanded(
             child: Obx(() {
               if (!controller.hasMessages) {
@@ -460,5 +461,93 @@ class AiChatScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildQuotaBanner() {
+    return Obx(() {
+      if (controller.isConfigLoading.value) {
+        return const SizedBox.shrink();
+      }
+
+      if (!controller.isChatEnabled.value) {
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          color: const Color(0xFFFFEBEE),
+          child: Row(
+            children: [
+              const Icon(Icons.block, size: 16, color: Colors.red),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'limit_complete_message'.tr,
+                  style: globalTextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red.shade800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      final remaining = controller.chatLimit.value;
+      final total = controller.maxLimit.value;
+      final isLow = remaining <= 1;
+
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isLow ? const Color(0xFFFFF3E0) : const Color(0xFFE8F5E9),
+          border: Border(
+            bottom: BorderSide(
+              color: isLow ? const Color(0xFFFFE0B2) : const Color(0xFFC8E6C9),
+              width: 1,
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.bolt_rounded,
+              size: 16,
+              color: isLow ? Colors.orange.shade800 : Colors.green.shade800,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'messages_remaining_rolling'.trParams({'count': '$remaining'}),
+                style: globalTextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isLow ? Colors.orange.shade900 : Colors.green.shade900,
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isLow ? Colors.orange.shade200 : Colors.green.shade200,
+                ),
+              ),
+              child: Text(
+                '$remaining / $total',
+                style: globalTextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: isLow ? Colors.orange.shade800 : Colors.green.shade800,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }

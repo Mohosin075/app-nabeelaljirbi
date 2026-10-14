@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -19,7 +20,8 @@ class AiChatController extends GetxController {
   WebSocketChannel? channel;
 
   var isChatEnabled = true.obs;
-  var chatLimit = 0.obs;
+  var chatLimit = 0.obs; // Represents live remaining messages in rolling 24h
+  var maxLimit = 5.obs; // Configured limit per rolling 24h
   var isConfigLoading = true.obs;
 
   bool get hasMessages => messages.isNotEmpty;
@@ -41,39 +43,58 @@ class AiChatController extends GetxController {
         return;
       }
 
-      final url = '${Urls.baseUrl}/allow-ai-chat';
-      debugPrint('🌍 Fetching AI Chat Config: $url');
+      // First try fetching patient's live rolling 24h status
+      final myStatusUrl = '${Urls.baseUrl}/allow-ai-chat/my-status';
+      debugPrint('🌍 Fetching User AI Rolling Status: $myStatusUrl');
 
       final response = await http.get(
-        Uri.parse(url),
+        Uri.parse(myStatusUrl),
         headers: {
           'Authorization': token,
           'Content-Type': 'application/json',
         },
       );
 
-      debugPrint('📥 Config Response Status: ${response.statusCode}');
-      debugPrint('📥 Config Response Body: ${response.body}');
+      debugPrint('📥 AI Status Response Status: ${response.statusCode}');
+      debugPrint('📥 AI Status Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
+        if (body['success'] == true && body['data'] != null) {
+          final data = body['data'];
+          isChatEnabled.value = data['isEnable'] ?? true;
+          maxLimit.value = data['limit'] ?? 5;
+          chatLimit.value = data['remainingCount'] ?? 0;
+          debugPrint(
+            '✅ Live AI Status Loaded: Enabled=${isChatEnabled.value}, Remaining=${chatLimit.value}/${maxLimit.value}',
+          );
+          return;
+        }
+      }
+
+      // Fallback to general config if my-status endpoint is unavailable
+      final fallbackUrl = '${Urls.baseUrl}/allow-ai-chat';
+      final fallbackResp = await http.get(
+        Uri.parse(fallbackUrl),
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (fallbackResp.statusCode == 200) {
+        final body = jsonDecode(fallbackResp.body);
         if (body['success'] == true && body['data'] != null) {
           final List data = body['data'];
           if (data.isNotEmpty) {
             final config = AiChatConfig.fromJson(data.first);
             isChatEnabled.value = config.isEnable ?? true;
-            chatLimit.value = config.limit ?? 0;
-            debugPrint(
-              '✅ Chat Config Loaded: Enabled=${isChatEnabled.value}, Limit=${chatLimit.value}',
-            );
-          } else {
-            debugPrint('⚠️ Chat Config Data is empty');
+            maxLimit.value = config.limit ?? 5;
+            if (chatLimit.value == 0) {
+              chatLimit.value = config.limit ?? 0;
+            }
           }
-        } else {
-          debugPrint('⚠️ Chat Config Success is false or data is null');
         }
-      } else {
-        debugPrint('❌ Failed to load config: ${response.statusCode}');
       }
     } catch (e) {
       debugPrint('❌ Error fetching AI chat config: $e');
@@ -96,7 +117,6 @@ class AiChatController extends GetxController {
     }
 
     try {
-      //final uri = Uri.parse('ws://206.162.244.141:8003/ws/');
       final uri = Uri.parse('wss://api.salamaapp.ly/ws/');
       debugPrint('🔌 Connecting to WebSocket: $uri');
 
@@ -122,7 +142,7 @@ class AiChatController extends GetxController {
         },
       );
 
-      // Load initial messages after connection
+      // Request rolling status & load previous messages
       debugPrint('📜 Requesting history messages...');
       loadHistoryMessages();
     } catch (e) {
@@ -136,7 +156,7 @@ class AiChatController extends GetxController {
     final request = {
       "type": "loadMessages",
       "page": page,
-      "limit": 10, // As per user request example
+      "limit": 50, // Load comprehensive message history
     };
 
     channel!.sink.add(jsonEncode(request));
@@ -161,9 +181,9 @@ class AiChatController extends GetxController {
     debugPrint('📤 Sending message: $text');
     scrollToBottom();
 
-    // Decrement limit
-    chatLimit.value--;
-    debugPrint('📉 Limit Decremented. New Limit: ${chatLimit.value}');
+    // Decrement remaining limit optimistically
+    chatLimit.value = max(0, chatLimit.value - 1);
+    debugPrint('📉 Limit Decremented. Remaining: ${chatLimit.value}');
 
     isLoading.value = true;
 
@@ -178,7 +198,6 @@ class AiChatController extends GetxController {
   }
 
   void reconnectWebSocket() {
-    // simple retry logic if needed, for now just call connect
     if (channel == null || channel!.closeCode != null) {
       connectWebSocket();
     }
@@ -191,6 +210,15 @@ class AiChatController extends GetxController {
       debugPrint('📥 Handle Message Type: $type');
 
       switch (type) {
+        case 'userUsageConfig':
+          _handleUserUsageConfig(decoded);
+          break;
+        case 'limitExceeded':
+          _handleLimitExceeded(decoded);
+          break;
+        case 'chatDisabled':
+          _handleChatDisabled(decoded);
+          break;
         case 'messagesLoaded':
           _handleMessagesLoaded(decoded);
           break;
@@ -214,42 +242,58 @@ class AiChatController extends GetxController {
     }
   }
 
+  void _handleUserUsageConfig(Map<String, dynamic> data) {
+    if (data['remainingCount'] != null) {
+      chatLimit.value = data['remainingCount'];
+    }
+    if (data['limit'] != null) {
+      maxLimit.value = data['limit'];
+    }
+    if (data['isEnable'] != null) {
+      isChatEnabled.value = data['isEnable'];
+    }
+    debugPrint('⚙️ User usage config updated: remaining=${chatLimit.value}/${maxLimit.value}, enabled=${isChatEnabled.value}');
+  }
+
+  void _handleLimitExceeded(Map<String, dynamic> data) {
+    chatLimit.value = 0;
+    isLoading.value = false;
+    isStreaming.value = false;
+    final msg = data['message'] ?? 'limit_complete_message'.tr;
+    Get.snackbar('error'.tr, msg);
+  }
+
+  void _handleChatDisabled(Map<String, dynamic> data) {
+    isChatEnabled.value = false;
+    isLoading.value = false;
+    isStreaming.value = false;
+    Get.snackbar('error'.tr, data['message'] ?? 'AI Assistant is disabled');
+  }
+
   void _handleDoctorRecommendation(Map<String, dynamic> data) {
-    // We assume this recommendation comes after a relevant query.
-    // We can append it as a separate message or part of the last AI message.
-    // The UI supports 'doctorRecommendation' key in the message map.
-
-    // If the last message is from AI (which it should be if we just got an answer/stream),
-    // we can attach it there. Or we can create a new message bubble.
-    // Given the flow, usually AI answers then recommends.
-
     final doctorData = data['doctor'];
     debugPrint(
       '👨‍⚕️ Doctor recommendation: ${doctorData != null ? "Found" : "None"}',
     );
     if (doctorData != null) {
-      debugPrint('👨‍⚕️ Doctor Data: ${jsonEncode(doctorData)}');
       final userData = doctorData['user'] ?? {};
 
       final mappedDoctor = {
-        'name': userData['fullName'] ?? 'Dr. Unknown',
+        'name': userData['fullName'] ?? 'Dr. Specialist',
         'specialty': doctorData['speciality'] ?? 'General',
         'experience': '${doctorData['experience'] ?? 0}y exp',
         'fee': '${doctorData['consultFee'] ?? 0}',
-        'rating': '5.0', // Default as API doesn't provide it yet
-        'reviews': '10+', // Default
+        'rating': '5.0',
+        'reviews': '10+',
         'image': userData['profileImage'] ?? 'https://placehold.co/150.png',
-        'id': doctorData['id'], // Added ID for navigation
+        'id': doctorData['id'],
       };
 
-      // Check if last message is AI and append, otherwise create new
       if (messages.isNotEmpty && messages.last['isUser'] == false) {
         final lastMsg = messages.last;
-        // If we are currently streaming or just finished, attach it
         lastMsg['doctorRecommendation'] = mappedDoctor;
         messages.refresh();
       } else {
-        // Create a new message just for the card
         messages.add({
           'isUser': false,
           'text': 'Here is a recommended doctor for you:',
@@ -263,6 +307,18 @@ class AiChatController extends GetxController {
   void _handleMessagesLoaded(Map<String, dynamic> data) {
     debugPrint('📜 Messages Loaded: ${data.keys}');
     final response = AiChatHistoryResponse.fromJson(data);
+
+    // Sync usage limits if provided by server
+    if (response.remainingCount != null) {
+      chatLimit.value = response.remainingCount!;
+    }
+    if (response.chatLimit != null) {
+      maxLimit.value = response.chatLimit!;
+    }
+    if (response.isEnable != null) {
+      isChatEnabled.value = response.isEnable!;
+    }
+
     if (response.messages != null) {
       var historyMessages = <Map<String, dynamic>>[];
 
@@ -275,16 +331,41 @@ class AiChatController extends GetxController {
             'timestamp': msg.createdAt,
           });
         }
-        // Add answer (AI)
+        // Add answer (AI) with doctor recommendation persistence
         if (msg.answer != null && msg.answer!.isNotEmpty) {
-          historyMessages.add({
+          Map<String, dynamic>? mappedDoctor;
+          if (msg.doctor != null) {
+            final doc = msg.doctor!;
+            final userData = doc['user'] ?? {};
+            mappedDoctor = {
+              'name': userData['fullName'] ?? 'Dr. Specialist',
+              'specialty': doc['speciality'] ?? 'General',
+              'experience': '${doc['experience'] ?? 0}y exp',
+              'fee': '${doc['consultFee'] ?? 0}',
+              'rating': '5.0',
+              'reviews': '10+',
+              'image': userData['profileImage'] ?? 'https://placehold.co/150.png',
+              'id': doc['id'] ?? userData['id'],
+            };
+          final Map<String, dynamic> aiMsg = {
             'isUser': false,
             'text': msg.answer,
-            'timestamp': msg.createdAt, // or updatedAt
-          });
+            'timestamp': msg.createdAt,
+          };
+          if (mappedDoctor != null) {
+            aiMsg['doctorRecommendation'] = mappedDoctor;
+          }
+          historyMessages.add(aiMsg);
         }
       }
-      messages.assignAll(historyMessages);
+
+      // Preserve active in-progress stream if any
+      if (isStreaming.value || isLoading.value) {
+        final inFlight = messages.where((m) => m['isStreaming'] == true).toList();
+        messages.assignAll([...historyMessages, ...inFlight]);
+      } else {
+        messages.assignAll(historyMessages);
+      }
       Future.delayed(const Duration(milliseconds: 100), scrollToBottom);
     }
   }
@@ -301,8 +382,6 @@ class AiChatController extends GetxController {
     if (!isStreaming.value) return;
 
     final chunk = data['chunk'] ?? '';
-    // Optional: too verbose for large texts, but requested
-    // debugPrint('🧩 Stream chunk: $chunk'); // Commented out to avoid spamming logs
     if (messages.isNotEmpty && messages.last['isUser'] == false) {
       final currentText = messages.last['text'] ?? '';
       messages.last['text'] = currentText + chunk;
