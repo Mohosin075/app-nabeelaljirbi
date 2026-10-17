@@ -146,7 +146,8 @@ class AppointmentCard extends StatelessWidget {
                         color: const Color(0xFF1E293B),
                       ),
                     ),
-                    if (appointment.bookedFor == 'FAMILY_MEMBER' &&
+                    if ((appointment.bookedFor == 'FAMILY' ||
+                            appointment.bookedFor == 'FAMILY_MEMBER') &&
                         appointment.familyMemberName != null) ...[
                       const SizedBox(height: 3),
                       Container(

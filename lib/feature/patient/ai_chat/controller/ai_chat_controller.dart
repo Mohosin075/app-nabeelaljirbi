@@ -117,7 +117,11 @@ class AiChatController extends GetxController {
     }
 
     try {
-      final uri = Uri.parse('wss://api.salamaapp.ly/ws/');
+      final wsBase = Urls.baseUrl
+          .replaceFirst('https://', 'wss://')
+          .replaceFirst('http://', 'ws://')
+          .replaceFirst('/api/v1', '/ws/');
+      final uri = Uri.parse(wsBase);
       debugPrint('🔌 Connecting to WebSocket: $uri');
 
       channel = IOWebSocketChannel.connect(
@@ -347,6 +351,7 @@ class AiChatController extends GetxController {
               'image': userData['profileImage'] ?? 'https://placehold.co/150.png',
               'id': doc['id'] ?? userData['id'],
             };
+          }
           final Map<String, dynamic> aiMsg = {
             'isUser': false,
             'text': msg.answer,

@@ -6,6 +6,7 @@ import 'package:nabeelaljirbi_app/core/const/app_colors.dart' show AppColors;
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/core/network_caller/endpoints.dart';
 import 'package:nabeelaljirbi_app/feature/patient/appointment/model/appointment_history_model.dart';
+import 'package:web_socket_channel/io.dart';
 
 class AppointmentController extends GetxController {
   var selectedReviewRating = 0.obs;
@@ -17,10 +18,47 @@ class AppointmentController extends GetxController {
   var finishedAppointments = <Appointment>[].obs;
   var allAppointments = <Appointment>[].obs;
 
+  IOWebSocketChannel? _wsChannel;
+
   @override
   void onInit() {
     super.onInit();
     getAppointmentHistory();
+    _connectWebSocket();
+  }
+
+  @override
+  void onClose() {
+    _wsChannel?.sink.close();
+    super.onClose();
+  }
+
+  void _connectWebSocket() {
+    try {
+      final token = SharedPrefHelper.getAccessToken();
+      if (token == null || token.isEmpty) return;
+
+      final wsUrl = Urls.baseUrl
+          .replaceFirst('https://', 'wss://')
+          .replaceFirst('http://', 'ws://')
+          .replaceFirst('/api/v1', '/ws/?token=$token');
+
+      _wsChannel = IOWebSocketChannel.connect(
+        Uri.parse(wsUrl),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      _wsChannel?.stream.listen((message) {
+        try {
+          final data = jsonDecode(message);
+          if (data['type'] == 'BOOKING_STATUS_CHANGED' ||
+              data['type'] == 'NEW_BOOKING_REQUEST' ||
+              data['type'] == 'BOOKING_CANCELLED') {
+            getAppointmentHistory(silent: true);
+          }
+        } catch (_) {}
+      }, onError: (_) {});
+    } catch (_) {}
   }
 
   void selectTab(int index) {
@@ -39,9 +77,11 @@ class AppointmentController extends GetxController {
         case 2: // Arrived
           return aptStatus == 'ARRIVED';
         case 3: // Completed
-          return aptStatus == 'COMPLETE';
-        case 4: // Cancelled
-          return aptStatus == 'CANCELLED';
+          return aptStatus == 'COMPLETE' || aptStatus == 'COMPLETED';
+        case 4: // Cancelled / Terminal
+          return aptStatus == 'CANCELLED' ||
+              aptStatus == 'REJECTED' ||
+              aptStatus == 'NOT_SHOW';
         default:
           return true;
       }
@@ -108,8 +148,8 @@ class AppointmentController extends GetxController {
     }
   }
 
-  Future<void> getAppointmentHistory() async {
-    isLoading.value = true;
+  Future<void> getAppointmentHistory({bool silent = false}) async {
+    if (!silent) isLoading.value = true;
     try {
       final token = SharedPrefHelper.getAccessToken();
       final url = '${Urls.baseUrl}/patient/appointment-history';
@@ -150,10 +190,12 @@ class AppointmentController extends GetxController {
 
             final status = apt.status?.toUpperCase() ?? '';
 
-            // Only these statuses should be in finished
+            // Terminal statuses are finished
             if (status == 'COMPLETED' ||
                 status == 'COMPLETE' ||
                 status == 'CANCELLED' ||
+                status == 'REJECTED' ||
+                status == 'NOT_SHOW' ||
                 status == 'FINISHED') {
               isFinished = true;
             }
@@ -172,7 +214,7 @@ class AppointmentController extends GetxController {
     } catch (e) {
       debugPrint('Error fetching appointments: $e');
     } finally {
-      isLoading.value = false;
+      if (!silent) isLoading.value = false;
     }
   }
 

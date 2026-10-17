@@ -635,7 +635,6 @@ class AppLanguages extends Translations {
       'currency_tunisia': 'TND',
       'currency_egypt': 'EGP',
       ' ly': ' LYD',
-      'lyd': 'LYD',
       // Specialties
       'Dermatology': 'Dermatology',
       'Dentistry': 'Dentistry',
@@ -1150,10 +1149,6 @@ class AppLanguages extends Translations {
       'subscription_success': 'Subscription Successful!',
       'subscription_success_desc':
           'Welcome to Premium! You now have access to all premium features.',
-      'currency_libya': 'LYD',
-      'currency_algeria': 'DZD',
-      'currency_tunisia': 'TND',
-      'currency_egypt': 'EGP',
       'no_earnings_to_claim': 'No earnings to claim',
       'bonus_claimed_success': 'Bonus claimed successfully',
       'failed_to_claim_bonus': 'Failed to claim bonus',
@@ -1968,7 +1963,6 @@ class AppLanguages extends Translations {
       'currency_tunisia': 'د.ت',
       'currency_egypt': 'ج.م',
       ' ly': ' د.ل',
-      'lyd': 'د.ل',
       // Specialties
       'Dermatology': 'طب الجلد',
       'Dentistry': 'طب الأسنان',
@@ -2481,10 +2475,6 @@ class AppLanguages extends Translations {
       'subscription_success': 'تم الاشتراك بنجاح!',
       'subscription_success_desc':
           'مرحباً بك في بريميوم! لديك الآن إمكانية الوصول إلى جميع الميزات المميزة.',
-      'currency_libya': 'د.ل',
-      'currency_algeria': 'د.ج',
-      'currency_tunisia': 'د.ت',
-      'currency_egypt': 'ج.م',
       'no_earnings_to_claim': 'لا توجد أرباح للمطالبة بها',
       'bonus_claimed_success': 'تمت المطالبة بالمكافأة بنجاح',
       'failed_to_claim_bonus': 'فشل في المطالبة بالمكافأة',

@@ -471,7 +471,8 @@ class DoctorAppointmentScreen extends StatelessWidget {
                         color: const Color(0xff1E293B),
                       ),
                     ),
-                    if (apt.bookedFor == 'FAMILY_MEMBER' &&
+                    if ((apt.bookedFor == 'FAMILY' ||
+                            apt.bookedFor == 'FAMILY_MEMBER') &&
                         apt.familyMemberName != null) ...[
                       const SizedBox(height: 3),
                       Container(

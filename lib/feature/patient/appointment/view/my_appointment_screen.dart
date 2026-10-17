@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
 import 'package:nabeelaljirbi_app/core/const/icons_path.dart';
+import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
+import 'package:nabeelaljirbi_app/core/network_caller/endpoints.dart';
 import 'package:nabeelaljirbi_app/core/route/routes.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/feature/patient/appointment/controller/appointment_controller.dart';
@@ -89,7 +93,10 @@ class MyAppointmentScreen extends StatelessWidget {
                       .where((apt) => apt.status?.toUpperCase() == 'COMPLETE')
                       .length;
                   final cancelledCount = controller.allAppointments
-                      .where((apt) => apt.status?.toUpperCase() == 'CANCELLED')
+                      .where((apt) {
+                        final s = apt.status?.toUpperCase() ?? '';
+                        return s == 'CANCELLED' || s == 'REJECTED' || s == 'NOT_SHOW';
+                      })
                       .length;
 
                   return Row(
@@ -164,7 +171,11 @@ class MyAppointmentScreen extends StatelessWidget {
                       final status = apt.status?.toUpperCase() ?? '';
 
                       // Show in appropriate card style
-                      if (status == 'COMPLETE' || status == 'CANCELLED') {
+                      if (status == 'COMPLETE' ||
+                          status == 'COMPLETED' ||
+                          status == 'CANCELLED' ||
+                          status == 'REJECTED' ||
+                          status == 'NOT_SHOW') {
                         return _buildFinishedCard(apt, context);
                       } else {
                         return _buildUpcomingCard(apt, context);
@@ -1123,6 +1134,18 @@ class MyAppointmentScreen extends StatelessWidget {
       dotColor = const Color(0xFFEF5350);
       borderColor = const Color(0xFFEF5350);
       label = 'cancelled'.tr;
+    } else if (statusUpper == 'REJECTED') {
+      // Dark Red for rejected
+      bgColor = const Color(0xFFFFEBEE);
+      dotColor = const Color(0xFFD32F2F);
+      borderColor = const Color(0xFFD32F2F);
+      label = 'rejected'.tr;
+    } else if (statusUpper == 'NOT_SHOW' || statusUpper == 'NO_SHOW') {
+      // Orange for no show
+      bgColor = const Color(0xFFFFF3E0);
+      dotColor = const Color(0xFFF57C00);
+      borderColor = const Color(0xFFF57C00);
+      label = 'no_show'.tr;
     } else if (statusUpper == 'ARRIVED') {
       // Blue/Green or specific color for arrived? using Purple for 'Arrived'
       bgColor = const Color(0xFFF3E5F5);
@@ -1272,6 +1295,7 @@ class MyAppointmentScreen extends StatelessWidget {
     ];
     final selectedReason = 'complaint_long_wait'.obs;
     final textController = TextEditingController();
+    final isSubmittingComplaint = false.obs;
 
     Get.bottomSheet(
       Container(
@@ -1386,77 +1410,146 @@ class MyAppointmentScreen extends StatelessWidget {
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Get.back();
-                    final refId =
-                        'REF-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
-                    Get.dialog(
-                      AlertDialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        title: Row(
-                          children: [
-                            const Icon(
-                              Icons.check_circle,
-                              color: Colors.green,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'complaint_submitted'.tr,
-                              style: globalTextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                        content: Text(
-                          '${'complaint_submitted_desc'.tr} $refId',
-                          style: globalTextStyle(
-                            fontSize: 13,
-                            color: const Color(0xFF636F85),
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Get.back(),
-                            child: Text('close'.tr),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              Get.back();
-                              Get.to(() => const PatientHelpCenterScreen());
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryColor,
-                            ),
-                            child: Text(
-                              'contact_support'.tr,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ],
+                child: Obx(() {
+                  return ElevatedButton(
+                    onPressed: isSubmittingComplaint.value
+                        ? null
+                        : () async {
+                            final desc = textController.text.trim();
+                            if (desc.isEmpty) {
+                              Get.snackbar(
+                                'error'.tr,
+                                'enter_complaint_details'.tr,
+                              );
+                              return;
+                            }
+
+                            isSubmittingComplaint.value = true;
+                            try {
+                              final token = SharedPrefHelper.getAccessToken();
+                              final url = '${Urls.baseUrl}/admin/complaints';
+
+                              final response = await http.post(
+                                Uri.parse(url),
+                                headers: {
+                                  'Authorization': token ?? '',
+                                  'Content-Type': 'application/json',
+                                },
+                                body: jsonEncode({
+                                  'targetType': 'BOOKING',
+                                  'targetId': apt.id,
+                                  'bookingId': apt.id,
+                                  'subject': selectedReason.value.tr,
+                                  'description': desc,
+                                }),
+                              );
+
+                              if (response.statusCode == 200 ||
+                                  response.statusCode == 201) {
+                                Get.back();
+                                final resBody = jsonDecode(response.body);
+                                final refId = resBody['data']
+                                        ?['complaintNumber'] ??
+                                    'CMP-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+
+                                Get.dialog(
+                                  AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    title: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.check_circle,
+                                          color: Colors.green,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          'complaint_submitted'.tr,
+                                          style: globalTextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    content: Text(
+                                      '${'complaint_submitted_desc'.tr} $refId',
+                                      style: globalTextStyle(
+                                        fontSize: 13,
+                                        color: const Color(0xFF636F85),
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Get.back(),
+                                        child: Text('close'.tr),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Get.back();
+                                          Get.to(
+                                            () =>
+                                                const PatientHelpCenterScreen(),
+                                          );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              AppColors.primaryColor,
+                                        ),
+                                        child: Text(
+                                          'contact_support'.tr,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              } else {
+                                final resBody = jsonDecode(response.body);
+                                Get.snackbar(
+                                  'error'.tr,
+                                  resBody['message'] ??
+                                      'failed_to_submit_complaint'.tr,
+                                );
+                              }
+                            } catch (e) {
+                              Get.snackbar(
+                                'error'.tr,
+                                '${'error_occurred'.tr}: $e',
+                              );
+                            } finally {
+                              isSubmittingComplaint.value = false;
+                            }
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFD32F2F),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD32F2F),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
                     ),
-                  ),
-                  child: Text(
-                    'submit_complaint'.tr,
-                    style: globalTextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+                    child: isSubmittingComplaint.value
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            'submit_complaint'.tr,
+                            style: globalTextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                  );
+                }),
               ),
             ],
           ),
