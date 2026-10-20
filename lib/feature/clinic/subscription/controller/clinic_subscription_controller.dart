@@ -29,11 +29,11 @@ class ClinicSubscriptionController extends GetxController {
       }
 
       debugPrint(
-        '📦 Fetching Plans from: ${Urls.baseUrl}/payment/patient-platform-subscription',
+        '📦 Fetching Plans from: ${Urls.baseUrl}/payment/clinic-platform-subscription',
       );
 
       final response = await http.get(
-        Uri.parse('${Urls.baseUrl}/payment/patient-platform-subscription'),
+        Uri.parse('${Urls.baseUrl}/payment/clinic-platform-subscription'),
         headers: {'Authorization': token, 'Content-Type': 'application/json'},
       );
 
@@ -174,11 +174,11 @@ class ClinicSubscriptionController extends GetxController {
       }
 
       debugPrint(
-        '💰 Posting Payment to: ${Urls.baseUrl}/payment/patient-platform-subscription',
+        '💰 Posting Payment to: ${Urls.baseUrl}/payment/clinic-platform-subscription',
       );
 
       final response = await http.post(
-        Uri.parse('${Urls.baseUrl}/payment/patient-platform-subscription'),
+        Uri.parse('${Urls.baseUrl}/payment/clinic-platform-subscription'),
         headers: {'Authorization': token, 'Content-Type': 'application/json'},
         body: jsonEncode({
           'paymentMethodId': paymentMethodId,
@@ -192,8 +192,10 @@ class ClinicSubscriptionController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Payment successful - refresh profile to update subscription status
-        final profileController = Get.find<PatientProfileController>();
-        await profileController.fetchProfile();
+        if (Get.isRegistered<ClinicProfileController>()) {
+          final profileController = Get.find<ClinicProfileController>();
+          await profileController.fetchProfile();
+        }
 
         isLoading.value = false;
 
