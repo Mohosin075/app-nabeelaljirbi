@@ -158,7 +158,7 @@ class AppLanguages extends Translations {
           'We accept various payment methods including credit cards, debit cards, and mobile payment options for your convenience.',
       'cancel_reschedule_title': 'How can I cancel or change an appointment?',
       'cancel_reschedule_desc':
-          'There is no direct rescheduling; you can cancel and rebook up to 12 hours before the scheduled time from My Appointments. Any cancellation before this cutoff receives a 100% full refund of both the consultation amount and the service fee.',
+          'There is no direct rescheduling; you can cancel and rebook up to 12 hours before the scheduled time from My Appointments. Any consultation amount collected is refunded when eligible. The service fee is released if the request is rejected or expires, but is non-refundable after confirmation.',
       'referral_program': 'Referral Program',
       'referral_program_desc': 'Invite friends and earn 1 LYD for each signup!',
       'your_referral_code': 'Your Referral Code',
@@ -461,8 +461,10 @@ class AppLanguages extends Translations {
       'failed_to_cancel_appointment': 'Failed to cancel appointment',
       'cancel_appointment_confirmation':
           'Are you sure you want to cancel this appointment?',
+      'booking_status_managed_by_clinic':
+          'The clinic manages appointment status updates.',
       'cancel_refund_notice':
-          'Are you sure you want to cancel this appointment? A full 100% refund of both consultation and service fee will be credited to your wallet balance. You can re-book for another time.',
+          'Are you sure you want to cancel this appointment? Any consultation amount collected will be refunded when eligible. The service fee is non-refundable after confirmation; a pending booking releases its held funds. You can re-book for another time.',
       'cancellation_locked_title': 'Cancellation Locked',
       'cancellation_locked_desc':
           'Appointments can only be cancelled at least 12 hours prior to the scheduled time.',
@@ -1491,7 +1493,7 @@ class AppLanguages extends Translations {
           'نقبل طرق دفع مختلفة بما في ذلك بطاقات الائتمان وبطاقات الخصم وخيارات الدفع عبر الهاتف المحمول لراحتك.',
       'cancel_reschedule_title': 'كيف يمكنني إلغاء أو تغيير الموعد؟',
       'cancel_reschedule_desc':
-          'لا توجد إعادة جدولة مباشرة؛ يمكنك الإلغاء ثم إعادة الحجز حتى 12 ساعة قبل الموعد من قسم مواعيدي. أي إلغاء قبل هذا الموعد النهائي يمنح استرداداً كاملاً بنسبة 100% لكل من قيمة الكشف ورسوم الخدمة.',
+          'لا توجد إعادة جدولة مباشرة؛ يمكنك الإلغاء ثم إعادة الحجز حتى 12 ساعة قبل الموعد من قسم مواعيدي. تُسترد قيمة الاستشارة المحصلة عند استحقاقها. تُحرر رسوم الخدمة عند رفض الطلب أو انتهاء مهلة الرد، لكنها غير قابلة للاسترداد بعد تأكيد الحجز.',
       'referral_program': 'برنامج الإحالة',
       'referral_program_desc': 'ادعُ أصدقاءك واكسب 1 دينار عن كل اشتراك!',
       'your_referral_code': 'رمز الإحالة الخاص بك',
@@ -1809,8 +1811,10 @@ class AppLanguages extends Translations {
       'failed_to_cancel_appointment': 'فشل في إلغاء الموعد',
       'cancel_appointment_confirmation':
           'هل أنت متأكد أنك تريد إلغاء هذا الموعد؟',
+      'booking_status_managed_by_clinic':
+          'تتولى العيادة إدارة تحديثات حالة الموعد.',
       'cancel_refund_notice':
-          'هل أنت متأكد أنك تريد إلغاء هذا الموعد؟ سيتم استرداد كامل المبلغ (رسوم الكشف والخدمة) بنسبة 100% إلى محفظتك. يمكنك إعادة الحجز في وقت آخر.',
+          'هل أنت متأكد أنك تريد إلغاء هذا الموعد؟ تُسترد قيمة الاستشارة المحصلة عند استحقاقها. رسوم الخدمة غير قابلة للاسترداد بعد تأكيد الحجز، أما الطلب المعلق فتُحرر المبالغ المحجوزة له. يمكنك إعادة الحجز في وقت آخر.',
       'cancellation_locked_title': 'تم قفل الإلغاء',
       'cancellation_locked_desc':
           'لا يمكن إلغاء المواعيد إلا قبل 12 ساعة على الأقل من وقت الموعد المحدد.',

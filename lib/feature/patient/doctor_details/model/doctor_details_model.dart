@@ -46,6 +46,8 @@ class DoctorDetailData {
   String? doctorId;
   bool? badgeActive;
   String? verificationStatus;
+  num? clinicServiceFeePercentage;
+  String? clinicCollectionMode;
 
   DoctorDetailData({
     this.id,
@@ -101,6 +103,8 @@ class DoctorDetailData {
     doctorId = json['doctorId'];
     badgeActive = json['badgeActive'];
     verificationStatus = json['verificationStatus'];
+    clinicServiceFeePercentage = json['clinicServiceFeePercentage'];
+    clinicCollectionMode = json['clinicCollectionMode'];
   }
 
   Map<String, dynamic> toJson() {

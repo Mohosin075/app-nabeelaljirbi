@@ -557,10 +557,7 @@ class MyAppointmentScreen extends StatelessWidget {
                                     ElevatedButton(
                                       onPressed: () {
                                         Navigator.pop(context);
-                                        controller.updateAppointmentStatus(
-                                          apt.id!,
-                                          'ARRIVED',
-                                        );
+                                        controller.markAppointmentArrived(apt.id!);
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: AppColors.primaryColor,
@@ -768,118 +765,52 @@ class MyAppointmentScreen extends StatelessWidget {
                 }),
               ),
             ],
-            if (status.toUpperCase() == 'ARRIVED') ...[
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: Obx(() {
-                  final isUpdating =
-                      controller.updatingAppointmentId.value == apt.id;
-                  return ElevatedButton(
-                    onPressed: isUpdating
-                        ? null
-                        : () {
-                            if (apt.id != null) {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  title: Text(
-                                    'complete_appointment'.tr,
-                                    style: globalTextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xff2D2D2D),
-                                    ),
-                                  ),
-                                  content: Text(
-                                    'confirm_complete_message'.tr,
-                                    style: globalTextStyle(
-                                      fontSize: 14,
-                                      color: const Color(0xff636F85),
-                                    ),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text(
-                                        'no'.tr,
-                                        style: globalTextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: const Color(0xff636F85),
-                                        ),
-                                      ),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        controller.updateAppointmentStatus(
-                                          apt.id!,
-                                          'COMPLETE',
-                                        );
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(
-                                          0xFF4CAF50,
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 20,
-                                          vertical: 12,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        'yes'.tr,
-                                        style: globalTextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                          },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF4CAF50),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: isUpdating
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            'complete'.tr,
-                            style: globalTextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                  );
-                }),
+            if (apt.bookedFor == 'FAMILY' &&
+                apt.familyMemberName?.isNotEmpty == true) ...[
+              const SizedBox(height: 10),
+              _buildAppointmentInfo(
+                'booked_for_family'.tr,
+                '${apt.familyMemberName}${apt.familyMemberRelation?.isNotEmpty == true ? ' (${apt.familyMemberRelation})' : ''}',
+                Icons.family_restroom,
+              ),
+            ],
+            if (apt.noShowReason?.isNotEmpty == true ||
+                apt.rejectionReason?.isNotEmpty == true ||
+                apt.cancellationReason?.isNotEmpty == true) ...[
+              const SizedBox(height: 10),
+              _buildAppointmentInfo(
+                apt.noShowReason?.isNotEmpty == true
+                    ? 'no_show_reason'.tr
+                    : apt.rejectionReason?.isNotEmpty == true
+                        ? 'rejection_reason'.tr
+                        : 'cancellation_reason'.tr,
+                apt.noShowReason?.isNotEmpty == true
+                    ? apt.noShowReason!
+                    : apt.rejectionReason?.isNotEmpty == true
+                        ? apt.rejectionReason!
+                        : apt.cancellationReason!,
+                Icons.info_outline,
               ),
             ],
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildAppointmentInfo(String label, String value, IconData icon) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 16, color: const Color(0xFF636F85)),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            '$label: $value',
+            style: globalTextStyle(fontSize: 12, color: const Color(0xff636F85)),
+          ),
+        ),
+      ],
     );
   }
 

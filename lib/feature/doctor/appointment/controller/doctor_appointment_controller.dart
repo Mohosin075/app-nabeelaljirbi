@@ -222,11 +222,7 @@ class DoctorAppointmentController extends GetxController {
     }
   }
 
-  Future<void> updateAppointmentStatus(
-    String bookingId,
-    String status, {
-    String? reason,
-  }) async {
+) async {
     isLoading.value = true;
     try {
       final token = SharedPrefHelper.getAccessToken();

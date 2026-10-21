@@ -10,7 +10,6 @@ import 'package:nabeelaljirbi_app/feature/patient/doctor_details/model/doctor_de
 import 'package:flutter/material.dart';
 import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
-import 'package:nabeelaljirbi_app/feature/patient/booking/model/patient_service_fee_model.dart';
 import 'package:nabeelaljirbi_app/feature/patient/wallet/view/patient_wallet_screen.dart';
 
 class BookingController extends GetxController {
@@ -22,6 +21,7 @@ class BookingController extends GetxController {
   var isLoading = false.obs;
   var serviceFee = 0.0.obs;
   var isServiceFeeLoading = true.obs;
+  var advanceBookingDays = 14.obs;
 
   // Family / Dependent booking fields
   var bookedFor = 'SELF'.obs; // 'SELF' or 'FAMILY'
@@ -44,62 +44,75 @@ class BookingController extends GetxController {
     super.onInit();
     _generateDates();
     _updateAvailableSlots(0);
-    fetchServiceFee();
+    fetchBookingSettings();
+    _updateServiceFeeFromClinic();
   }
 
-  Future<void> fetchServiceFee() async {
-    isServiceFeeLoading.value = true;
+  Future<void> fetchBookingSettings() async {
     try {
       final token = SharedPrefHelper.getAccessToken();
       if (token == null) return;
 
-      final url = '${Urls.baseUrl}/patient-service-fee';
-      debugPrint('🌍 Fetching Service Fee: $url');
+      final url = '${Urls.baseUrl}/patient/booking-settings';
+      debugPrint('🌍 Fetching patient booking settings: $url');
 
       final response = await http.get(
         Uri.parse(url),
         headers: {'Authorization': token, 'Content-Type': 'application/json'},
       );
 
-      debugPrint('📥 Service Fee Response Status: ${response.statusCode}');
-      debugPrint('📥 Service Fee Response Body: ${response.body}');
+      debugPrint('📥 Booking Settings Response Status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         if (body['success'] == true && body['data'] != null) {
-          final List data = body['data'];
-          if (data.isNotEmpty) {
-            final String clinicCountry =
-                (doctorController.doctorDetails.value?.clinicCountry ?? '')
-                    .toLowerCase();
-
-            var matchedFeeData = data.firstWhere((fee) {
-              final feeCountry =
-                  (fee['country'] as String?)?.toLowerCase() ?? '';
-              return feeCountry == clinicCountry;
-            }, orElse: () => data.first);
-
-            final feeData = PatientServiceFeeModel.fromJson(matchedFeeData);
-            serviceFee.value = feeData.amount ?? 0.0;
-            debugPrint(
-              '✅ Service Fee Loaded: ${serviceFee.value} for clinic country: $clinicCountry',
-            );
+          final configuredDays =
+              int.tryParse('${body['data']['advanceBookingDays']}') ?? 14;
+          if (configuredDays > 0 && configuredDays <= 365) {
+            advanceBookingDays.value = configuredDays;
+            _generateDates();
+            if (dates.isNotEmpty) _updateAvailableSlots(0);
           }
         }
       }
     } catch (e) {
-      debugPrint('❌ Error fetching service fee: $e');
+      debugPrint('❌ Error fetching booking settings: $e');
     } finally {
-      isServiceFeeLoading.value = false;
+      _updateServiceFeeFromClinic();
     }
+  }
+
+  void _updateServiceFeeFromClinic() {
+    final doctor = doctorController.doctorDetails.value;
+    if (doctor == null) {
+      isServiceFeeLoading.value = false;
+      return;
+    }
+
+    final consultationFee = (doctor.consultFee ?? 0).toDouble();
+    final percentage = (doctor.clinicServiceFeePercentage ?? 0).toDouble();
+    serviceFee.value = double.parse(
+      ((consultationFee * percentage) / 100).toStringAsFixed(2),
+    );
+    isServiceFeeLoading.value = false;
+  }
+
+  String get collectionMode =>
+      doctorController.doctorDetails.value?.clinicCollectionMode ?? 'MODE_A';
+
+  double get requiredPatientHoldAmount {
+    final consultationFee =
+        (doctorController.doctorDetails.value?.consultFee ?? 0).toDouble();
+    return collectionMode == 'MODE_B'
+        ? double.parse((consultationFee + serviceFee.value).toStringAsFixed(2))
+        : serviceFee.value;
   }
 
   void _generateDates() {
     final now = DateTime.now();
     final List<Map<String, dynamic>> generatedDates = [];
     // Advance-booking window (Phase 1 default is 14 days)
-    const int advanceBookingDays = 14;
-    for (int i = 0; i < advanceBookingDays; i++) {
+    for (int i = 0; i <= advanceBookingDays.value; i++) {
       final date = now.add(Duration(days: i));
       generatedDates.add({
         'day': DateFormat('EEE').format(date),
@@ -184,48 +197,18 @@ class BookingController extends GetxController {
     debugPrint("DEBUGGING: Selected Slot StartTime: ${slot.startTime}");
     debugPrint("DEBUGGING: Selected Date: ${selectedDate.toIso8601String()}");
 
-    int hours = 0;
-    int minutes = 0;
-
-    if (slot.startTime != null && slot.startTime!.isNotEmpty) {
-      try {
-        final timeParts = slot.startTime!.split(':');
-        if (timeParts.length >= 2) {
-          // Clean up string: remove anything after digits (like .000Z)
-          String hStr = timeParts[0].replaceAll(RegExp(r'[^0-9]'), '');
-          String mStr = timeParts[1].replaceAll(RegExp(r'[^0-9]'), '');
-
-          if (hStr.isNotEmpty) hours = int.parse(hStr);
-          if (mStr.isNotEmpty) minutes = int.parse(mStr);
-        } else {
-          // Try parsing as ISO if it's not HH:mm
-          final dt = DateTime.tryParse(slot.startTime!);
-          if (dt != null) {
-            hours = dt.hour;
-            minutes = dt.minute;
-          }
-        }
-      } catch (e) {
-        debugPrint("Error parsing time '${slot.startTime}': $e");
-      }
-    }
-
-    DateTime consultDateTime = DateTime(
-      selectedDate.year,
-      selectedDate.month,
-      selectedDate.day,
-      hours,
-      minutes,
-    );
-
     if (bookedFor.value == 'FAMILY' &&
         familyMemberNameController.text.trim().isEmpty) {
       Get.snackbar('error'.tr, 'please_enter_family_member_name'.tr);
       return;
     }
 
-    // If time was parsed successfully, we send ISO.
-    final consultDateString = consultDateTime.toUtc().toIso8601String();
+    // Send the selected clinic calendar date only. The server combines it
+    // with the clinic-local working period and converts that moment to UTC.
+    final consultDateString =
+        '${selectedDate.year.toString().padLeft(4, '0')}-'
+        '${selectedDate.month.toString().padLeft(2, '0')}-'
+        '${selectedDate.day.toString().padLeft(2, '0')}';
 
     isLoading.value = true;
     try {

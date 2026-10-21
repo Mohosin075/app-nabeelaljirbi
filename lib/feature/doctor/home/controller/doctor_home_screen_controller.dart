@@ -136,46 +136,5 @@ class DoctorHomeScreenController extends GetxController {
     selectedTab.value = index;
   }
 
-  Future<void> updateAppointmentStatus(String bookingId, String status) async {
-    isLoading.value = true;
-    try {
-      final token = SharedPrefHelper.getAccessToken();
-      final url = '${Urls.baseUrl}/clinic/update/appointment-status';
 
-      final response = await http.patch(
-        Uri.parse(url),
-        headers: {
-          'Authorization': token ?? '',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({"bookingId": bookingId, "status": status}),
-      );
-
-      if (response.statusCode == 200) {
-        String statusKey = status.toLowerCase();
-        if (status == 'CONFIRMED') statusKey = 'upcoming';
-        if (status == 'COMPLETE') statusKey = 'completed';
-        if (status == 'INPROGRESS') statusKey = 'in_progress';
-
-        Get.snackbar(
-          'success'.tr,
-          '${'appointment_status_updated_to'.tr} ${statusKey.tr}',
-          backgroundColor: AppColors.primaryColor,
-          colorText: Colors.white,
-        );
-        await getHomeData();
-      } else {
-        final body = jsonDecode(response.body);
-        Get.snackbar(
-          'error'.tr,
-          body['message'] ?? 'failed_to_update_status'.tr,
-        );
-      }
-    } catch (e) {
-      debugPrint('Error updating status: $e');
-      Get.snackbar('error'.tr, 'error_updating_status'.tr);
-    } finally {
-      isLoading.value = false;
-    }
-  }
 }

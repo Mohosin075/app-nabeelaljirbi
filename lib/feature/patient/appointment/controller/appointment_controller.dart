@@ -263,14 +263,14 @@ class AppointmentController extends GetxController {
     }
   }
 
-  Future<void> updateAppointmentStatus(String bookingId, String status) async {
+  Future<void> markAppointmentArrived(String bookingId) async {
     updatingAppointmentId.value = bookingId;
     try {
       final token = SharedPrefHelper.getAccessToken();
-      final url = '${Urls.baseUrl}/clinic/update/appointment-status';
+      final url = '${Urls.baseUrl}/patient/appointment-arrived/$bookingId';
 
       debugPrint('Updating Appointment Status: $url');
-      debugPrint('BookingId: $bookingId, Status: $status');
+      debugPrint('BookingId: $bookingId, Status: ARRIVED');
 
       final response = await http.patch(
         Uri.parse(url),
@@ -278,7 +278,6 @@ class AppointmentController extends GetxController {
           'Authorization': token ?? '',
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({"bookingId": bookingId, "status": status}),
       );
 
       debugPrint('Update Status Response: ${response.statusCode}');

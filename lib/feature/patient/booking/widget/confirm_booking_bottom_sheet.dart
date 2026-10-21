@@ -147,11 +147,12 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                             '${(selectedDate['day'] as String).toLowerCase().tr}, ${selectedDate['date']} - $selectedTime',
                             isBold: true,
                           ),
-                          _buildInfoRow(
-                            'session_fee'.tr,
-                            '${doctor.consultFee} ${CurrencyUtil.getUserCurrencySymbol()}',
-                            isAmount: true,
-                          ),
+                          if (bookingController.collectionMode == 'MODE_B')
+                            _buildInfoRow(
+                              'session_fee'.tr,
+                              '${doctor.consultFee} ${CurrencyUtil.getUserCurrencySymbol()}',
+                              isAmount: true,
+                            ),
                           const Divider(),
                           Obx(() {
                             if (bookingController.isServiceFeeLoading.value) {
@@ -165,6 +166,14 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                               isAmount: true,
                             );
                           }),
+                          Obx(
+                            () => _buildInfoRow(
+                              'required_hold_amount'.tr,
+                              '${bookingController.requiredPatientHoldAmount.toStringAsFixed(2)} ${CurrencyUtil.getUserCurrencySymbol()}',
+                              isAmount: true,
+                              isBold: true,
+                            ),
+                          ),
                         ],
                       ),
                     ),

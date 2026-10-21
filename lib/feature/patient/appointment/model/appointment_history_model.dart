@@ -51,6 +51,12 @@ class Appointment {
   String? startTime;
   String? endTime;
   String? approximateEstimatedTime;
+  String? bookedFor;
+  String? familyMemberName;
+  String? familyMemberRelation;
+  String? cancellationReason;
+  String? rejectionReason;
+  String? noShowReason;
   Doctor? doctor;
   List<DoctorRating>? doctorRatings;
   Clinic? clinic;
@@ -63,6 +69,12 @@ class Appointment {
     this.startTime,
     this.endTime,
     this.approximateEstimatedTime,
+    this.bookedFor,
+    this.familyMemberName,
+    this.familyMemberRelation,
+    this.cancellationReason,
+    this.rejectionReason,
+    this.noShowReason,
     this.doctor,
     this.doctorRatings,
     this.clinic,
@@ -76,6 +88,12 @@ class Appointment {
     startTime = json['startTime'];
     endTime = json['endTime'];
     approximateEstimatedTime = json['approximateEstimatedTime'];
+    bookedFor = json['bookedFor'];
+    familyMemberName = json['familyMemberName'];
+    familyMemberRelation = json['familyMemberRelation'];
+    cancellationReason = json['cancellationReason'];
+    rejectionReason = json['rejectionReason'];
+    noShowReason = json['noShowReason'];
     doctor = json['doctor'] != null ? Doctor.fromJson(json['doctor']) : null;
     if (json['doctorRatings'] != null) {
       doctorRatings = <DoctorRating>[];

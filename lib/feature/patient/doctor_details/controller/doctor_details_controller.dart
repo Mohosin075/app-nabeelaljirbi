@@ -11,13 +11,24 @@ class DoctorDetailsController extends GetxController {
   var isLoading = true.obs;
   var doctorDetails = Rxn<DoctorDetailData>();
   var errorMessage = ''.obs;
+  String? requestedClinicId;
 
   @override
   void onInit() {
     super.onInit();
     // Assuming the doctor ID is passed as an argument
-    if (Get.arguments != null && Get.arguments is String) {
-      getDoctorDetails(Get.arguments);
+    final arguments = Get.arguments;
+    if (arguments is String) {
+      getDoctorDetails(arguments);
+    } else if (arguments is Map) {
+      final doctorId = arguments['doctorId']?.toString();
+      requestedClinicId = arguments['clinicId']?.toString();
+      if (doctorId != null && doctorId.isNotEmpty) {
+        getDoctorDetails(doctorId, clinicId: requestedClinicId);
+      } else {
+        errorMessage.value = "Doctor ID not provided";
+        isLoading.value = false;
+      }
     } else {
       // Fallback or error handling if no ID is passed
       // For now, let's just log or set an error
@@ -26,16 +37,20 @@ class DoctorDetailsController extends GetxController {
     }
   }
 
-  Future<void> getDoctorDetails(String doctorId) async {
+  Future<void> getDoctorDetails(String doctorId, {String? clinicId}) async {
     try {
       isLoading(true);
       final token = SharedPrefHelper.getAccessToken();
-      final url = '${Urls.baseUrl}/patient/get-doctor/$doctorId';
+      final uri = Uri.parse('${Urls.baseUrl}/patient/get-doctor/$doctorId')
+          .replace(queryParameters: clinicId == null || clinicId.isEmpty
+              ? null
+              : {'clinicId': clinicId});
+      final url = uri.toString();
 
       debugPrint('Fetching Doctor Details: $url');
 
       final response = await http.get(
-        Uri.parse(url),
+        uri,
         headers: {
           'Authorization': token ?? '',
           'Content-Type': 'application/json',

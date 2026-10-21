@@ -783,7 +783,10 @@ class ClinicDetailsScreen extends StatelessWidget {
                     // Navigation logic if details are needed, for now just pass id if navigating
                     Get.toNamed(
                       AppRoutes.doctorDetails,
-                      arguments: doctor.doctorId,
+                      arguments: {
+                        'doctorId': doctor.doctorId ?? doctor.id,
+                        'clinicId': doctor.clinicId ?? controller.currentClinicId.value,
+                      },
                     );
                   },
                   child: Container(
