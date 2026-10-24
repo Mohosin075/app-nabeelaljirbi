@@ -91,12 +91,17 @@ class _DoctorNotificationScreenState extends State<DoctorNotificationScreen> {
                 final patient = notification.bookingAppointment?.patient?.user;
                 final appointment = notification.bookingAppointment;
 
+                final type = notification.notificationType ?? '';
+                final isNew = type == 'New Appointment';
+                final isUpcoming = type == 'Upcoming Appointment' ||
+                    type == 'APPOINTMENT_REMINDER_24_HOUR' ||
+                    type == 'APPOINTMENT_REMINDER_3_HOUR';
+
                 String description = "";
-                if (notification.notificationType == "New Appointment" ||
-                    notification.notificationType == "Upcoming Appointment") {
+                if (isNew || isUpcoming) {
                   final patientName = patient?.fullName ?? 'a_patient'.tr;
 
-                  if (notification.notificationType == "New Appointment") {
+                  if (isNew) {
                     String dateStr = "";
                     if (appointment?.consultDate != null) {
                       final now = DateTime.now();
@@ -136,8 +141,7 @@ class _DoctorNotificationScreenState extends State<DoctorNotificationScreen> {
                       'date': dateStr,
                       'time': timeStr,
                     });
-                  } else if (notification.notificationType ==
-                      "Upcoming Appointment") {
+                  } else if (isUpcoming) {
                     String timeDiff = "";
                     if (appointment?.consultDate != null &&
                         appointment?.startTime != null) {
@@ -163,9 +167,7 @@ class _DoctorNotificationScreenState extends State<DoctorNotificationScreen> {
                           ).format(appointmentTime);
                         }
                       } catch (e) {
-                        timeDiff =
-                            notification.notificationType?.tr ??
-                            'notification'.tr;
+                        timeDiff = type.tr;
                       }
                     }
 
@@ -175,9 +177,10 @@ class _DoctorNotificationScreenState extends State<DoctorNotificationScreen> {
                     });
                   }
                 } else {
-                  description =
-                      notification.notificationType?.tr ?? 'notification'.tr;
+                  description = type.tr;
                 }
+
+                String displayTitle = type.isNotEmpty ? type.tr : 'notification'.tr;
 
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
@@ -219,8 +222,7 @@ class _DoctorNotificationScreenState extends State<DoctorNotificationScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  notification.notificationType ??
-                                      'Notification',
+                                  displayTitle,
                                   style: globalTextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,

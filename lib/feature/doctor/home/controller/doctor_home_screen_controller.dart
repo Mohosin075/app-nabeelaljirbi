@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/core/network_caller/endpoints.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/appointment/model/doctor_appointment_model.dart';

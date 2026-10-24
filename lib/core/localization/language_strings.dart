@@ -610,6 +610,10 @@ class AppLanguages extends Translations {
       'clinic_payments_help_desc':
           'Monitor your clinic\'s earnings and payouts securely through the dedicated wallet section.',
       'no_notifications_found': 'No notifications found',
+      'APPOINTMENT_REMINDER_24_HOUR': 'Upcoming Appointment (24h)',
+      'APPOINTMENT_REMINDER_3_HOUR': 'Upcoming Appointment (3h)',
+      'New Appointment': 'New Appointment',
+      'Upcoming Appointment': 'Upcoming Appointment',
       'new_appointment_desc': '@name booked an appointment for @date @time',
       'upcoming_appointment_desc':
           'You have an appointment with @name @time_diff',
@@ -1941,6 +1945,10 @@ class AppLanguages extends Translations {
       'clinic_payments_help_desc':
           'راقب أرباح ومدفوعات عيادتك بأمان من خلال قسم المحفظة المخصص.',
       'no_notifications_found': 'لم يتم العثور على إشعارات',
+      'APPOINTMENT_REMINDER_24_HOUR': 'موعد قادم (خلال 24 ساعة)',
+      'APPOINTMENT_REMINDER_3_HOUR': 'موعد قادم (خلال 3 ساعات)',
+      'New Appointment': 'موعد جديد',
+      'Upcoming Appointment': 'موعد قادم',
       'new_appointment_desc': 'حجزت @name موعدًا لـ @date @time',
       'upcoming_appointment_desc': 'لديك موعد مع @name @time_diff',
       'in_minutes': 'خلال @min دقيقة',
