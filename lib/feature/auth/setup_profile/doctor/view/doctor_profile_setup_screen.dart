@@ -308,6 +308,14 @@ class DoctorProfileSetupScreen extends StatelessWidget {
                           ),
                         ),
 
+                        _buildLabel("biography".tr),
+                        _buildTextField(
+                          controller: controller.biographyController,
+                          hint: "biography_hint".tr,
+                          keyboardType: TextInputType.multiline,
+                          maxLines: 4,
+                        ),
+
                         _buildQualificationsBuilder(
                           qualifications: controller.qualifications,
                           onAdd: controller.addQualification,
@@ -1027,7 +1035,7 @@ class DoctorProfileSetupScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildLabel("biography".tr),
+              _buildLabel("qualifications".tr),
               InkWell(
                 onTap: onAdd,
                 borderRadius: BorderRadius.circular(20),
@@ -1050,7 +1058,7 @@ class DoctorProfileSetupScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '+ Add Qualification',
+                        'add_qualification'.tr,
                         style: globalTextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -1075,7 +1083,7 @@ class DoctorProfileSetupScreen extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  'No qualifications added yet. Tap + Add Qualification.',
+                  'no_qualifications_added'.tr,
                   style: globalTextStyle(
                     fontSize: 13,
                     color: const Color(0xff636F85),

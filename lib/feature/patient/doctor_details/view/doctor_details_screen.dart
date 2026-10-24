@@ -102,16 +102,22 @@ class DoctorDetailsScreen extends StatelessWidget {
                   height: 8,
                 ),
                 _buildAboutSection(),
-                if (controller.doctorDetails.value?.biography != null &&
-                    controller.doctorDetails.value!.biography!.isNotEmpty)
+                if (_hasBiography()) ...[
                   const Divider(
                     color: Color(0xFFF5F5F5),
                     thickness: 8,
                     height: 8,
                   ),
-                if (controller.doctorDetails.value?.biography != null &&
-                    controller.doctorDetails.value!.biography!.isNotEmpty)
                   _buildBiographySection(),
+                ],
+                if (_hasQualifications()) ...[
+                  const Divider(
+                    color: Color(0xFFF5F5F5),
+                    thickness: 8,
+                    height: 8,
+                  ),
+                  _buildQualificationsSection(),
+                ],
                 const SizedBox(height: 24),
                 _buildBookButton(),
                 const SizedBox(height: 32),
@@ -591,10 +597,25 @@ class DoctorDetailsScreen extends StatelessWidget {
     );
   }
 
+  bool _hasBiography() {
+    final bio = (controller.doctorDetails.value?.biography ?? '').trim();
+    if (bio.isEmpty) return false;
+    return !bio.startsWith('[') && !bio.startsWith('{');
+  }
+
+  bool _hasQualifications() {
+    final doctor = controller.doctorDetails.value;
+    if (doctor == null) return false;
+    final qualRaw = doctor.qualifications ??
+        ((doctor.biography != null && doctor.biography!.trim().startsWith('['))
+            ? doctor.biography
+            : null);
+    return QualificationData.parse(qualRaw).isNotEmpty;
+  }
+
   Widget _buildBiographySection() {
     final doctor = controller.doctorDetails.value!;
-    final bio = doctor.biography ?? '';
-    final qualifications = QualificationData.parse(bio);
+    final bio = (doctor.biography ?? '').trim();
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -606,90 +627,7 @@ class DoctorDetailsScreen extends StatelessWidget {
             style: globalTextStyle(fontSize: 18, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 12),
-          if (qualifications.isNotEmpty)
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: qualifications.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 10),
-              itemBuilder: (context, index) {
-                final q = qualifications[index];
-                return Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xffF8FAFC),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xffE2E8F0)),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.school,
-                          size: 20,
-                          color: AppColors.primaryColor,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (q.degree.isNotEmpty)
-                              Text(
-                                q.degree,
-                                style: globalTextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xff1E293B),
-                                ),
-                              ),
-                            if (q.institute.isNotEmpty) ...[
-                              const SizedBox(height: 2),
-                              Text(
-                                q.institute,
-                                style: globalTextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w400,
-                                  color: const Color(0xff64748B),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      if (q.year.isNotEmpty) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            q.year,
-                            style: globalTextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryColor,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                );
-              },
-            )
-          else if (bio.startsWith('http'))
+          if (bio.startsWith('http'))
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
@@ -715,9 +653,115 @@ class DoctorDetailsScreen extends StatelessWidget {
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
                   color: const Color(0xff475569),
+                  lineHeight: 1.5,
                 ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQualificationsSection() {
+    final doctor = controller.doctorDetails.value!;
+    final qualRaw = doctor.qualifications ??
+        ((doctor.biography != null && doctor.biography!.trim().startsWith('['))
+            ? doctor.biography
+            : null);
+    final qualifications = QualificationData.parse(qualRaw);
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'qualifications'.tr,
+            style: globalTextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 12),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: qualifications.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
+            itemBuilder: (context, index) {
+              final q = qualifications[index];
+              return Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xffF8FAFC),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xffE2E8F0)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.school,
+                        size: 20,
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (q.degree.isNotEmpty)
+                            Text(
+                              q.degree,
+                              style: globalTextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xff1E293B),
+                              ),
+                            ),
+                          if (q.institute.isNotEmpty) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              q.institute,
+                              style: globalTextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xff64748B),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    if (q.year.isNotEmpty) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          q.year,
+                          style: globalTextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            },
+          ),
         ],
       ),
     );

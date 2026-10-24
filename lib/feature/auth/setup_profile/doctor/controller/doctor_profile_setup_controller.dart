@@ -415,7 +415,7 @@ class DoctorProfileSetupController extends GetxController {
         "licenseNumber": licenseController.text.trim(),
         "consultFee": int.tryParse(consultationFeeController.text.trim()) ?? 0,
         "clinicId": selectedClinicId.value,
-        "biography": QualificationItem.encodeList(qualifications),
+        "biography": biographyController.text.trim(),
         "qualifications": QualificationItem.encodeList(qualifications),
       };
 

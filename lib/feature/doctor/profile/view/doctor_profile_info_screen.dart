@@ -163,11 +163,93 @@ class DoctorProfileInfoScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       // Biography Section
+                      () {
+                        final rawBio = (controller
+                                    .doctorProfile.value?.doctor?.biography ??
+                                '')
+                            .trim();
+                        final isJson =
+                            rawBio.startsWith('[') || rawBio.startsWith('{');
+                        final bioText = isJson ? '' : rawBio;
+                        if (bioText.isEmpty) return const SizedBox.shrink();
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'biography'.tr,
+                              style: globalTextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xff2D2D2D),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            if (bioText.startsWith('http'))
+                              Container(
+                                width: double.infinity,
+                                height: 220,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: const Color(0xff94A3B8),
+                                  ),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.network(
+                                    bioText,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Center(
+                                        child: Text(
+                                          'unable_to_preview_file'.tr,
+                                          style: globalTextStyle(
+                                            fontSize: 14,
+                                            color: const Color(0xff94A3B8),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              )
+                            else
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: const Color(0xff94A3B8),
+                                  ),
+                                ),
+                                child: Text(
+                                  bioText,
+                                  style: globalTextStyle(
+                                    fontSize: 14,
+                                    color: const Color(0xff2D2D2D),
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(height: 16),
+                          ],
+                        );
+                      }(),
+
+                      // Qualifications Section
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'biography'.tr,
+                            'qualifications'.tr,
                             style: globalTextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -176,12 +258,14 @@ class DoctorProfileInfoScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           () {
-                            final bio = controller
-                                .doctorProfile
-                                .value
-                                ?.doctor
-                                ?.biography;
-                            final qualifications = QualificationData.parse(bio);
+                            final doc = controller.doctorProfile.value?.doctor;
+                            final qualRaw = doc?.qualifications ??
+                                ((doc?.biography != null &&
+                                        doc!.biography!.trim().startsWith('['))
+                                    ? doc.biography
+                                    : null);
+                            final qualifications =
+                                QualificationData.parse(qualRaw);
 
                             if (qualifications.isNotEmpty) {
                               return ListView.separated(
@@ -207,7 +291,7 @@ class DoctorProfileInfoScreen extends StatelessWidget {
                                           padding: const EdgeInsets.all(10),
                                           decoration: BoxDecoration(
                                             color: AppColors.primaryColor
-                                                .withOpacity(0.1),
+                                                .withValues(alpha: 0.1),
                                             shape: BoxShape.circle,
                                           ),
                                           child: const Icon(
@@ -228,7 +312,8 @@ class DoctorProfileInfoScreen extends StatelessWidget {
                                                   style: globalTextStyle(
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.w600,
-                                                    color: const Color(0xff1E293B),
+                                                    color:
+                                                        const Color(0xff1E293B),
                                                   ),
                                                 ),
                                               if (q.institute.isNotEmpty) ...[
@@ -238,7 +323,8 @@ class DoctorProfileInfoScreen extends StatelessWidget {
                                                   style: globalTextStyle(
                                                     fontSize: 13,
                                                     fontWeight: FontWeight.w400,
-                                                    color: const Color(0xff64748B),
+                                                    color:
+                                                        const Color(0xff64748B),
                                                   ),
                                                 ),
                                               ],
@@ -254,7 +340,7 @@ class DoctorProfileInfoScreen extends StatelessWidget {
                                             ),
                                             decoration: BoxDecoration(
                                               color: AppColors.primaryColor
-                                                  .withOpacity(0.1),
+                                                  .withValues(alpha: 0.1),
                                               borderRadius:
                                                   BorderRadius.circular(12),
                                             ),
@@ -273,7 +359,7 @@ class DoctorProfileInfoScreen extends StatelessWidget {
                                   );
                                 },
                               );
-                            } else if (bio == null || bio.isEmpty) {
+                            } else {
                               return Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.symmetric(
@@ -288,64 +374,10 @@ class DoctorProfileInfoScreen extends StatelessWidget {
                                   ),
                                 ),
                                 child: Text(
-                                  'not_uploaded'.tr,
+                                  'no_qualifications_added'.tr,
                                   style: globalTextStyle(
                                     fontSize: 14,
                                     color: const Color(0xff94A3B8),
-                                  ),
-                                ),
-                              );
-                            } else if (bio.startsWith('http')) {
-                              return Container(
-                                width: double.infinity,
-                                height: 220,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: const Color(0xff94A3B8),
-                                  ),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.network(
-                                    bio,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Center(
-                                        child: Text(
-                                          'unable_to_preview_file'.tr,
-                                          style: globalTextStyle(
-                                            fontSize: 14,
-                                            color: const Color(0xff94A3B8),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              );
-                            } else {
-                              return Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 14,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: const Color(0xff94A3B8),
-                                  ),
-                                ),
-                                child: Text(
-                                  bio,
-                                  style: globalTextStyle(
-                                    fontSize: 14,
-                                    color: const Color(0xff2D2D2D),
                                   ),
                                 ),
                               );

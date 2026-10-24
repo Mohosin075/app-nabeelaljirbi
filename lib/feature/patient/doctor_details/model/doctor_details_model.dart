@@ -42,6 +42,7 @@ class DoctorDetailData {
   List<ScheduleDay>? schedule;
   String? about;
   String? biography;
+  String? qualifications;
   String? clinicId;
   String? doctorId;
   bool? badgeActive;
@@ -67,6 +68,7 @@ class DoctorDetailData {
     this.schedule,
     this.about,
     this.biography,
+    this.qualifications,
     this.clinicId,
     this.doctorId,
   });
@@ -99,6 +101,7 @@ class DoctorDetailData {
     }
     about = json['about'];
     biography = json['biography'];
+    qualifications = json['qualifications'];
     clinicId = json['clinicId'];
     doctorId = json['doctorId'];
     badgeActive = json['badgeActive'];
@@ -130,6 +133,7 @@ class DoctorDetailData {
     }
     data['about'] = about;
     data['biography'] = biography;
+    data['qualifications'] = qualifications;
     data['clinicId'] = clinicId;
     data['doctorId'] = doctorId;
     return data;

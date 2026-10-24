@@ -84,9 +84,13 @@ class DoctorEditProfileController extends GetxController {
       // specialtyController.text = data.doctor?.speciality ?? '';
       selectedSpecialty.value = data.doctor?.speciality ?? '';
       licenseController.text = data.doctor?.licenseNumber ?? '';
-      biographyController.text = data.doctor?.biography ?? '';
+      final rawBio = (data.doctor?.biography ?? '').trim();
+      final bool isJsonOrUrl = rawBio.startsWith('[') ||
+          rawBio.startsWith('{') ||
+          rawBio.startsWith('http');
+      biographyController.text = isJsonOrUrl ? '' : rawBio;
       qualifications.value = QualificationItem.decodeList(
-          data.doctor?.qualifications ?? data.doctor?.biography);
+          data.doctor?.qualifications ?? (rawBio.startsWith('[') ? rawBio : null));
       consultationFeeController.text =
           data.doctor?.consultFee?.toString() ?? '';
       if (data.dateOfBirth != null) {
@@ -332,7 +336,7 @@ class DoctorEditProfileController extends GetxController {
         "licenseNumber": licenseController.text.trim(),
         "consultFee": int.tryParse(consultationFeeController.text) ?? 0,
         "clinicId": null,
-        "biography": QualificationItem.encodeList(qualifications),
+        "biography": biographyController.text.trim(),
         "qualifications": QualificationItem.encodeList(qualifications),
       };
 

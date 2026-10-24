@@ -180,7 +180,6 @@ class DoctorEditProfileScreen extends StatelessWidget {
                 forceLtr: true,
               ),
               const SizedBox(height: 16),
-              const SizedBox(height: 16),
               _buildTextField(
                 label: 'base_consultation_fee'.tr,
                 controller: controller.consultationFeeController,
@@ -189,7 +188,16 @@ class DoctorEditProfileScreen extends StatelessWidget {
                 forceLtr: true,
               ),
               const SizedBox(height: 16),
-              // Biography / Academic & Professional Qualifications Section
+              // Doctor Biography (multiline textbox)
+              _buildTextField(
+                label: 'biography'.tr,
+                controller: controller.biographyController,
+                hint: 'biography_hint'.tr,
+                maxLines: 4,
+                inputType: TextInputType.multiline,
+              ),
+              const SizedBox(height: 16),
+              // Qualifications Section
               _buildQualificationsBuilder(
                 qualifications: controller.qualifications,
                 onAdd: controller.addQualification,
@@ -633,7 +641,7 @@ class DoctorEditProfileScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'biography'.tr,
+                'qualifications'.tr,
                 style: globalTextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -649,7 +657,7 @@ class DoctorEditProfileScreen extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xff137CCF).withOpacity(0.1),
+                    color: const Color(0xff137CCF).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -662,7 +670,7 @@ class DoctorEditProfileScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '+ Add Qualification',
+                        'add_qualification'.tr,
                         style: globalTextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -687,7 +695,7 @@ class DoctorEditProfileScreen extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  'No qualifications added yet. Tap + Add Qualification.',
+                  'no_qualifications_added'.tr,
                   style: globalTextStyle(
                     fontSize: 13,
                     color: const Color(0xff636F85),
@@ -711,7 +719,7 @@ class DoctorEditProfileScreen extends StatelessWidget {
                     border: Border.all(color: const Color(0xFFCBD5E1)),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
+                        color: Colors.black.withValues(alpha: 0.03),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -728,7 +736,8 @@ class DoctorEditProfileScreen extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xff137CCF).withOpacity(0.1),
+                                  color: const Color(0xff137CCF)
+                                      .withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(

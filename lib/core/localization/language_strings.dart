@@ -53,6 +53,13 @@ class AppLanguages extends Translations {
       'enter_license_number': 'Enter medical license number',
       'base_consultation_fee': 'Base Consultation Fee',
       'enter_consultation_fee': 'Enter consultation fee',
+      'biography_hint':
+          'Write a brief biography about your medical background and experience...',
+      'enter_biography': 'Enter your biography',
+      'qualifications': 'Qualifications',
+      'add_qualification': '+ Add Qualification',
+      'no_qualifications_added':
+          'No qualifications added yet. Tap + Add Qualification.',
       'clinic_info_optional': 'Clinic Information (Optional)',
       'select_clinic': 'Select Clinic',
       'select_clinic_info': 'Select clinic info',
@@ -1399,6 +1406,13 @@ class AppLanguages extends Translations {
       'enter_license_number': 'أدخل رقم الترخيص الطبي',
       'base_consultation_fee': 'رسوم الاستشارة الأساسية',
       'enter_consultation_fee': 'أدخل رسوم الاستشارة',
+      'biography_hint':
+          'اكتب سيرة ذاتية موجزة عن خلفيتك الطبية وخبراتك...',
+      'enter_biography': 'أدخل سيرتك الذاتية',
+      'qualifications': 'المؤهلات العلمية',
+      'add_qualification': '+ إضافة مؤهل',
+      'no_qualifications_added':
+          'لم يتم إضافة مؤهلات بعد. اضغط على + إضافة مؤهل.',
       'clinic_info_optional': 'معلومات العيادة (اختياري)',
       'select_clinic': 'اختر العيادة',
       'select_clinic_info': 'اختر معلومات العيادة',
