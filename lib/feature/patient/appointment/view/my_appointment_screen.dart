@@ -417,67 +417,10 @@ class MyAppointmentScreen extends StatelessWidget {
                         ? null
                         : () {
                             if (apt.id != null) {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  title: Text(
-                                    'cancel_appointment'.tr,
-                                    style: globalTextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xff2D2D2D),
-                                    ),
-                                  ),
-                                  content: Text(
-                                    'are_you_sure_cancel'.tr,
-                                    style: globalTextStyle(
-                                      fontSize: 14,
-                                      color: const Color(0xff636F85),
-                                    ),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text(
-                                        'no'.tr,
-                                        style: globalTextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: const Color(0xff636F85),
-                                        ),
-                                      ),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        controller.cancelAppointment(apt.id!);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 20,
-                                          vertical: 12,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        'yes'.tr,
-                                        style: globalTextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              _showCancelConfirmationDialog(
+                                context,
+                                apt.id!,
+                                isConfirmed: false,
                               );
                             }
                           },
@@ -666,65 +609,10 @@ class MyAppointmentScreen extends StatelessWidget {
                               }
 
                               if (apt.id != null) {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    title: Text(
-                                      'cancel_appointment'.tr,
-                                      style: globalTextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                        color: const Color(0xff2D2D2D),
-                                      ),
-                                    ),
-                                    content: Text(
-                                      'cancel_refund_notice'.tr,
-                                      style: globalTextStyle(
-                                        fontSize: 14,
-                                        color: const Color(0xff636F85),
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: Text(
-                                          'no'.tr,
-                                          style: globalTextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: const Color(0xff636F85),
-                                          ),
-                                        ),
-                                      ),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                          controller.cancelAppointment(apt.id!);
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.red,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 20,
-                                            vertical: 12,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          'yes'.tr,
-                                          style: globalTextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                _showCancelConfirmationDialog(
+                                  context,
+                                  apt.id!,
+                                  isConfirmed: true,
                                 );
                               }
                             },
@@ -811,6 +699,115 @@ class MyAppointmentScreen extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _showCancelConfirmationDialog(
+    BuildContext context,
+    String appointmentId, {
+    required bool isConfirmed,
+  }) {
+    final reasonController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text(
+          'cancel_appointment'.tr,
+          style: globalTextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xff2D2D2D),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isConfirmed
+                  ? 'cancel_refund_notice'.tr
+                  : 'are_you_sure_cancel'.tr,
+              style: globalTextStyle(
+                fontSize: 14,
+                color: const Color(0xff636F85),
+              ),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: reasonController,
+              maxLines: 2,
+              decoration: InputDecoration(
+                hintText: 'enter_reason'.tr,
+                labelText: '${'cancellation_reason'.tr} (${'optional'.tr})',
+                labelStyle: globalTextStyle(
+                  fontSize: 12,
+                  color: const Color(0xff636F85),
+                ),
+                hintStyle: globalTextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Color(0xffE0E0E0)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppColors.primaryColor),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'no'.tr,
+              style: globalTextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xff636F85),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              final reason = reasonController.text.trim();
+              controller.cancelAppointment(
+                appointmentId,
+                reason: reason.isNotEmpty ? reason : null,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 12,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'yes'.tr,
+              style: globalTextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -1356,6 +1356,7 @@ class AppLanguages extends Translations {
       'yes_reject': 'Yes, Reject',
       'yes_mark_no_show': 'Yes, Mark No Show',
       'yes_start': 'Yes, Start',
+      'optional': 'Optional',
     },
     'ar_SA': {
       'language': 'اللغة',
@@ -2688,6 +2689,7 @@ class AppLanguages extends Translations {
       'yes_reject': 'نعم، رفض',
       'yes_mark_no_show': 'نعم، تسجيل عدم الحضور',
       'yes_start': 'نعم، ابدأ',
+      'optional': 'اختياري',
     },
   };
 }

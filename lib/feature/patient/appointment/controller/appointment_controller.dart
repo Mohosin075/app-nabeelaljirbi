@@ -221,7 +221,7 @@ class AppointmentController extends GetxController {
   var cancellingAppointmentId = ''.obs;
   var updatingAppointmentId = ''.obs;
 
-  Future<void> cancelAppointment(String appointmentId) async {
+  Future<void> cancelAppointment(String appointmentId, {String? reason}) async {
     cancellingAppointmentId.value = appointmentId;
     try {
       final token = SharedPrefHelper.getAccessToken();
@@ -229,12 +229,18 @@ class AppointmentController extends GetxController {
 
       debugPrint('Cancelling Appointment: $url');
 
+      final Map<String, dynamic> body = {};
+      if (reason != null && reason.trim().isNotEmpty) {
+        body['reason'] = reason.trim();
+      }
+
       final response = await http.patch(
         Uri.parse(url),
         headers: {
           'Authorization': token ?? '',
           'Content-Type': 'application/json',
         },
+        body: jsonEncode(body),
       );
 
       debugPrint('Cancel Response Status: ${response.statusCode}');

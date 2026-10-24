@@ -87,6 +87,7 @@ class Appointment {
   String? approximateEstimatedTime;
   String? cancellationReason;
   String? rejectionReason;
+  String? noShowReason;
   String? bookedFor;
   String? familyMemberName;
   String? familyMemberRelation;
@@ -109,6 +110,7 @@ class Appointment {
     this.approximateEstimatedTime,
     this.cancellationReason,
     this.rejectionReason,
+    this.noShowReason,
     this.bookedFor,
     this.familyMemberName,
     this.familyMemberRelation,
@@ -132,6 +134,8 @@ class Appointment {
     approximateEstimatedTime = json['approximateEstimatedTime'];
     cancellationReason = json['cancellationReason'] ?? json['noShowReason'];
     rejectionReason = json['rejectionReason'];
+    noShowReason = json['noShowReason'] ??
+        (json['status'] == 'NOT_SHOW' ? json['cancellationReason'] : null);
     bookedFor = json['bookedFor'];
     familyMemberName = json['familyMemberName'];
     familyMemberRelation = json['familyMemberRelation'];

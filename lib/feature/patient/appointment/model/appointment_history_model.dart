@@ -91,9 +91,10 @@ class Appointment {
     bookedFor = json['bookedFor'];
     familyMemberName = json['familyMemberName'];
     familyMemberRelation = json['familyMemberRelation'];
-    cancellationReason = json['cancellationReason'];
+    cancellationReason = json['cancellationReason'] ?? json['noShowReason'];
     rejectionReason = json['rejectionReason'];
-    noShowReason = json['noShowReason'];
+    noShowReason = json['noShowReason'] ??
+        (json['status'] == 'NOT_SHOW' ? json['cancellationReason'] : null);
     doctor = json['doctor'] != null ? Doctor.fromJson(json['doctor']) : null;
     if (json['doctorRatings'] != null) {
       doctorRatings = <DoctorRating>[];
