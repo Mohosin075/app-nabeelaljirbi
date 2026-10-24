@@ -91,6 +91,8 @@ class ClinicDoctorItem {
   num? totalConsult;
   num? upcomingConsult;
   String? about;
+  String? biography;
+  String? qualifications;
 
   ClinicDoctorItem({
     this.id,
@@ -109,6 +111,8 @@ class ClinicDoctorItem {
     this.totalConsult,
     this.upcomingConsult,
     this.about,
+    this.biography,
+    this.qualifications,
   });
 
   ClinicDoctorItem.fromJson(Map<String, dynamic> json) {
@@ -128,6 +132,8 @@ class ClinicDoctorItem {
     totalConsult = json['totalConsult'];
     upcomingConsult = json['upcomingConsult'];
     about = json['about'];
+    biography = json['biography'];
+    qualifications = json['qualifications'];
   }
 
   Map<String, dynamic> toJson() {
@@ -148,6 +154,8 @@ class ClinicDoctorItem {
     data['totalConsult'] = totalConsult;
     data['upcomingConsult'] = upcomingConsult;
     data['about'] = about;
+    data['biography'] = biography;
+    data['qualifications'] = qualifications;
     return data;
   }
 }
