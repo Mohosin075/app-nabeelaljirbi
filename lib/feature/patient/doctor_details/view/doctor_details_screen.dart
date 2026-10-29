@@ -284,96 +284,107 @@ class DoctorDetailsScreen extends StatelessWidget {
 
   Widget _buildClinicSection() {
     final doctor = controller.doctorDetails.value!;
-    return InkWell(
-      onTap: () {
-        if (doctor.clinicId != null) {
-          debugPrint('clinicId: ${doctor.clinicId}');
-          Get.toNamed(AppRoutes.clinicDetails, arguments: doctor.clinicId);
-        }
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'clinic'.tr,
-                  style: globalTextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
+    final clinics = doctor.doctorClinics.isNotEmpty
+        ? doctor.doctorClinics
+        : <Map<String, dynamic>>[
+            {
+              'id': doctor.clinicId,
+              'clinicName': doctor.clinicName,
+              'logo': doctor.clinicLogo,
+              'galleries': doctor.clinicPhoto
+                  ?.map((photo) => {'image': photo.image})
+                  .toList(),
+              'schedule': doctor.schedule?.map((day) => day.toJson()).toList(),
+            },
+          ];
+    return Column(
+      children: clinics.map((clinic) {
+        final selected = clinic['id'] == doctor.clinicId;
+        final days = clinic['schedule'] as List? ?? [];
+        final photos = clinic['galleries'] as List? ?? [];
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: clinic['logo'] != null
+                    ? CircleAvatar(
+                        backgroundImage: NetworkImage(clinic['logo']),
+                      )
+                    : const Icon(Icons.local_hospital),
+                title: Text(
+                  clinic['clinicName'] ?? 'clinic'.tr,
+                  style: globalTextStyle(fontWeight: FontWeight.w600),
                 ),
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  size: 16,
-                  color: Color(0xff636F85),
+                subtitle: Text(clinic['location'] ?? ''),
+                trailing: selected
+                    ? const Icon(
+                        Icons.check_circle,
+                        color: AppColors.primaryColor,
+                      )
+                    : null,
+                onTap: () => Get.toNamed(
+                  AppRoutes.clinicDetails,
+                  arguments: clinic['id'],
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: const Color(0xFFF0F0F0)),
-                  ),
-                  child:
-                      doctor.clinicLogo != null && doctor.clinicLogo!.isNotEmpty
-                      ? Image.network(
-                          doctor.clinicLogo!,
-                          errorBuilder: (context, error, stackTrace) =>
-                              SvgPicture.asset(IconsPath.clinicIcon),
-                        )
-                      : SvgPicture.asset(IconsPath.clinicIcon),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    doctor.clinicName ?? '',
-                    style: globalTextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xff1A1A1A),
+              ),
+              if (photos.isNotEmpty)
+                SizedBox(
+                  height: 100,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: photos.length,
+                    separatorBuilder: (_, _) => const SizedBox(width: 8),
+                    itemBuilder: (_, index) => ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        photos[index]['image'] ?? '',
+                        width: 150,
+                        height: 100,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => const SizedBox(
+                          width: 150,
+                          child: Icon(Icons.image_not_supported),
+                        ),
+                      ),
                     ),
                   ),
                 ),
+              for (final day in days) ...[
+                const SizedBox(height: 8),
+                Text(
+                  (day['day'] ?? '').toString().toLowerCase().tr,
+                  style: globalTextStyle(fontWeight: FontWeight.w600),
+                ),
+                for (final slot in (day['slots'] as List? ?? []))
+                  if (slot['isActive'] != false)
+                    Text(
+                      '${slot['startTime']} - ${slot['endTime']}',
+                      style: globalTextStyle(fontSize: 13),
+                    ),
               ],
-            ),
-            const SizedBox(height: 16),
-            if (doctor.clinicPhoto != null && doctor.clinicPhoto!.isNotEmpty)
-              SizedBox(
-                height: 100,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: doctor.clinicPhoto!.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 12.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          doctor.clinicPhoto![index].image ?? '',
-                          width: 140,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(width: 140, color: Colors.grey[200]),
-                        ),
-                      ),
-                    );
-                  },
+              const SizedBox(height: 8),
+              OutlinedButton(
+                onPressed: selected
+                    ? null
+                    : () async {
+                        if (doctor.doctorId == null) return;
+                        await controller.getDoctorDetails(
+                          doctor.doctorId!,
+                          clinicId: clinic['id'],
+                        );
+                      },
+                child: Text(
+                  selected ? 'selected_clinic'.tr : 'select_clinic_booking'.tr,
                 ),
               ),
-          ],
-        ),
-      ),
+              const Divider(),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -606,7 +617,8 @@ class DoctorDetailsScreen extends StatelessWidget {
   bool _hasQualifications() {
     final doctor = controller.doctorDetails.value;
     if (doctor == null) return false;
-    final qualRaw = doctor.qualifications ??
+    final qualRaw =
+        doctor.qualifications ??
         ((doctor.biography != null && doctor.biography!.trim().startsWith('['))
             ? doctor.biography
             : null);
@@ -664,7 +676,8 @@ class DoctorDetailsScreen extends StatelessWidget {
 
   Widget _buildQualificationsSection() {
     final doctor = controller.doctorDetails.value!;
-    final qualRaw = doctor.qualifications ??
+    final qualRaw =
+        doctor.qualifications ??
         ((doctor.biography != null && doctor.biography!.trim().startsWith('['))
             ? doctor.biography
             : null);

@@ -13,6 +13,7 @@ import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/feature/patient/wallet/view/patient_wallet_screen.dart';
 
 class BookingController extends GetxController {
+  late final Worker _doctorWorker;
   final DoctorDetailsController doctorController =
       Get.find<DoctorDetailsController>();
 
@@ -25,9 +26,16 @@ class BookingController extends GetxController {
 
   // Family / Dependent booking fields
   var bookedFor = 'SELF'.obs; // 'SELF' or 'FAMILY'
-  final TextEditingController familyMemberNameController = TextEditingController();
+  final TextEditingController familyMemberNameController =
+      TextEditingController();
   var selectedFamilyRelation = 'SPOUSE'.obs;
-  final List<String> familyRelations = ['SPOUSE', 'CHILD', 'PARENT', 'SIBLING', 'OTHER'];
+  final List<String> familyRelations = [
+    'SPOUSE',
+    'CHILD',
+    'PARENT',
+    'SIBLING',
+    'OTHER',
+  ];
 
   RxList<Map<String, dynamic>> dates = <Map<String, dynamic>>[].obs;
   RxList<Slot> availableSlots = <Slot>[].obs;
@@ -46,6 +54,20 @@ class BookingController extends GetxController {
     _updateAvailableSlots(0);
     fetchBookingSettings();
     _updateServiceFeeFromClinic();
+    _doctorWorker = ever(doctorController.doctorDetails, (_) {
+      selectedDateIndex.value = 0;
+      selectedSlotIndex.value = -1;
+      availableSlots.clear();
+      if (dates.isNotEmpty) _updateAvailableSlots(0);
+      _updateServiceFeeFromClinic();
+    });
+  }
+
+  @override
+  void onClose() {
+    _doctorWorker.dispose();
+    familyMemberNameController.dispose();
+    super.onClose();
   }
 
   Future<void> fetchBookingSettings() async {
@@ -69,6 +91,8 @@ class BookingController extends GetxController {
           final configuredDays =
               int.tryParse('${body['data']['advanceBookingDays']}') ?? 14;
           if (configuredDays > 0 && configuredDays <= 365) {
+            selectedDateIndex.value = 0;
+            selectedSlotIndex.value = -1;
             advanceBookingDays.value = configuredDays;
             _generateDates();
             if (dates.isNotEmpty) _updateAvailableSlots(0);
@@ -91,9 +115,13 @@ class BookingController extends GetxController {
 
     final consultationFee = (doctor.consultFee ?? 0).toDouble();
     final percentage = (doctor.clinicServiceFeePercentage ?? 0).toDouble();
-    serviceFee.value = double.parse(
-      ((consultationFee * percentage) / 100).toStringAsFixed(2),
-    );
+    serviceFee.value =
+        doctor.patientServiceFeeAmount?.toDouble() ??
+        (doctor.clinicCollectionMode == 'MODE_B'
+            ? double.parse(
+                ((consultationFee * percentage) / 100).toStringAsFixed(2),
+              )
+            : (doctor.fixedPatientServiceFee ?? 0).toDouble());
     isServiceFeeLoading.value = false;
   }
 
@@ -190,6 +218,10 @@ class BookingController extends GetxController {
     }
 
     final doctor = doctorController.doctorDetails.value!;
+    if (collectionMode == 'MODE_A' && doctor.fixedPatientServiceFee == null) {
+      Get.snackbar('error'.tr, 'clinic_fee_not_configured'.tr);
+      return;
+    }
     final slot = availableSlots[selectedSlotIndex.value];
     final selectedDateMap = dates[selectedDateIndex.value];
     final DateTime selectedDate = selectedDateMap['fullDate'];
@@ -223,8 +255,7 @@ class BookingController extends GetxController {
       };
 
       if (bookedFor.value == 'FAMILY') {
-        payloadMap["familyMemberName"] =
-            familyMemberNameController.text.trim();
+        payloadMap["familyMemberName"] = familyMemberNameController.text.trim();
         payloadMap["familyMemberRelation"] = selectedFamilyRelation.value;
       }
 
@@ -278,15 +309,17 @@ class BookingController extends GetxController {
         (lower.contains('wallet') && lower.contains('balance'))) {
       String? requiredHold;
       String? availableBal;
-      final holdMatch =
-          RegExp(r'Required hold:\s*([0-9.]+)', caseSensitive: false)
-              .firstMatch(rawMsg);
+      final holdMatch = RegExp(
+        r'Required hold:\s*([0-9.]+)',
+        caseSensitive: false,
+      ).firstMatch(rawMsg);
       if (holdMatch != null) {
         requiredHold = holdMatch.group(1);
       }
-      final availMatch =
-          RegExp(r'Available balance:\s*([0-9.]+)', caseSensitive: false)
-              .firstMatch(rawMsg);
+      final availMatch = RegExp(
+        r'Available balance:\s*([0-9.]+)',
+        caseSensitive: false,
+      ).firstMatch(rawMsg);
       if (availMatch != null) {
         availableBal = availMatch.group(1);
       }
@@ -584,4 +617,3 @@ class BookingController extends GetxController {
     }
   }
 }
-

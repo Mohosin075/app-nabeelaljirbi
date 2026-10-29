@@ -56,11 +56,15 @@ class ClinicStatsModel {
   final int doctorCount;
   final int todayAppointment;
   final int pendingAppointment;
+  final int upcomingAppointment;
+  final num? consultationNet;
 
   ClinicStatsModel({
     required this.doctorCount,
     required this.todayAppointment,
     required this.pendingAppointment,
+    this.upcomingAppointment = 0,
+    this.consultationNet,
   });
 
   factory ClinicStatsModel.fromJson(Map<String, dynamic> json) {
@@ -68,6 +72,8 @@ class ClinicStatsModel {
       todayAppointment: json['todayAppointment'] ?? 0,
       pendingAppointment: json['pendingAppointment'] ?? 0,
       doctorCount: json['doctorCount'] ?? 0,
+      upcomingAppointment: json['upcomingAppointment'] ?? 0,
+      consultationNet: json['consultationNet'],
     );
   }
 }

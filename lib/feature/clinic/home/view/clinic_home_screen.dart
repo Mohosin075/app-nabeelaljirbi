@@ -71,7 +71,38 @@ class _ClinicHomeScreenState extends State<ClinicHomeScreen> {
                 _buildHeader(profileController),
                 const SizedBox(height: 24),
                 _buildStats(controller),
+                Obx(
+                  () => controller.stats.value.consultationNet == null
+                      ? const SizedBox.shrink()
+                      : Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Text(
+                            '${'completed_consultation_net'.tr}: ${controller.stats.value.consultationNet!.toStringAsFixed(2)}',
+                            style: globalTextStyle(fontSize: 14),
+                          ),
+                        ),
+                ),
                 const SizedBox(height: 32),
+                Obx(
+                  () => TextButton.icon(
+                    onPressed: () async {
+                      final date = await showDatePicker(
+                        context: context,
+                        initialDate: controller.selectedDate.value,
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                      );
+                      if (date != null) {
+                        controller.selectedDate.value = date;
+                        await controller.fetchBookingHistory();
+                      }
+                    },
+                    icon: const Icon(Icons.calendar_month),
+                    label: Text(
+                      '${controller.selectedDate.value.year}-${controller.selectedDate.value.month}-${controller.selectedDate.value.day}',
+                    ),
+                  ),
+                ),
                 _buildTodayAppointmentsHeader(),
                 const SizedBox(height: 16),
                 _buildTabs(controller),
@@ -223,7 +254,7 @@ class _ClinicHomeScreenState extends State<ClinicHomeScreen> {
           ),
           ClinicStatsCard(
             label: 'upcoming'.tr,
-            value: controller.stats.value.pendingAppointment.toString(),
+            value: controller.stats.value.upcomingAppointment.toString(),
           ),
         ],
       ),
@@ -235,7 +266,7 @@ class _ClinicHomeScreenState extends State<ClinicHomeScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          "todays_appointments".tr,
+          "appointments".tr,
           style: globalTextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,

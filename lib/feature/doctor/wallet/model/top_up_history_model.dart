@@ -49,8 +49,9 @@ class Meta {
 
 class TopUpItem {
   String? id;
-  int? amount;
+  num? amount;
   String? type;
+  String? direction;
   String? createdAt;
   AppointmentInfo? appointment;
   PrepaidCard? prepaidCard;
@@ -68,6 +69,7 @@ class TopUpItem {
     id = json['id'];
     amount = json['amount'];
     type = json['type'];
+    direction = json['direction'];
     createdAt = json['createdAt'];
     appointment = json['appointment'] != null
         ? AppointmentInfo.fromJson(json['appointment'])

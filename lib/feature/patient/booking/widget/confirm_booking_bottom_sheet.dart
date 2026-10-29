@@ -97,10 +97,10 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) =>
                                       const Icon(
-                                    Icons.person,
-                                    size: 60,
-                                    color: Colors.grey,
-                                  ),
+                                        Icons.person,
+                                        size: 60,
+                                        color: Colors.grey,
+                                      ),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -147,12 +147,13 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                             '${(selectedDate['day'] as String).toLowerCase().tr}, ${selectedDate['date']} - $selectedTime',
                             isBold: true,
                           ),
-                          if (bookingController.collectionMode == 'MODE_B')
-                            _buildInfoRow(
-                              'session_fee'.tr,
-                              '${doctor.consultFee} ${CurrencyUtil.getUserCurrencySymbol()}',
-                              isAmount: true,
-                            ),
+                          _buildInfoRow(
+                            bookingController.collectionMode == 'MODE_B'
+                                ? 'session_fee'.tr
+                                : 'consultation_cash_at_clinic'.tr,
+                            '${doctor.consultFee} ${CurrencyUtil.getUserCurrencySymbol()}',
+                            isAmount: true,
+                          ),
                           const Divider(),
                           Obx(() {
                             if (bookingController.isServiceFeeLoading.value) {
@@ -189,7 +190,8 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Obx(() {
-                      final isSelf = bookingController.bookedFor.value == 'SELF';
+                      final isSelf =
+                          bookingController.bookedFor.value == 'SELF';
                       return Row(
                         children: [
                           Expanded(
@@ -198,7 +200,9 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                                 bookingController.bookedFor.value = 'SELF';
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                                 decoration: BoxDecoration(
                                   color: isSelf
                                       ? AppColors.primaryColor
@@ -229,7 +233,9 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                                 bookingController.bookedFor.value = 'FAMILY';
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                                 decoration: BoxDecoration(
                                   color: !isSelf
                                       ? AppColors.primaryColor
@@ -298,8 +304,9 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                                 fillColor: Colors.white,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide:
-                                      const BorderSide(color: Color(0xFFCED4DA)),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFCED4DA),
+                                  ),
                                 ),
                               ),
                             ),
@@ -312,18 +319,23 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 6),
-                            Obx(() => Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: bookingController.familyRelations
-                                  .map((rel) {
-                                    final isSelected = bookingController
-                                            .selectedFamilyRelation.value ==
+                            Obx(
+                              () => Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: bookingController.familyRelations.map(
+                                  (rel) {
+                                    final isSelected =
+                                        bookingController
+                                            .selectedFamilyRelation
+                                            .value ==
                                         rel;
                                     return GestureDetector(
                                       onTap: () {
                                         bookingController
-                                            .selectedFamilyRelation.value = rel;
+                                                .selectedFamilyRelation
+                                                .value =
+                                            rel;
                                       },
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(
@@ -334,7 +346,9 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                                           color: isSelected
                                               ? AppColors.primaryColor
                                               : Colors.white,
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                           border: Border.all(
                                             color: isSelected
                                                 ? AppColors.primaryColor
@@ -355,9 +369,10 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                                         ),
                                       ),
                                     );
-                                  })
-                                  .toList(),
-                            )),
+                                  },
+                                ).toList(),
+                              ),
+                            ),
                           ],
                         ),
                       );
@@ -471,8 +486,9 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
             value,
             style: globalTextStyle(
               fontSize: 13,
-              fontWeight:
-                  isBold || isAmount ? FontWeight.w700 : FontWeight.w500,
+              fontWeight: isBold || isAmount
+                  ? FontWeight.w700
+                  : FontWeight.w500,
               color: const Color(0xff1A1A1A),
             ),
           ),

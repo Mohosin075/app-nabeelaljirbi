@@ -15,6 +15,62 @@ import 'package:nabeelaljirbi_app/feature/clinic/profile/model/clinic_profile_mo
 import 'package:nabeelaljirbi_app/feature/clinic/wallet/model/top_up_history_model.dart';
 
 class ClinicWalletController extends GetxController {
+  Future<void> requestSettlement() async {
+    if (isLoading.value) return;
+    final input = TextEditingController();
+    final amount = await Get.dialog<double>(
+      AlertDialog(
+        title: Text('withdraw'.tr),
+        content: TextField(
+          controller: input,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(labelText: 'withdraw_amount'.tr),
+        ),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: Text('cancel'.tr)),
+          TextButton(
+            onPressed: () {
+              final value = double.tryParse(input.text.trim());
+              if (value != null &&
+                  value.isFinite &&
+                  value > 0 &&
+                  value <= balance.value) {
+                Get.back(result: value);
+              } else {
+                Get.snackbar('error'.tr, 'insufficient_balance'.tr);
+              }
+            },
+            child: Text('withdraw'.tr),
+          ),
+        ],
+      ),
+    );
+    await Future<void>.delayed(const Duration(milliseconds: 350));
+    input.dispose();
+    if (amount == null) return;
+    isLoading.value = true;
+    try {
+      final response = await http.post(
+        Uri.parse('${Urls.baseUrl}/clinic/settlements'),
+        headers: {
+          'Authorization': SharedPrefHelper.getAccessToken() ?? '',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'amount': amount}),
+      );
+      final result = jsonDecode(response.body);
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(result['message'] ?? 'Unable to request withdrawal');
+      }
+      Get.snackbar('success'.tr, 'withdraw_request_sent'.tr);
+      await refreshData();
+    } catch (error) {
+      Get.snackbar('error'.tr, error.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   late final ClinicProfileController _profileController;
 
   final RxDouble balance = 0.0.obs;
@@ -155,9 +211,7 @@ class ClinicWalletController extends GetxController {
 
   void shareReferralCode() {
     if (referralCode.value.isNotEmpty) {
-      Share.share(
-        'share_referral_msg'.trParams({'code': referralCode.value}),
-      );
+      Share.share('share_referral_msg'.trParams({'code': referralCode.value}));
     } else {
       Get.snackbar(
         'error'.tr,

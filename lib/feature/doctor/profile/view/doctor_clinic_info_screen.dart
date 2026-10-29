@@ -47,6 +47,8 @@ class DoctorClinicInfoScreen extends StatelessWidget {
 
         final doctor = profileController.doctorProfile.value;
         final clinic = doctor?.doctor?.clinic;
+        final linked = doctor?.doctor?.doctorClinics ?? [];
+        final requests = doctor?.doctor?.joinRequests ?? [];
 
         if (doctor == null) {
           return Center(child: Text('no_data_found'.tr));
@@ -56,131 +58,164 @@ class DoctorClinicInfoScreen extends StatelessWidget {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xffE5E9F2)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      clinic?.clinicName ?? 'na'.tr,
-                      style: globalTextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xff2D2D2D),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                clinic?.logo ??
-                                    'https://placehold.co/150.png',
-                              ),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            spacing: 6,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                doctor.fullName ?? 'na'.tr,
-                                style: globalTextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: const Color(0xff2d2d2d),
-                                ),
-                              ),
-                              Row(
-                                spacing: 8,
-                                children: [
-                                  const Icon(Icons.access_time, size: 20),
-                                  Text(
-                                    '${'joined_on'.tr}:',
-                                    style: globalTextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: const Color(0xff636F85),
-                                    ),
-                                  ),
-                                  Text(
-                                    _formatDate(doctor.doctor?.joinClinicDate),
-                                    textDirection: ui.TextDirection.ltr,
-                                    style: globalTextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: const Color(0xff636F85),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    _buildInfoRow(
-                      icon: SvgPicture.asset(
-                        IconsPath.location,
-                        width: 20,
-                        height: 20,
-                        colorFilter: const ColorFilter.mode(
-                          Color(0xff2d2d2d),
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                      label: 'location'.tr,
-                      value: clinic?.location ?? 'na'.tr,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildInfoRow(
-                      icon: const Icon(
-                        Icons.phone,
-                        color: Color(0xff2d2d2d),
-                        size: 20,
-                      ),
-                      label: 'contact_number'.tr,
-                      value: clinic?.contactPhone ?? 'na'.tr,
-                      forceLtr: true,
-                    ),
-                    // const SizedBox(height: 16),
-                    // _buildInfoRow(
-                    //   icon: SvgPicture.asset(
-                    //     IconsPath.calender,
-                    //     width: 20,
-                    //     height: 20,
-                    //     colorFilter: const ColorFilter.mode(
-                    //       Color(0xff2d2d2d),
-                    //       BlendMode.srcIn,
-                    //     ),
-                    //   ),
-                    //   label: 'joined_since'.tr,
-                    //   value: _formatDate(doctor.doctor?.joinClinicDate),
-                    // ),
-                  ],
+              Text(
+                '${'clinic_information'.tr} (${linked.length}/3)',
+                style: globalTextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
+              for (final link in linked)
+                ListTile(
+                  leading: link.clinic?.logo != null
+                      ? CircleAvatar(
+                          backgroundImage: NetworkImage(link.clinic!.logo!),
+                        )
+                      : const Icon(Icons.local_hospital),
+                  title: Text(link.clinic?.clinicName ?? ''),
+                  subtitle: Text(link.clinic?.location ?? ''),
+                  trailing: const Icon(
+                    Icons.check_circle,
+                    color: AppColors.primaryColor,
+                  ),
+                ),
+              for (final request in requests.where(
+                (request) => request.status == 'PENDING',
+              ))
+                ListTile(
+                  title: Text(request.clinic?.clinicName ?? ''),
+                  subtitle: Text('pending'.tr),
+                ),
+
+              if (linked.isEmpty)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xffE5E9F2)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        clinic?.clinicName ?? 'na'.tr,
+                        style: globalTextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xff2D2D2D),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                  clinic?.logo ??
+                                      'https://placehold.co/150.png',
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              spacing: 6,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  doctor.fullName ?? 'na'.tr,
+                                  style: globalTextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: const Color(0xff2d2d2d),
+                                  ),
+                                ),
+                                Row(
+                                  spacing: 8,
+                                  children: [
+                                    const Icon(Icons.access_time, size: 20),
+                                    Text(
+                                      '${'joined_on'.tr}:',
+                                      style: globalTextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: const Color(0xff636F85),
+                                      ),
+                                    ),
+                                    Text(
+                                      _formatDate(
+                                        doctor.doctor?.joinClinicDate,
+                                      ),
+                                      textDirection: ui.TextDirection.ltr,
+                                      style: globalTextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: const Color(0xff636F85),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      _buildInfoRow(
+                        icon: SvgPicture.asset(
+                          IconsPath.location,
+                          width: 20,
+                          height: 20,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0xff2d2d2d),
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        label: 'location'.tr,
+                        value: clinic?.location ?? 'na'.tr,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildInfoRow(
+                        icon: const Icon(
+                          Icons.phone,
+                          color: Color(0xff2d2d2d),
+                          size: 20,
+                        ),
+                        label: 'contact_number'.tr,
+                        value: clinic?.contactPhone ?? 'na'.tr,
+                        forceLtr: true,
+                      ),
+                      // const SizedBox(height: 16),
+                      // _buildInfoRow(
+                      //   icon: SvgPicture.asset(
+                      //     IconsPath.calender,
+                      //     width: 20,
+                      //     height: 20,
+                      //     colorFilter: const ColorFilter.mode(
+                      //       Color(0xff2d2d2d),
+                      //       BlendMode.srcIn,
+                      //     ),
+                      //   ),
+                      //   label: 'joined_since'.tr,
+                      //   value: _formatDate(doctor.doctor?.joinClinicDate),
+                      // ),
+                    ],
+                  ),
+                ),
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () =>
-                      _showChangeClinicBottomSheet(context, controller),
+                  onPressed: linked.length >= 3
+                      ? null
+                      : () => _showChangeClinicBottomSheet(context, controller),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor,
                     foregroundColor: Colors.white,
@@ -195,7 +230,7 @@ class DoctorClinicInfoScreen extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'change_clinic'.tr,
+                        'add_clinic'.tr,
                         style: globalTextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,

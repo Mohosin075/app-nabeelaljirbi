@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
 import 'package:nabeelaljirbi_app/core/const/icons_path.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/core/utils/currency_util.dart';
@@ -149,15 +148,7 @@ class ClinicWalletScreen extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                //onTap: controller.withdraw,
-                onTap: () {
-                  Get.snackbar(
-                    'withdraw'.tr,
-                    'withdraw_success_desc'.tr,
-                    backgroundColor: AppColors.primaryColor,
-                    colorText: Colors.white,
-                  );
-                },
+                onTap: controller.requestSettlement,
                 borderRadius: BorderRadius.circular(12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -474,7 +465,10 @@ class ClinicWalletScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final TopUpItem tx = controller.topUpHistory[index];
 
-          final isNegative = tx.type == 'BOOKING' || tx.type == 'WITHDRAW';
+          final isNegative =
+              tx.direction == 'DEBIT' ||
+              (tx.direction != 'CREDIT' &&
+                  (tx.type == 'BOOKING' || tx.type == 'WITHDRAW'));
           final color = isNegative
               ? const Color(0xFFF44336)
               : const Color(0xFF4CAF50);

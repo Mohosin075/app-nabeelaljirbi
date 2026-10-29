@@ -8,6 +8,10 @@ import 'package:nabeelaljirbi_app/core/network_caller/endpoints.dart';
 import 'package:nabeelaljirbi_app/feature/patient/doctor_details/model/doctor_details_model.dart';
 
 class DoctorDetailsController extends GetxController {
+  DoctorDetailsController({http.Client? client})
+    : _client = client ?? http.Client();
+  final http.Client _client;
+  int _requestVersion = 0;
   var isLoading = true.obs;
   var doctorDetails = Rxn<DoctorDetailData>();
   var errorMessage = ''.obs;
@@ -38,24 +42,30 @@ class DoctorDetailsController extends GetxController {
   }
 
   Future<void> getDoctorDetails(String doctorId, {String? clinicId}) async {
+    final version = ++_requestVersion;
     try {
+      errorMessage.value = '';
+      requestedClinicId = clinicId;
       isLoading(true);
       final token = SharedPrefHelper.getAccessToken();
       final uri = Uri.parse('${Urls.baseUrl}/patient/get-doctor/$doctorId')
-          .replace(queryParameters: clinicId == null || clinicId.isEmpty
-              ? null
-              : {'clinicId': clinicId});
+          .replace(
+            queryParameters: clinicId == null || clinicId.isEmpty
+                ? null
+                : {'clinicId': clinicId},
+          );
       final url = uri.toString();
 
       debugPrint('Fetching Doctor Details: $url');
 
-      final response = await http.get(
+      final response = await _client.get(
         uri,
         headers: {
           'Authorization': token ?? '',
           'Content-Type': 'application/json',
         },
       );
+      if (version != _requestVersion || isClosed) return;
 
       debugPrint('Response Status: ${response.statusCode}');
       log('Response Body: ${response.body}');
@@ -72,10 +82,18 @@ class DoctorDetailsController extends GetxController {
         errorMessage.value = "Server error: ${response.statusCode}";
       }
     } catch (e) {
+      if (version != _requestVersion || isClosed) return;
       errorMessage.value = "An error occurred: $e";
       debugPrint('Error fetching doctor details: $e');
     } finally {
-      isLoading(false);
+      if (version == _requestVersion && !isClosed) isLoading(false);
     }
+  }
+
+  @override
+  void onClose() {
+    _requestVersion++;
+    _client.close();
+    super.onClose();
   }
 }

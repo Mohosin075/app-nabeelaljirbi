@@ -280,7 +280,7 @@ class ClinicDoctor {
   String? city;
   String? specialty;
   String? experience;
-  int? consultFee;
+  num? consultFee;
   String? profileImage;
   String? clinicName;
   String? clinicLogo;

@@ -126,7 +126,7 @@ class Doctor {
   String? speciality;
   String? experience;
   String? licenseNumber;
-  int? consultFee;
+  num? consultFee;
   String? clinicId;
   String? joinClinicDate;
   String? createdAt;
@@ -221,7 +221,14 @@ class JoinRequestItem {
   String? createdAt;
   Clinic? clinic;
 
-  JoinRequestItem({this.id, this.clinicId, this.status, this.note, this.createdAt, this.clinic});
+  JoinRequestItem({
+    this.id,
+    this.clinicId,
+    this.status,
+    this.note,
+    this.createdAt,
+    this.clinic,
+  });
 
   JoinRequestItem.fromJson(Map<String, dynamic> json) {
     id = json['id'];

@@ -21,6 +21,7 @@ class ClinicHomeController extends GetxController {
 
   final RxList<AppointmentModel> allAppointments = <AppointmentModel>[].obs;
   final RxString selectedTab = 'pending'.obs;
+  final selectedDate = DateTime.now().obs;
   final RxString selectedDoctor = 'all_doctors'.obs;
   final RxnString selectedDoctorId = RxnString();
 
@@ -109,7 +110,7 @@ class ClinicHomeController extends GetxController {
 
     try {
       final token = SharedPrefHelper.getAccessToken() ?? '';
-      final today = DateTime.now();
+      final today = selectedDate.value;
       final dateStr = _formatDateForApi(today);
       final statuses = _getApiStatuses(selectedTab.value);
 
@@ -118,38 +119,49 @@ class ClinicHomeController extends GetxController {
 
       final List<AppointmentModel> combinedAppointments = [];
 
+      final requestedDate = dateStr;
+      final requestedDoctorId = selectedDoctorId.value;
+      final requestedTab = selectedTab.value;
       for (final status in statuses) {
-        var url =
-            '${Urls.baseUrl}/clinic/booking-history?status=$status&consultDate=$dateStr';
-
-        if (selectedDoctorId.value != null) {
-          url += '&doctorId=${selectedDoctorId.value}';
-        }
-
-        debugPrint('Booking History Request URL: $url');
-
-        final response = await http.get(
-          Uri.parse(url),
-          headers: {'Authorization': token},
-        );
-
-        debugPrint('Booking History Status Code: ${response.statusCode}');
-        debugPrint('Booking History Response Body: ${response.body}');
-
-        if (response.statusCode == 200) {
-          final parsedResponse = BookingHistoryResponse.fromJson(
+        var fetched = 0;
+        for (var page = 1; page <= 1000; page++) {
+          final uri = Uri.parse('${Urls.baseUrl}/clinic/booking-history')
+              .replace(
+                queryParameters: {
+                  'status': status,
+                  'consultDate': requestedDate,
+                  'page': '$page',
+                  'limit': '100',
+                  'doctorId': ?requestedDoctorId,
+                },
+              );
+          final response = await http.get(
+            uri,
+            headers: {'Authorization': token},
+          );
+          if (response.statusCode != 200) {
+            throw Exception('Unable to load bookings');
+          }
+          final parsed = BookingHistoryResponse.fromJson(
             jsonDecode(response.body),
           );
-
-          if (parsedResponse.success && parsedResponse.data != null) {
-            final appointments = parsedResponse.data!.data
-                .map((item) => item.toAppointmentModel())
-                .toList();
-            combinedAppointments.addAll(appointments);
+          if (!parsed.success || parsed.data == null) {
+            throw Exception('Invalid booking response');
           }
+          final rows = parsed.data!.data;
+          combinedAppointments.addAll(
+            rows.map((item) => item.toAppointmentModel()),
+          );
+          fetched += rows.length;
+          if (fetched >= parsed.data!.meta.total) break;
+          if (rows.isEmpty) throw Exception('Incomplete booking response');
         }
       }
-
+      if (requestedDate != _formatDateForApi(selectedDate.value) ||
+          requestedDoctorId != selectedDoctorId.value ||
+          requestedTab != selectedTab.value) {
+        return;
+      }
       allAppointments.assignAll(combinedAppointments);
     } catch (e) {
       debugPrint('Error fetching booking history: $e');

@@ -424,7 +424,10 @@ class PatientWalletScreen extends StatelessWidget {
             }
           } catch (_) {}
 
-          final isNegative = tx.type == 'BOOKING' || tx.type == 'WITHDRAW';
+          final isNegative =
+              tx.direction == 'DEBIT' ||
+              (tx.direction != 'CREDIT' &&
+                  (tx.type == 'BOOKING' || tx.type == 'WITHDRAW'));
           final color = isNegative
               ? const Color(0xFFF44336)
               : const Color(0xFF4CAF50);

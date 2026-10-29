@@ -41,6 +41,18 @@ class DoctorHomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 _buildStatistics(controller),
+                Obx(
+                  () => Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
+                    child: Text(
+                      '${'completed_consultation_gross'.tr}: ${controller.consultationGross.value.toStringAsFixed(2)}',
+                      style: globalTextStyle(fontSize: 14),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 16),
                 Divider(
                   color: Color(0xffE5E9F2).withValues(alpha: 0.7),
@@ -108,7 +120,12 @@ class DoctorHomeScreen extends StatelessWidget {
                               ),
                             ),
                             if (profileController.badgeActive.value ||
-                                profileController.doctorProfile.value?.doctor?.badgeActive == true) ...[
+                                profileController
+                                        .doctorProfile
+                                        .value
+                                        ?.doctor
+                                        ?.badgeActive ==
+                                    true) ...[
                               const SizedBox(width: 4),
                               const BlueBadgeWidget(size: 18),
                             ],
@@ -116,10 +133,17 @@ class DoctorHomeScreen extends StatelessWidget {
                         ),
                         Row(
                           children: [
-                            SvgPicture.asset(IconsPath.star, width: 12, height: 12),
+                            SvgPicture.asset(
+                              IconsPath.star,
+                              width: 12,
+                              height: 12,
+                            ),
                             const SizedBox(width: 4),
                             Text(
-                              profileController.doctorProfile.value?.weightedRating
+                              profileController
+                                      .doctorProfile
+                                      .value
+                                      ?.weightedRating
                                       ?.toStringAsFixed(1) ??
                                   '0.0',
                               style: globalTextStyle(
@@ -266,9 +290,11 @@ class DoctorHomeScreen extends StatelessWidget {
             .where((a) => a.status?.toUpperCase() == 'PENDING')
             .length;
         final upcomingCount = controller.appointments
-            .where((a) =>
-                a.status?.toUpperCase() == 'CONFIRMED' ||
-                a.status?.toUpperCase() == 'INPROGRESS')
+            .where(
+              (a) =>
+                  a.status?.toUpperCase() == 'CONFIRMED' ||
+                  a.status?.toUpperCase() == 'INPROGRESS',
+            )
             .length;
         final arrivedCount = controller.appointments
             .where((a) => a.status?.toUpperCase() == 'ARRIVED')
@@ -583,6 +609,4 @@ class DoctorHomeScreen extends StatelessWidget {
       return dateStr;
     }
   }
-
-
 }

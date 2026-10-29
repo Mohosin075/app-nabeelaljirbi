@@ -12,6 +12,7 @@ class DoctorHomeScreenController extends GetxController {
   var totalBook = 0.obs;
   var todayCount = 0.obs;
   var upcomingCount = 0.obs;
+  var consultationGross = 0.0.obs;
 
   // Observable appointment list
   var appointments = <Appointment>[].obs;
@@ -39,37 +40,34 @@ class DoctorHomeScreenController extends GetxController {
     try {
       final token = SharedPrefHelper.getAccessToken();
       final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-      String url = '${Urls.baseUrl}/doctor/appointments?consultDate=$today';
-
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': token ?? '',
-          'Content-Type': 'application/json',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
-        final model = DoctorAppointmentModel.fromJson(body);
-
-        if (model.success == true &&
-            model.data != null &&
-            model.data!.data != null) {
-          final allFetched = model.data!.data!;
-          final todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-          // Strict local filtering for today's date to prevent future/past dates
-          // that might be returned due to timezone or backend logic issues.
-          final strictlyToday = allFetched
-              .where((apt) => apt.consultDate?.startsWith(todayDate) ?? false)
-              .toList();
-
-          appointments.assignAll(strictlyToday);
+      final collected = <Appointment>[];
+      for (var page = 1; page <= 1000; page++) {
+        final response = await http.get(
+          Uri.parse(
+            '${Urls.baseUrl}/doctor/appointments?consultDate=$today&page=$page&limit=100',
+          ),
+          headers: {
+            'Authorization': token ?? '',
+            'Content-Type': 'application/json',
+          },
+        );
+        if (response.statusCode != 200) {
+          throw Exception('Unable to load appointments');
         }
+        final model = DoctorAppointmentModel.fromJson(
+          jsonDecode(response.body),
+        );
+        if (model.success != true || model.data == null) {
+          throw Exception('Invalid appointment response');
+        }
+        final rows = model.data!.data ?? [];
+        collected.addAll(rows);
+        if (collected.length >= (model.data!.meta?.total ?? 0)) break;
+        if (rows.isEmpty) throw Exception('Incomplete appointment response');
       }
-    } catch (e) {
-      debugPrint('Error fetching today appointments: $e');
+      appointments.assignAll(collected);
+    } catch (error) {
+      debugPrint('Error fetching today appointments: $error');
     }
   }
 
@@ -93,21 +91,16 @@ class DoctorHomeScreenController extends GetxController {
         final model = DoctorAppointmentModel.fromJson(body);
 
         if (model.success == true && model.data != null) {
-          totalBook.value = model.data!.meta?.total ?? 0;
-
-          final allData = model.data!.data ?? [];
-          final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-          todayCount.value = allData
-              .where((apt) => apt.consultDate?.startsWith(today) ?? false)
-              .length;
-          upcomingCount.value = allData
-              .where(
-                (apt) =>
-                    apt.status?.toUpperCase() == 'CONFIRMED' ||
-                    apt.status?.toUpperCase() == 'INPROGRESS',
-              )
-              .length;
+          final statistics = body['data']?['statistics'];
+          if (statistics is Map) {
+            consultationGross.value =
+                (statistics['consultationGross'] as num? ?? 0).toDouble();
+            totalBook.value = (statistics['totalBookings'] as num? ?? 0)
+                .toInt();
+            todayCount.value = (statistics['todayCount'] as num? ?? 0).toInt();
+            upcomingCount.value = (statistics['upcomingCount'] as num? ?? 0)
+                .toInt();
+          }
         }
       }
     } catch (e) {
@@ -134,6 +127,4 @@ class DoctorHomeScreenController extends GetxController {
   void selectTab(int index) {
     selectedTab.value = index;
   }
-
-
 }

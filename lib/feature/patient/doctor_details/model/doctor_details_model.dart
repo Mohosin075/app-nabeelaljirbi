@@ -31,7 +31,7 @@ class DoctorDetailData {
   String? city;
   String? specialty;
   String? experience;
-  int? consultFee;
+  num? consultFee;
   String? profileImage;
   String? clinicName;
   String? clinicLogo;
@@ -49,6 +49,9 @@ class DoctorDetailData {
   String? verificationStatus;
   num? clinicServiceFeePercentage;
   String? clinicCollectionMode;
+  num? fixedPatientServiceFee;
+  num? patientServiceFeeAmount;
+  List<Map<String, dynamic>> doctorClinics = [];
 
   DoctorDetailData({
     this.id,
@@ -108,6 +111,11 @@ class DoctorDetailData {
     verificationStatus = json['verificationStatus'];
     clinicServiceFeePercentage = json['clinicServiceFeePercentage'];
     clinicCollectionMode = json['clinicCollectionMode'];
+    fixedPatientServiceFee = json['fixedPatientServiceFee'];
+    patientServiceFeeAmount = json['patientServiceFeeAmount'];
+    doctorClinics = (json['doctorClinics'] as List? ?? [])
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
   }
 
   Map<String, dynamic> toJson() {

@@ -582,7 +582,10 @@ class DoctorWalletScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final TopUpItem tx = controller.topUpHistory[index];
 
-          final isNegative = tx.type == 'BOOKING' || tx.type == 'WITHDRAW';
+          final isNegative =
+              tx.direction == 'DEBIT' ||
+              (tx.direction != 'CREDIT' &&
+                  (tx.type == 'BOOKING' || tx.type == 'WITHDRAW'));
           final color = isNegative
               ? const Color(0xFFFF4D4F)
               : const Color(0xFF4CAF50);

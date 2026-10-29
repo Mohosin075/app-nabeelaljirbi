@@ -332,6 +332,16 @@ class AppLanguages extends Translations {
       'misrata': 'Misrata',
       'bank_of_libya': 'Bank of Libya',
       'clinic_information': 'Clinic Information',
+      'add_clinic': 'Add clinic',
+      'selected_clinic': 'Selected for booking',
+      'select_clinic_booking': 'Select this clinic for booking',
+      'withdraw_request_sent':
+          'Withdrawal request submitted for admin approval',
+      'completed_consultation_net': 'Net consultation income (completed)',
+      'completed_consultation_gross': 'Gross consultation fees (completed)',
+      'consultation_cash_at_clinic': 'Consultation fee (cash at clinic)',
+      'clinic_fee_not_configured':
+          'This clinic has not configured its booking fee. Please contact support.',
       'working_hours': 'Working Hours',
       'location': 'Location',
       'na': 'N/A',
@@ -639,9 +649,12 @@ class AppLanguages extends Translations {
       'describe_symptoms_hint': 'Describe your symptoms briefly...',
       'clinics': 'Clinics',
       'distance_away': 'km away',
-      'limit_complete_message': 'Limit is complete for this rolling 24-hour window',
-      'messages_remaining_rolling': '@count free messages remaining (24h window)',
-      'ai_quota_notice': 'Free quota resets continuously on a rolling 24h clock',
+      'limit_complete_message':
+          'Limit is complete for this rolling 24-hour window',
+      'messages_remaining_rolling':
+          '@count free messages remaining (24h window)',
+      'ai_quota_notice':
+          'Free quota resets continuously on a rolling 24h clock',
       'ai_assistant_disabled': 'AI Assistant is currently unavailable',
       'currency_libya': 'LYD',
       'currency_algeria': 'DZD',
@@ -1223,20 +1236,25 @@ class AppLanguages extends Translations {
       'patient_login': 'Patient Login',
       'back_to_patient_login': 'Back to Patient Login',
       'doctor_login_subtitle': 'Dedicated portal for licensed physicians',
-      'clinic_login_subtitle': 'Dedicated portal for clinics and medical centers',
-      'terms_and_privacy_consent': 'By continuing, you agree to our Terms of Service & Privacy Policy',
+      'clinic_login_subtitle':
+          'Dedicated portal for clinics and medical centers',
+      'terms_and_privacy_consent':
+          'By continuing, you agree to our Terms of Service & Privacy Policy',
       'i_agree': 'I Agree',
       'i_agree_to_terms': 'I agree to the',
       'terms_and_legal_agreement': 'Terms of Service & Legal Agreement',
       'terms_updated_title': 'Terms of Service Updated',
-      'terms_updated_desc': 'We have updated our terms and policies. Please review and accept to continue.',
+      'terms_updated_desc':
+          'We have updated our terms and policies. Please review and accept to continue.',
       'read_full_terms': 'Read full terms & conditions',
       'agree_to_terms_required': 'You must agree to the terms to proceed',
       'reconciliation_reports': 'Reconciliation Reports',
-      'reconciliation_reports_desc': 'Reconcile independent earnings and appointments with linked clinics',
+      'reconciliation_reports_desc':
+          'Reconcile independent earnings and appointments with linked clinics',
       'clinic_reconciliation': 'Clinic Reconciliation',
       'reconcile_with_clinic': 'Reconcile with Clinics',
-      'reconciliation_notice': 'Clinic consultation payments are settled directly between you and each clinic. This report provides a detailed breakdown to reconcile accounts.',
+      'reconciliation_notice':
+          'Clinic consultation payments are settled directly between you and each clinic. This report provides a detailed breakdown to reconcile accounts.',
       'daily': 'Daily',
       'weekly': 'Weekly',
       'monthly': 'Monthly',
@@ -1251,7 +1269,8 @@ class AppLanguages extends Translations {
       'consult_fee_rate': 'Fee Rate',
       'breakdown_by_clinic': 'Breakdown by Clinic',
       'appointments_list': 'Appointments List',
-      'no_reconciliation_records': 'No appointments found for the selected period.',
+      'no_reconciliation_records':
+          'No appointments found for the selected period.',
       'records': 'records',
       'settled': 'Settled with clinic',
       'last_month': 'Last Month',
@@ -1269,7 +1288,8 @@ class AppLanguages extends Translations {
       'blue_badge_verification': 'Blue Badge Verification',
       'verified_account': 'Verified Account',
       'verification_notice_title': 'Account Verification Notice',
-      'verification_notice_content': 'The verification badge indicates that the Salama platform has reviewed the data and documents provided by the doctor and clinic in accordance with its verification procedures. The badge does not represent an absolute guarantee of the validity of all documents, the ongoing validity of licenses, or an evaluation of professional competence. Responsibility for the accuracy of submitted documents rests with the doctor and clinic. The platform reserves the right to suspend or remove the verification badge if in doubt, incomplete, or expired.',
+      'verification_notice_content':
+          'The verification badge indicates that the Salama platform has reviewed the data and documents provided by the doctor and clinic in accordance with its verification procedures. The badge does not represent an absolute guarantee of the validity of all documents, the ongoing validity of licenses, or an evaluation of professional competence. Responsibility for the accuracy of submitted documents rests with the doctor and clinic. The platform reserves the right to suspend or remove the verification badge if in doubt, incomplete, or expired.',
       'verification_status': 'Verification Status',
       'under_review': 'Under Review',
       'not_submitted': 'Not Submitted',
@@ -1279,25 +1299,34 @@ class AppLanguages extends Translations {
       'medical_license_doc': 'Medical License / Practice Certificate',
       'id_proof_doc': 'National ID / Registration Document',
       'submit_for_verification': 'Submit for Verification',
-      'verification_submitted_success': 'Documents submitted successfully and are under review',
+      'verification_submitted_success':
+          'Documents submitted successfully and are under review',
       'rejection_reason': 'Rejection Reason',
       'resubmit_documents': 'Re-submit Documents',
-      'badge_active_note': 'Your Blue Badge is active and visible on the public platform.',
-      'badge_pending_activation': 'Documents approved! The Blue Badge will be activated publicly by administration.',
-      'verification_under_review_desc': 'Your request is under review by our administration team. You will be notified once complete.',
+      'badge_active_note':
+          'Your Blue Badge is active and visible on the public platform.',
+      'badge_pending_activation':
+          'Documents approved! The Blue Badge will be activated publicly by administration.',
+      'verification_under_review_desc':
+          'Your request is under review by our administration team. You will be notified once complete.',
       'submitted_documents': 'Submitted Documents',
       'official_document': 'Official Document',
       'uploaded_successfully': 'Uploaded successfully',
-      'upload_documents_instruction': 'Please capture or select the official documents required for verification.',
+      'upload_documents_instruction':
+          'Please capture or select the official documents required for verification.',
       'clinic_license_doc': 'Clinic Operating License',
-      'clinic_license_desc': 'Official clinic operating license or practice permit',
+      'clinic_license_desc':
+          'Official clinic operating license or practice permit',
       'commercial_registration_doc': 'Commercial Registration',
       'commercial_registration_desc': 'National ID card or commercial registry',
-      'doctor_license_desc': 'Official medical practice license or practice permit',
+      'doctor_license_desc':
+          'Official medical practice license or practice permit',
       'doctor_id_desc': 'National ID card or personal identity document',
-      'optional_notes_hint': 'Additional notes for administration (optional)...',
+      'optional_notes_hint':
+          'Additional notes for administration (optional)...',
       'submitted_successfully': 'Submitted Successfully',
-      'submission_failed_try_again': 'An error occurred during submission. Please try again.',
+      'submission_failed_try_again':
+          'An error occurred during submission. Please try again.',
       'ready': 'Ready',
       'uploading_doc_securely': 'Uploading document securely to cloud...',
       'document_attached': 'Document Attached',
@@ -1312,7 +1341,8 @@ class AppLanguages extends Translations {
       'select_saved_file': 'Select saved image or file',
       'close': 'Close',
       'upload_error': 'Upload Error',
-      'upload_license_failed': 'Failed to upload license document. Please try again.',
+      'upload_license_failed':
+          'Failed to upload license document. Please try again.',
       'upload_id_failed': 'Failed to upload ID document. Please try again.',
       'insufficient_wallet_title': 'Insufficient Wallet Balance',
       'insufficient_wallet_desc':
@@ -1348,9 +1378,11 @@ class AppLanguages extends Translations {
       'enter_reason': 'Enter reason...',
       'please_enter_reason': 'Please provide a reason',
       'booked_for_family': 'Booked for Family Member',
-      'reason_stays_visible_to_patient': 'This reason will be visible to the patient.',
+      'reason_stays_visible_to_patient':
+          'This reason will be visible to the patient.',
       'reason_label': 'Reason',
-      'start_consultation_message': 'Are you sure you want to start this consultation?',
+      'start_consultation_message':
+          'Are you sure you want to start this consultation?',
       'reject_appointment_title': 'Reject Booking Request',
       'no_show_appointment_title': 'Mark as No Show',
       'yes_reject': 'Yes, Reject',
@@ -1407,8 +1439,7 @@ class AppLanguages extends Translations {
       'enter_license_number': 'أدخل رقم الترخيص الطبي',
       'base_consultation_fee': 'رسوم الاستشارة الأساسية',
       'enter_consultation_fee': 'أدخل رسوم الاستشارة',
-      'biography_hint':
-          'اكتب سيرة ذاتية موجزة عن خلفيتك الطبية وخبراتك...',
+      'biography_hint': 'اكتب سيرة ذاتية موجزة عن خلفيتك الطبية وخبراتك...',
       'enter_biography': 'أدخل سيرتك الذاتية',
       'qualifications': 'المؤهلات العلمية',
       'add_qualification': '+ إضافة مؤهل',
@@ -1680,6 +1711,15 @@ class AppLanguages extends Translations {
       'misrata': 'مصراتة',
       'bank_of_libya': 'مصرف ليبيا',
       'clinic_information': 'معلومات العيادة',
+      'add_clinic': 'إضافة عيادة',
+      'selected_clinic': 'تم اختيارها للحجز',
+      'select_clinic_booking': 'اختيار هذه العيادة للحجز',
+      'withdraw_request_sent': 'تم إرسال طلب السحب لموافقة الإدارة',
+      'completed_consultation_net': 'صافي دخل الاستشارات المكتملة',
+      'completed_consultation_gross': 'إجمالي رسوم الاستشارات المكتملة',
+      'consultation_cash_at_clinic': 'رسوم الاستشارة (نقداً في العيادة)',
+      'clinic_fee_not_configured':
+          'لم يتم إعداد رسوم الحجز لهذه العيادة. يرجى التواصل مع الدعم.',
       'working_hours': 'ساعات العمل',
       'location': 'الموقع',
       'na': 'غير متوفر',
@@ -1981,9 +2021,11 @@ class AppLanguages extends Translations {
       'describe_symptoms_hint': 'صف أعراضك بإيجاز...',
       'clinics': 'العيادات',
       'distance_away': 'كم بعد',
-      'limit_complete_message': 'لقد وصلت للحد الأقصى للرسائل المجانية خلال نافذة 24 ساعة',
+      'limit_complete_message':
+          'لقد وصلت للحد الأقصى للرسائل المجانية خلال نافذة 24 ساعة',
       'messages_remaining_rolling': 'متبقي @count رسائل مجانية (خلال 24 ساعة)',
-      'ai_quota_notice': 'تتجدد الحصة المجانية باستمرار على مدار 24 ساعة حقيقية',
+      'ai_quota_notice':
+          'تتجدد الحصة المجانية باستمرار على مدار 24 ساعة حقيقية',
       'ai_assistant_disabled': 'المساعد الذكي غير متاح حالياً',
       'currency_libya': 'د.ل',
       'currency_algeria': 'د.ج',
@@ -2557,19 +2599,23 @@ class AppLanguages extends Translations {
       'back_to_patient_login': 'العودة إلى دخول المرضى',
       'doctor_login_subtitle': 'بوابة مخصصة للأطباء المرخصين',
       'clinic_login_subtitle': 'بوابة مخصصة لإدارات العيادات والمراكز الطبية',
-      'terms_and_privacy_consent': 'بالمتابعة، فإنك توافق على الشروط والأحكام وسياسة الخصوصية',
+      'terms_and_privacy_consent':
+          'بالمتابعة، فإنك توافق على الشروط والأحكام وسياسة الخصوصية',
       'i_agree': 'أوافق',
       'i_agree_to_terms': 'أوافق على',
       'terms_and_legal_agreement': 'شروط الخدمة والاتفاقية القانونية',
       'terms_updated_title': 'تم تحديث شروط الخدمة والسياسات',
-      'terms_updated_desc': 'لقد قمنا بتحديث شروطنا وسياساتنا. يرجى مراجعتها والموافقة عليها للمتابعة.',
+      'terms_updated_desc':
+          'لقد قمنا بتحديث شروطنا وسياساتنا. يرجى مراجعتها والموافقة عليها للمتابعة.',
       'read_full_terms': 'قراءة كامل الشروط والأحكام',
       'agree_to_terms_required': 'يجب عليك الموافقة على الشروط للمتابعة',
       'reconciliation_reports': 'تقارير التسوية المالية',
-      'reconciliation_reports_desc': 'تسوية الحسابات والمواعيد بشكل مستقل مع العيادات المرتبطة',
+      'reconciliation_reports_desc':
+          'تسوية الحسابات والمواعيد بشكل مستقل مع العيادات المرتبطة',
       'clinic_reconciliation': 'تسوية حسابات العيادة',
       'reconcile_with_clinic': 'التسوية مع العيادات',
-      'reconciliation_notice': 'يتم تحصيل وسداد أتعاب الاستشارات مباشرة بينك وبين كل عيادة. يوفر هذا التقرير تفصيلاً دقيقاً لمطابقة الحسابات.',
+      'reconciliation_notice':
+          'يتم تحصيل وسداد أتعاب الاستشارات مباشرة بينك وبين كل عيادة. يوفر هذا التقرير تفصيلاً دقيقاً لمطابقة الحسابات.',
       'daily': 'يومي',
       'weekly': 'أسبوعي',
       'monthly': 'شهري',
@@ -2584,7 +2630,8 @@ class AppLanguages extends Translations {
       'consult_fee_rate': 'سعر الاستشارة',
       'breakdown_by_clinic': 'تفصيل حسب العيادة',
       'appointments_list': 'قائمة المواعيد',
-      'no_reconciliation_records': 'لا توجد مواعيد مسجلة في هذه الفترة المحددة.',
+      'no_reconciliation_records':
+          'لا توجد مواعيد مسجلة في هذه الفترة المحددة.',
       'records': 'سجل',
       'settled': 'مستحق من العيادة',
       'last_month': 'الشهر الماضي',
@@ -2602,7 +2649,8 @@ class AppLanguages extends Translations {
       'blue_badge_verification': 'توثيق الحساب (الشارة الزرقاء)',
       'verified_account': 'حساب موثق رسمياً',
       'verification_notice_title': 'إشعار علامة التوثيق',
-      'verification_notice_content': 'تعني علامة التوثيق أن منصة سلامة قامت بمراجعة البيانات والمستندات المقدمة من الطبيب والعيادة وفق إجراءات التحقق المتاحة لديها. ولا تمثل العلامة ضماناً مطلقاً لصحة جميع المستندات أو استمرار صلاحية التراخيص أو تقييماً للكفاءة المهنية للطبيب او العيادة، وتبقى مسؤولية صحة البيانات والمستندات المقدمة على الطبيب والعيادة. ويحق للمنصة تعليق أو إزالة علامة التوثيق عند وجود شك أو عدم اكتمال البيانات أو انتهاء المستندات.',
+      'verification_notice_content':
+          'تعني علامة التوثيق أن منصة سلامة قامت بمراجعة البيانات والمستندات المقدمة من الطبيب والعيادة وفق إجراءات التحقق المتاحة لديها. ولا تمثل العلامة ضماناً مطلقاً لصحة جميع المستندات أو استمرار صلاحية التراخيص أو تقييماً للكفاءة المهنية للطبيب او العيادة، وتبقى مسؤولية صحة البيانات والمستندات المقدمة على الطبيب والعيادة. ويحق للمنصة تعليق أو إزالة علامة التوثيق عند وجود شك أو عدم اكتمال البيانات أو انتهاء المستندات.',
       'verification_status': 'حالة التوثيق',
       'under_review': 'قيد المراجعة',
       'not_submitted': 'لم يتم التقديم',
@@ -2612,16 +2660,20 @@ class AppLanguages extends Translations {
       'medical_license_doc': 'ترخيص مزاولة المهنة / شهادة التسجيل',
       'id_proof_doc': 'الهوية الوطنية / السجل التجاري',
       'submit_for_verification': 'إرسال طلب التوثيق',
-      'verification_submitted_success': 'تم إرسال الوثائق بنجاح وهي قيد المراجعة لدى الإدارة',
+      'verification_submitted_success':
+          'تم إرسال الوثائق بنجاح وهي قيد المراجعة لدى الإدارة',
       'rejection_reason': 'سبب الرفض',
       'resubmit_documents': 'إعادة إرسال الوثائق',
       'badge_active_note': 'الشارة الزرقاء مفعّلة وظاهرة للجميع في المنصة.',
-      'badge_pending_activation': 'تمت الموافقة على الوثائق، وسيتم تفعيل الشارة من قِبل الإدارة قريباً.',
-      'verification_under_review_desc': 'طلبك قيد المراجعة لدى فريق الإدارة. سيتم إشعارك فور اكتمال التدقيق.',
+      'badge_pending_activation':
+          'تمت الموافقة على الوثائق، وسيتم تفعيل الشارة من قِبل الإدارة قريباً.',
+      'verification_under_review_desc':
+          'طلبك قيد المراجعة لدى فريق الإدارة. سيتم إشعارك فور اكتمال التدقيق.',
       'submitted_documents': 'الوثائق المقدمة',
       'official_document': 'وثيقة رسمية',
       'uploaded_successfully': 'تم الرفع بنجاح',
-      'upload_documents_instruction': 'الرجاء التقاط أو اختيار الوثائق الرسمية المطلوبة للتحقق والتوثيق.',
+      'upload_documents_instruction':
+          'الرجاء التقاط أو اختيار الوثائق الرسمية المطلوبة للتحقق والتوثيق.',
       'clinic_license_doc': 'رخصة تشغيل العيادة الرسمية',
       'clinic_license_desc': 'رخصة مزاولة المهنة أو ترخيص العيادة الرسمي',
       'commercial_registration_doc': 'السجل التجاري',
@@ -2630,7 +2682,8 @@ class AppLanguages extends Translations {
       'doctor_id_desc': 'بطاقة الهوية الوطنية أو إثبات الشخصية الرسمي',
       'optional_notes_hint': 'ملاحظات إضافية للإدارة (اختياري)...',
       'submitted_successfully': 'تم الإرسال بنجاح',
-      'submission_failed_try_again': 'حدث خطأ أثناء الإرسال. الرجاء المحاولة مرة أخرى.',
+      'submission_failed_try_again':
+          'حدث خطأ أثناء الإرسال. الرجاء المحاولة مرة أخرى.',
       'ready': 'جاهز',
       'uploading_doc_securely': 'جاري رفع الوثيقة بأمان إلى السحابة...',
       'document_attached': 'تم إرفاق الوثيقة',
@@ -2645,7 +2698,8 @@ class AppLanguages extends Translations {
       'select_saved_file': 'اختيار ملف أو صورة محفوظة',
       'close': 'إغلاق',
       'upload_error': 'خطأ في الرفع',
-      'upload_license_failed': 'فشل في رفع وثيقة الترخيص. يرجى المحاولة مرة أخرى.',
+      'upload_license_failed':
+          'فشل في رفع وثيقة الترخيص. يرجى المحاولة مرة أخرى.',
       'upload_id_failed': 'فشل في رفع وثيقة الهوية. يرجى المحاولة مرة أخرى.',
       'insufficient_wallet_title': 'رصيد المحفظة غير كافٍ',
       'insufficient_wallet_desc':
