@@ -143,6 +143,29 @@ void main() {
     expect(utf8.decode(result), '%PDF-synthetic');
     client.close();
   });
+  test(
+    'payout export preserves status, date, search and row filters',
+    () async {
+      final client = MockClient((request) async {
+        expect(request.url.path.endsWith('/reports/payouts/xlsx'), true);
+        expect(request.url.queryParameters['status'], 'COMPLETED');
+        expect(request.url.queryParameters['startDate'], '2026-10-01');
+        expect(request.url.queryParameters['endDate'], '2026-10-31');
+        expect(request.url.queryParameters['searchTerm'], 'BANK-123');
+        expect(request.url.queryParameters['limit'], '1000');
+        return http.Response('synthetic-xlsx', 200);
+      });
+      final result = await PhaseOneApi.download('payouts', 'xlsx', {
+        'status': 'COMPLETED',
+        'startDate': '2026-10-01',
+        'endDate': '2026-10-31',
+        'searchTerm': 'BANK-123',
+        'limit': 1000,
+      }, client: client);
+      expect(utf8.decode(result), 'synthetic-xlsx');
+      client.close();
+    },
+  );
   test('doctor absence display retains the compatible terminal status', () {
     final absent = Appointment.fromJson({
       'id': 'b',

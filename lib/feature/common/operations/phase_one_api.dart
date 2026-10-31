@@ -128,10 +128,11 @@ class PhaseOneApi {
       'DOCTOR': 'doctor/profile-update',
       'CLINIC': 'clinic/update-info',
     };
-    if (!paths.containsKey(role))
+    if (!paths.containsKey(role)) {
       throw Exception(
         'Public profile editing is not available for this account',
       );
+    }
     final request = http.MultipartRequest(
       'PATCH',
       Uri.parse('${Urls.baseUrl}/${paths[role]}'),
@@ -140,7 +141,7 @@ class PhaseOneApi {
     request.fields['data'] = jsonEncode({
       if (role != 'PATIENT' && about != null) 'about': about,
     });
-    if (imagePath != null)
+    if (imagePath != null) {
       request.files.add(
         await http.MultipartFile.fromPath(
           role == 'CLINIC' ? 'companyLogo' : 'profilePicture',
@@ -151,6 +152,7 @@ class PhaseOneApi {
           ),
         ),
       );
+    }
     final response = await http.Response.fromStream(
       await (client == null ? request.send() : client.send(request)).timeout(
         const Duration(seconds: 60),
@@ -159,8 +161,9 @@ class PhaseOneApi {
     final data = jsonDecode(response.body);
     if (response.statusCode < 200 ||
         response.statusCode >= 300 ||
-        data['success'] == false)
+        data['success'] == false) {
       throw Exception(data['message'] ?? 'Unable to save public details');
+    }
     return data['data'];
   }
 }

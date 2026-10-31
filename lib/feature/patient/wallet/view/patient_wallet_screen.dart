@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:nabeelaljirbi_app/feature/common/operations/history_reports_screen.dart';
+import 'package:nabeelaljirbi_app/feature/common/operations/phase_one_api.dart';
 import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
 import 'package:nabeelaljirbi_app/core/const/icons_path.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
@@ -52,6 +54,12 @@ class PatientWalletScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildBalanceCard(context), // Pass context
+              TextButton(
+                onPressed: () => Get.to(() => const HistoryReportsScreen()),
+                child: Text(
+                  phaseText('Full wallet history', 'سجل المحفظة الكامل'),
+                ),
+              ),
               const SizedBox(height: 16),
               _buildReferralSection(),
               const SizedBox(height: 24),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'phase_one_api.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HistoryReportsScreen extends StatefulWidget {
   final bool complaints;
@@ -17,9 +18,11 @@ class _HistoryReportsScreenState extends State<HistoryReportsScreen> {
   bool busy = false;
   String? error;
   List<dynamic> rows = [];
+  String search = '';
   Map<String, dynamic> get query => {
     'page': page,
     'limit': 25,
+    if (!widget.complaints) 'searchTerm': search,
     if (start != null) 'startDate': start!.toIso8601String().substring(0, 10),
     if (end != null) 'endDate': end!.toIso8601String().substring(0, 10),
     if (widget.complaints || kind == 'bookings')
@@ -179,6 +182,21 @@ class _HistoryReportsScreenState extends State<HistoryReportsScreen> {
                         load();
                       },
               ),
+            if (!widget.complaints)
+              TextField(
+                decoration: InputDecoration(
+                  labelText: phaseText(
+                    'Search ID or reference',
+                    'بحث بالرقم أو المرجع',
+                  ),
+                ),
+                enabled: !busy,
+                onSubmitted: (value) {
+                  search = value.trim();
+                  page = 1;
+                  load();
+                },
+              ),
             DropdownButtonFormField<String>(
               key: ValueKey('$kind-${widget.complaints}-$filter'),
               initialValue: filter,
@@ -283,6 +301,44 @@ class _HistoryReportsScreenState extends State<HistoryReportsScreen> {
                               '${r['type']} · ${r['createdAt'].toString().substring(0, 10)}',
                             ),
                             SelectableText('${r['id']}'),
+                            if (r['settlementNumber'] != null)
+                              Text('${r['settlementNumber']}'),
+                            if (r['reference'] != null)
+                              SelectableText(
+                                '${phaseText('Reference', 'المرجع')}: ${r['reference']}',
+                              ),
+                            if (['http', 'https'].contains(
+                              Uri.tryParse('${r['receiptUrl']}')?.scheme,
+                            ))
+                              TextButton(
+                                onPressed: () async {
+                                  try {
+                                    if (!await launchUrl(
+                                      Uri.parse(r['receiptUrl']),
+                                      mode: LaunchMode.externalApplication,
+                                    )) {
+                                      throw Exception(
+                                        phaseText(
+                                          'Unable to open receipt.',
+                                          'تعذر فتح الإيصال.',
+                                        ),
+                                      );
+                                    }
+                                  } catch (e) {
+                                    if (mounted) {
+                                      setState(() {
+                                        error = '$e';
+                                      });
+                                    }
+                                  }
+                                },
+                                child: Text(
+                                  phaseText(
+                                    'View payment receipt',
+                                    'عرض إيصال الدفع',
+                                  ),
+                                ),
+                              ),
                             if (r['appointmentId'] != null)
                               Text(
                                 '${phaseText('Booking', 'الحجز')}: ${r['appointmentId']}',

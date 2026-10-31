@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'phase_one_api.dart';
+import 'report_share.dart';
 
 class PayoutScreen extends StatefulWidget {
   const PayoutScreen({super.key});
@@ -15,11 +16,57 @@ class _PayoutScreenState extends State<PayoutScreen> {
       key: TextEditingController(),
   };
   final amount = TextEditingController();
+  final search = TextEditingController();
+  DateTime? start, end;
   List<dynamic> rows = [];
   bool busy = false, eligible = false;
   String method = 'BANK', status = 'ALL';
   String? error, message;
-  int page = 1, total = 0;
+  int page = 1, total = 0, limit = 25;
+  Map<String, dynamic> get query => {
+    'page': page,
+    'limit': limit,
+    'status': status,
+    'searchTerm': search.text.trim(),
+    if (start != null) 'startDate': start!.toIso8601String().substring(0, 10),
+    if (end != null) 'endDate': end!.toIso8601String().substring(0, 10),
+  };
+
+  Future<void> date(bool from) async {
+    final result = await showDatePicker(
+      context: context,
+      initialDate: (from ? start : end) ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+    if (result == null || !mounted) return;
+    if (from) {
+      start = result;
+    } else {
+      end = result;
+    }
+    page = 1;
+    await load();
+  }
+
+  Future<void> download(String format) async {
+    setState(() {
+      busy = true;
+      error = null;
+    });
+    try {
+      await sharePhaseReport(context, 'payouts', format, query);
+    } catch (e) {
+      if (mounted) error = '$e';
+    } finally {
+      if (mounted) {
+        setState(() {
+          busy = false;
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -32,6 +79,7 @@ class _PayoutScreenState extends State<PayoutScreen> {
       c.dispose();
     }
     amount.dispose();
+    search.dispose();
     super.dispose();
   }
 
@@ -51,10 +99,7 @@ class _PayoutScreenState extends State<PayoutScreen> {
           e.value.text = '${data['bankDetails']?[e.key] ?? ''}';
         }
       }
-      final history = await PhaseOneApi.call(
-        'payouts',
-        query: {'page': page, 'limit': 20, 'status': status},
-      );
+      final history = await PhaseOneApi.call('payouts', query: query);
       if (!mounted) return;
       rows = history['data'];
       total = history['meta']['total'];
@@ -281,6 +326,80 @@ class _PayoutScreenState extends State<PayoutScreen> {
                     load();
                   },
           ),
+          TextField(
+            controller: search,
+            enabled: !busy,
+            decoration: InputDecoration(
+              labelText: phaseText(
+                'Search name, phone or reference',
+                'بحث بالاسم أو الهاتف أو المرجع',
+              ),
+            ),
+            onSubmitted: (_) {
+              page = 1;
+              load();
+            },
+          ),
+          Wrap(
+            spacing: 12,
+            children: [
+              TextButton(
+                onPressed: busy ? null : () => date(true),
+                child: Text(
+                  '${phaseText('From', 'من')}: ${start?.toIso8601String().substring(0, 10) ?? '—'}',
+                ),
+              ),
+              TextButton(
+                onPressed: busy ? null : () => date(false),
+                child: Text(
+                  '${phaseText('To', 'إلى')}: ${end?.toIso8601String().substring(0, 10) ?? '—'}',
+                ),
+              ),
+              TextButton(
+                onPressed: busy
+                    ? null
+                    : () {
+                        start = null;
+                        end = null;
+                        page = 1;
+                        load();
+                      },
+                child: Text(phaseText('Clear dates', 'مسح التواريخ')),
+              ),
+              TextButton(
+                onPressed: busy
+                    ? null
+                    : () {
+                        page = 1;
+                        load();
+                      },
+                child: Text(phaseText('Search', 'بحث')),
+              ),
+              OutlinedButton(
+                onPressed: busy ? null : () => download('pdf'),
+                child: const Text('PDF'),
+              ),
+              OutlinedButton(
+                onPressed: busy ? null : () => download('xlsx'),
+                child: const Text('Excel'),
+              ),
+            ],
+          ),
+          DropdownButtonFormField<int>(
+            initialValue: limit,
+            decoration: InputDecoration(labelText: phaseText('Rows', 'الصفوف')),
+            items: [
+              for (final n in [25, 100, 500, 1000, 5000])
+                DropdownMenuItem(value: n, child: Text('$n')),
+            ],
+            onChanged: busy
+                ? null
+                : (v) {
+                    limit = v!;
+                    page = 1;
+                    load();
+                  },
+          ),
           for (final r in rows)
             Card(
               child: Padding(
@@ -310,16 +429,23 @@ class _PayoutScreenState extends State<PayoutScreen> {
                         ].contains(Uri.tryParse(r['receiptUrl'])?.scheme))
                       TextButton(
                         onPressed: () async {
-                          final ok = await launchUrl(
-                            Uri.parse(r['receiptUrl']),
-                            mode: LaunchMode.externalApplication,
-                          );
-                          if (!ok && mounted) {
-                            setState(() {
-                              error = phaseText(
-                                'Unable to open receipt.',
-                                'تعذر فتح الإيصال.',
+                          try {
+                            final ok = await launchUrl(
+                              Uri.parse(r['receiptUrl']),
+                              mode: LaunchMode.externalApplication,
+                            );
+                            if (!ok) {
+                              throw Exception(
+                                phaseText(
+                                  'Unable to open receipt.',
+                                  'تعذر فتح الإيصال.',
+                                ),
                               );
+                            }
+                          } catch (e) {
+                            if (!mounted) return;
+                            setState(() {
+                              error = '$e';
                             });
                           }
                         },
@@ -347,7 +473,7 @@ class _PayoutScreenState extends State<PayoutScreen> {
               ),
               Text('$page'),
               TextButton(
-                onPressed: busy || page * 20 >= total
+                onPressed: busy || page * limit >= total
                     ? null
                     : () {
                         page++;

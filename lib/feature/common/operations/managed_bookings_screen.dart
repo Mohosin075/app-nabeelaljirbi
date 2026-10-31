@@ -237,7 +237,26 @@ class _ManagedBookingsScreenState extends State<ManagedBookingsScreen> {
                   ),
                   items: [
                     for (final s in ['requests', 'date', 'newest', 'serial'])
-                      DropdownMenuItem(value: s, child: Text(s)),
+                      DropdownMenuItem(
+                        value: s,
+                        child: Text(
+                          {
+                            'requests': phaseText(
+                              'Requests: oldest first',
+                              'الطلبات: الأقدم أولاً',
+                            ),
+                            'newest': phaseText('Newest first', 'الأحدث أولاً'),
+                            'date': phaseText(
+                              'Appointment date',
+                              'تاريخ الموعد',
+                            ),
+                            'serial': phaseText(
+                              'Serial number',
+                              'الرقم التسلسلي',
+                            ),
+                          }[s]!,
+                        ),
+                      ),
                   ],
                   onChanged: busy
                       ? null

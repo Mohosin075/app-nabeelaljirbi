@@ -44,15 +44,17 @@ class _PublicDetailsScreenState extends State<PublicDetailsScreen> {
         source: ImageSource.gallery,
         imageQuality: 85,
       );
-      if (chosen != null && mounted)
+      if (chosen != null && mounted) {
         setState(() {
           image = chosen;
         });
+      }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           error = '$e';
         });
+      }
     }
   }
 
@@ -67,25 +69,30 @@ class _PublicDetailsScreenState extends State<PublicDetailsScreen> {
         about: widget.role == 'PATIENT' ? null : about.text.trim(),
         imagePath: image?.path,
       );
-      if (data is Map && data['accessToken'] is String)
+      if (data is Map && data['accessToken'] is String) {
         await SharedPrefHelper.saveToken(data['accessToken']);
+      }
       if (widget.role == 'PATIENT' &&
-          Get.isRegistered<PatientProfileController>())
+          Get.isRegistered<PatientProfileController>()) {
         await Get.find<PatientProfileController>().fetchProfile();
+      }
       if (widget.role == 'DOCTOR' &&
-          Get.isRegistered<DoctorProfileController>())
+          Get.isRegistered<DoctorProfileController>()) {
         await Get.find<DoctorProfileController>().fetchProfile();
+      }
       if (widget.role == 'CLINIC' &&
-          Get.isRegistered<ClinicProfileController>())
+          Get.isRegistered<ClinicProfileController>()) {
         await Get.find<ClinicProfileController>().fetchClinicProfile();
+      }
       if (!mounted) return;
       Navigator.pop(context, true);
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           error = '$e';
           busy = false;
         });
+      }
     }
   }
 
