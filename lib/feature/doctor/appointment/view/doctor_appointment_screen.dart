@@ -143,21 +143,27 @@ class DoctorAppointmentScreen extends StatelessWidget {
             .where((apt) => apt.status?.toUpperCase() == 'INPROGRESS')
             .length;
         final completedCount = controller.allAppointments
-            .where((apt) =>
-                apt.status?.toUpperCase() == 'COMPLETE' ||
-                apt.status?.toUpperCase() == 'COMPLETED')
+            .where(
+              (apt) =>
+                  apt.status?.toUpperCase() == 'COMPLETE' ||
+                  apt.status?.toUpperCase() == 'COMPLETED',
+            )
             .length;
         final noShowCount = controller.allAppointments
-            .where((apt) =>
-                apt.status?.toUpperCase() == 'NOT_SHOW' ||
-                apt.status?.toUpperCase() == 'NOTSHOWN' ||
-                apt.status?.toUpperCase() == 'NOT_SHOWN' ||
-                apt.status?.toUpperCase() == 'NO_SHOW')
+            .where(
+              (apt) =>
+                  apt.status?.toUpperCase() == 'NOT_SHOW' ||
+                  apt.status?.toUpperCase() == 'NOTSHOWN' ||
+                  apt.status?.toUpperCase() == 'NOT_SHOWN' ||
+                  apt.status?.toUpperCase() == 'NO_SHOW',
+            )
             .length;
         final cancelledCount = controller.allAppointments
-            .where((apt) =>
-                apt.status?.toUpperCase() == 'CANCELLED' ||
-                apt.status?.toUpperCase() == 'REJECTED')
+            .where(
+              (apt) =>
+                  apt.status?.toUpperCase() == 'CANCELLED' ||
+                  apt.status?.toUpperCase() == 'REJECTED',
+            )
             .length;
 
         final tabsData = [
@@ -181,12 +187,15 @@ class DoctorAppointmentScreen extends StatelessWidget {
             return GestureDetector(
               onTap: () => controller.selectTab(tabIndex),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color:
-                      isSelected ? const Color(0xff137CCF) : const Color(0xffEDEEF4),
+                  color: isSelected
+                      ? const Color(0xff137CCF)
+                      : const Color(0xffEDEEF4),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -237,7 +246,8 @@ class DoctorAppointmentScreen extends StatelessWidget {
             : ListView.builder(
                 controller: controller.scrollController,
                 physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: controller.filteredAppointments.length +
+                itemCount:
+                    controller.filteredAppointments.length +
                     (controller.isMoreLoading.value ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index < controller.filteredAppointments.length) {
@@ -310,7 +320,11 @@ class DoctorAppointmentScreen extends StatelessWidget {
       case 'CANCELLED':
         statusColor = const Color(0xFFEF4444);
         statusBgColor = const Color(0xFFFEE2E2);
-        statusDisplayLabel = 'cancelled'.tr;
+        statusDisplayLabel = apt.absenceType == 'DOCTOR_ABSENT'
+            ? (Get.locale?.languageCode == 'ar'
+                  ? 'غياب الطبيب'
+                  : 'Doctor absent')
+            : 'cancelled'.tr;
         break;
       case 'REJECTED':
         statusColor = const Color(0xFFDC2626);
@@ -330,7 +344,8 @@ class DoctorAppointmentScreen extends StatelessWidget {
         "${_formatTime(apt.startTime)} - ${_formatTime(apt.endTime)}";
     final dateFormatted = _formatDate(apt.consultDate);
 
-    final hasReason = (statusValue == 'NOT_SHOW' ||
+    final hasReason =
+        (statusValue == 'NOT_SHOW' ||
             statusValue == 'NOTSHOWN' ||
             statusValue == 'CANCELLED' ||
             statusValue == 'REJECTED') &&
@@ -361,7 +376,10 @@ class DoctorAppointmentScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: statusBgColor,
                   borderRadius: BorderRadius.circular(20),
@@ -484,8 +502,9 @@ class DoctorAppointmentScreen extends StatelessWidget {
                           color: const Color(0xFFF5F3FF),
                           borderRadius: BorderRadius.circular(6),
                           border: Border.all(
-                            color:
-                                const Color(0xFF7C3AED).withValues(alpha: 0.2),
+                            color: const Color(
+                              0xFF7C3AED,
+                            ).withValues(alpha: 0.2),
                           ),
                         ),
                         child: Text(
@@ -595,7 +614,8 @@ class DoctorAppointmentScreen extends StatelessWidget {
                             ),
                           ),
                           TextSpan(
-                            text: apt.cancellationReason ??
+                            text:
+                                apt.cancellationReason ??
                                 apt.rejectionReason ??
                                 '',
                             style: globalTextStyle(
@@ -684,8 +704,8 @@ class DoctorAppointmentScreen extends StatelessWidget {
       final displayHour = hour > 12
           ? hour - 12
           : hour == 0
-              ? 12
-              : hour;
+          ? 12
+          : hour;
 
       return "$displayHour:${minute.toString().padLeft(2, '0')} $period";
     } catch (e) {

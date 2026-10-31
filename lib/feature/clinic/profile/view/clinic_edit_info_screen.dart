@@ -1,3 +1,4 @@
+import 'package:nabeelaljirbi_app/feature/common/operations/profile_changes_screen.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,7 +16,10 @@ class ClinicEditInfoScreen extends StatelessWidget {
   const ClinicEditInfoScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      ApprovedProfileGate(builder: _buildEditor);
+
+  Widget _buildEditor(BuildContext context) {
     // Put the controller if not already in memory
     final controller = Get.put(ClinicEditInfoController());
 
@@ -219,9 +223,12 @@ class ClinicEditInfoScreen extends StatelessWidget {
                           ),
                         );
                         if (result != null) {
-                          controller.locationController.text = result['address'] ?? '';
-                          controller.latitude = result['lat'] ?? controller.latitude;
-                          controller.longitude = result['lng'] ?? controller.longitude;
+                          controller.locationController.text =
+                              result['address'] ?? '';
+                          controller.latitude =
+                              result['lat'] ?? controller.latitude;
+                          controller.longitude =
+                              result['lng'] ?? controller.longitude;
                         }
                       },
                     ),

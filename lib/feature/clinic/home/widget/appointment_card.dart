@@ -113,7 +113,8 @@ class AppointmentCard extends StatelessWidget {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: const Color(0xFFF1F5F9),
-                child: appointment.patientImage != null &&
+                child:
+                    appointment.patientImage != null &&
                         appointment.patientImage!.isNotEmpty
                     ? ClipOval(
                         child: CachedNetworkImage(
@@ -159,8 +160,9 @@ class AppointmentCard extends StatelessWidget {
                           color: const Color(0xFFF5F3FF),
                           borderRadius: BorderRadius.circular(6),
                           border: Border.all(
-                            color:
-                                const Color(0xFF7C3AED).withValues(alpha: 0.2),
+                            color: const Color(
+                              0xFF7C3AED,
+                            ).withValues(alpha: 0.2),
                           ),
                         ),
                         child: Text(
@@ -289,20 +291,23 @@ class AppointmentCard extends StatelessWidget {
                             style: globalTextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: appointment.status ==
+                              color:
+                                  appointment.status ==
                                       AppointmentStatus.notShown
                                   ? const Color(0xFF92400E)
                                   : const Color(0xFF991B1B),
                             ),
                           ),
                           TextSpan(
-                            text: appointment.cancellationReason ??
+                            text:
+                                appointment.cancellationReason ??
                                 appointment.rejectionReason ??
                                 'N/A',
                             style: globalTextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
-                              color: appointment.status ==
+                              color:
+                                  appointment.status ==
                                       AppointmentStatus.notShown
                                   ? const Color(0xFF92400E)
                                   : const Color(0xFF991B1B),
@@ -349,16 +354,21 @@ class AppointmentCard extends StatelessWidget {
                 title: 'reject_appointment_title'.tr,
                 actionLabel: 'yes_reject'.tr,
                 actionColor: const Color(0xFFEF4444),
-                onConfirm: (reason) =>
-                    _invokeUpdateStatus(appointment.id, 'REJECTED', reason: reason),
+                onConfirm: (reason) => _invokeUpdateStatus(
+                  appointment.id,
+                  'REJECTED',
+                  reason: reason,
+                ),
               ),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Color(0xFFEF4444)),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
               ),
               child: Text(
                 'reject'.tr,
@@ -385,8 +395,10 @@ class AppointmentCard extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
               ),
               child: Text(
                 'confirm'.tr,
@@ -412,8 +424,11 @@ class AppointmentCard extends StatelessWidget {
                 title: 'cancel_appointment_title'.tr,
                 actionLabel: 'yes_cancel'.tr,
                 actionColor: const Color(0xFFEF4444),
-                onConfirm: (reason) =>
-                    _invokeUpdateStatus(appointment.id, 'CANCELLED', reason: reason),
+                onConfirm: (reason) => _invokeUpdateStatus(
+                  appointment.id,
+                  'CANCELLED',
+                  reason: reason,
+                ),
               ),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Color(0xFFEF4444)),
@@ -437,8 +452,11 @@ class AppointmentCard extends StatelessWidget {
                 actionLabel: 'yes_mark_no_show'.tr,
                 actionColor: const Color(0xFFD97706),
                 showNotice: true,
-                onConfirm: (reason) =>
-                    _invokeUpdateStatus(appointment.id, 'NOT_SHOW', reason: reason),
+                onConfirm: (reason) => _invokeUpdateStatus(
+                  appointment.id,
+                  'NOT_SHOW',
+                  reason: reason,
+                ),
               ),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Color(0xFFD97706)),
@@ -462,8 +480,7 @@ class AppointmentCard extends StatelessWidget {
                 message: 'update_status_arrived_message'.tr,
                 actionLabel: 'yes_update'.tr,
                 actionColor: const Color(0xFF7C3AED),
-                onConfirm: () =>
-                    _invokeUpdateStatus(appointment.id, 'ARRIVED'),
+                onConfirm: () => _invokeUpdateStatus(appointment.id, 'ARRIVED'),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF7C3AED),
@@ -521,8 +538,11 @@ class AppointmentCard extends StatelessWidget {
                 actionLabel: 'yes_mark_no_show'.tr,
                 actionColor: const Color(0xFFD97706),
                 showNotice: true,
-                onConfirm: (reason) =>
-                    _invokeUpdateStatus(appointment.id, 'NOT_SHOW', reason: reason),
+                onConfirm: (reason) => _invokeUpdateStatus(
+                  appointment.id,
+                  'NOT_SHOW',
+                  reason: reason,
+                ),
               ),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Color(0xFFD97706)),
@@ -566,8 +586,7 @@ class AppointmentCard extends StatelessWidget {
             ),
             // One-tap complete
             ElevatedButton(
-              onPressed: () =>
-                  _invokeUpdateStatus(appointment.id, 'COMPLETE'),
+              onPressed: () => _invokeUpdateStatus(appointment.id, 'COMPLETE'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF10B981),
                 shape: RoundedRectangleBorder(
@@ -598,8 +617,11 @@ class AppointmentCard extends StatelessWidget {
                 title: 'cancel_appointment_title'.tr,
                 actionLabel: 'yes_cancel'.tr,
                 actionColor: const Color(0xFFEF4444),
-                onConfirm: (reason) =>
-                    _invokeUpdateStatus(appointment.id, 'CANCELLED', reason: reason),
+                onConfirm: (reason) => _invokeUpdateStatus(
+                  appointment.id,
+                  'CANCELLED',
+                  reason: reason,
+                ),
               ),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Color(0xFFEF4444)),
@@ -623,8 +645,11 @@ class AppointmentCard extends StatelessWidget {
                 actionLabel: 'yes_mark_no_show'.tr,
                 actionColor: const Color(0xFFD97706),
                 showNotice: true,
-                onConfirm: (reason) =>
-                    _invokeUpdateStatus(appointment.id, 'NOT_SHOW', reason: reason),
+                onConfirm: (reason) => _invokeUpdateStatus(
+                  appointment.id,
+                  'NOT_SHOW',
+                  reason: reason,
+                ),
               ),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Color(0xFFD97706)),
@@ -643,8 +668,7 @@ class AppointmentCard extends StatelessWidget {
             ),
             // One-tap complete
             ElevatedButton(
-              onPressed: () =>
-                  _invokeUpdateStatus(appointment.id, 'COMPLETE'),
+              onPressed: () => _invokeUpdateStatus(appointment.id, 'COMPLETE'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF10B981),
                 shape: RoundedRectangleBorder(
@@ -689,10 +713,7 @@ class AppointmentCard extends StatelessWidget {
         ),
         content: Text(
           message,
-          style: globalTextStyle(
-            fontSize: 14,
-            color: const Color(0xFF64748B),
-          ),
+          style: globalTextStyle(fontSize: 14, color: const Color(0xFF64748B)),
         ),
         actions: [
           TextButton(
@@ -881,7 +902,11 @@ class AppointmentCard extends StatelessWidget {
         break;
       case AppointmentStatus.cancelled:
         color = const Color(0xFFEF4444);
-        text = 'cancelled'.tr;
+        text = appointment.absenceType == 'DOCTOR_ABSENT'
+            ? (Get.locale?.languageCode == 'ar'
+                  ? 'غياب الطبيب'
+                  : 'Doctor absent')
+            : 'cancelled'.tr;
         bgColor = const Color(0xFFFEE2E2);
         break;
     }

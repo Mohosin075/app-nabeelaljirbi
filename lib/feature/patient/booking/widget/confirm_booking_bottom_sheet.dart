@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
-import 'package:nabeelaljirbi_app/core/utils/currency_util.dart';
 import 'package:nabeelaljirbi_app/feature/patient/doctor_details/controller/doctor_details_controller.dart';
 import 'package:nabeelaljirbi_app/feature/patient/booking/controller/booking_controller.dart';
 
@@ -151,7 +150,7 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                             bookingController.collectionMode == 'MODE_B'
                                 ? 'session_fee'.tr
                                 : 'consultation_cash_at_clinic'.tr,
-                            '${doctor.consultFee} ${CurrencyUtil.getUserCurrencySymbol()}',
+                            '${doctor.consultFee} ${bookingController.bookingCurrencySymbol}',
                             isAmount: true,
                           ),
                           const Divider(),
@@ -163,14 +162,14 @@ class ConfirmBookingBottomSheet extends StatelessWidget {
                             }
                             return _buildInfoRow(
                               'service_fee'.tr,
-                              '${bookingController.serviceFee.value} ${CurrencyUtil.getUserCurrencySymbol()}',
+                              '${bookingController.serviceFee.value} ${bookingController.bookingCurrencySymbol}',
                               isAmount: true,
                             );
                           }),
                           Obx(
                             () => _buildInfoRow(
                               'required_hold_amount'.tr,
-                              '${bookingController.requiredPatientHoldAmount.toStringAsFixed(2)} ${CurrencyUtil.getUserCurrencySymbol()}',
+                              '${bookingController.requiredPatientHoldAmount.toStringAsFixed(2)} ${bookingController.bookingCurrencySymbol}',
                               isAmount: true,
                               isBold: true,
                             ),

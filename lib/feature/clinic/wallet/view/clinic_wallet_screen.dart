@@ -1,3 +1,5 @@
+import 'package:nabeelaljirbi_app/feature/common/operations/payout_screen.dart';
+import 'package:nabeelaljirbi_app/feature/common/operations/operations_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -42,6 +44,7 @@ class ClinicWalletScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildBalanceCard(controller),
+              const OperationsMenu(),
               const SizedBox(height: 16),
               _buildReferralSection(controller),
               const SizedBox(height: 24),
@@ -148,7 +151,7 @@ class ClinicWalletScreen extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: controller.requestSettlement,
+                onTap: () => Get.to(() => const PayoutScreen()),
                 borderRadius: BorderRadius.circular(12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

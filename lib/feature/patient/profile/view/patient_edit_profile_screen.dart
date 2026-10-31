@@ -1,3 +1,4 @@
+import 'package:nabeelaljirbi_app/feature/common/operations/profile_changes_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -10,7 +11,10 @@ class PatientEditProfileScreen extends StatelessWidget {
   const PatientEditProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      ApprovedProfileGate(builder: _buildEditor);
+
+  Widget _buildEditor(BuildContext context) {
     final controller = Get.put(PatientEditProfileController());
 
     return Scaffold(

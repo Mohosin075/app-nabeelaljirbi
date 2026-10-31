@@ -1,3 +1,4 @@
+import 'package:nabeelaljirbi_app/feature/common/operations/profile_changes_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -12,7 +13,10 @@ class DoctorEditProfileScreen extends StatelessWidget {
   const DoctorEditProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      ApprovedProfileGate(builder: _buildEditor);
+
+  Widget _buildEditor(BuildContext context) {
     final controller = Get.put(DoctorEditProfileController());
 
     return Scaffold(
@@ -736,8 +740,9 @@ class DoctorEditProfileScreen extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xff137CCF)
-                                      .withValues(alpha: 0.1),
+                                  color: const Color(
+                                    0xff137CCF,
+                                  ).withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
@@ -774,19 +779,26 @@ class DoctorEditProfileScreen extends StatelessWidget {
                       TextField(
                         controller: item.degreeController,
                         style: globalTextStyle(
-                            fontSize: 14, color: const Color(0xff2D2D2D)),
+                          fontSize: 14,
+                          color: const Color(0xff2D2D2D),
+                        ),
                         decoration: InputDecoration(
                           labelText: 'Degree / Title (e.g. MBBS, FCPS)',
                           labelStyle: globalTextStyle(
-                              fontSize: 12, color: const Color(0xff64748B)),
+                            fontSize: 12,
+                            color: const Color(0xff64748B),
+                          ),
                           hintText: 'Enter degree title',
                           isDense: true,
                           contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide:
-                                const BorderSide(color: Color(0xFFE2E8F0)),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFE2E8F0),
+                            ),
                           ),
                         ),
                       ),
@@ -798,19 +810,26 @@ class DoctorEditProfileScreen extends StatelessWidget {
                             child: TextField(
                               controller: item.instituteController,
                               style: globalTextStyle(
-                                  fontSize: 14, color: const Color(0xff2D2D2D)),
+                                fontSize: 14,
+                                color: const Color(0xff2D2D2D),
+                              ),
                               decoration: InputDecoration(
                                 labelText: 'Institute / University',
                                 labelStyle: globalTextStyle(
-                                    fontSize: 12, color: const Color(0xff64748B)),
+                                  fontSize: 12,
+                                  color: const Color(0xff64748B),
+                                ),
                                 hintText: 'e.g. Dhaka Medical College',
                                 isDense: true,
                                 contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 10),
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide:
-                                      const BorderSide(color: Color(0xFFE2E8F0)),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFE2E8F0),
+                                  ),
                                 ),
                               ),
                             ),
@@ -826,19 +845,26 @@ class DoctorEditProfileScreen extends StatelessWidget {
                                 LengthLimitingTextInputFormatter(4),
                               ],
                               style: globalTextStyle(
-                                  fontSize: 14, color: const Color(0xff2D2D2D)),
+                                fontSize: 14,
+                                color: const Color(0xff2D2D2D),
+                              ),
                               decoration: InputDecoration(
                                 labelText: 'Year',
                                 labelStyle: globalTextStyle(
-                                    fontSize: 12, color: const Color(0xff64748B)),
+                                  fontSize: 12,
+                                  color: const Color(0xff64748B),
+                                ),
                                 hintText: 'e.g. 2018',
                                 isDense: true,
                                 contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 10),
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
-                                  borderSide:
-                                      const BorderSide(color: Color(0xFFE2E8F0)),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFE2E8F0),
+                                  ),
                                 ),
                               ),
                             ),

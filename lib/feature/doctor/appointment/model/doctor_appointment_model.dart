@@ -82,6 +82,7 @@ class Appointment {
   String? endTime;
   int? serialNumber;
   String? status;
+  String? absenceType;
   String? createdAt;
   String? updatedAt;
   String? approximateEstimatedTime;
@@ -129,12 +130,14 @@ class Appointment {
     endTime = json['endTime'];
     serialNumber = json['serialNumber'];
     status = json['status'];
+    absenceType = json['absenceType'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     approximateEstimatedTime = json['approximateEstimatedTime'];
     cancellationReason = json['cancellationReason'] ?? json['noShowReason'];
     rejectionReason = json['rejectionReason'];
-    noShowReason = json['noShowReason'] ??
+    noShowReason =
+        json['noShowReason'] ??
         (json['status'] == 'NOT_SHOW' ? json['cancellationReason'] : null);
     bookedFor = json['bookedFor'];
     familyMemberName = json['familyMemberName'];

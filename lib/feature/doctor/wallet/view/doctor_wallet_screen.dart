@@ -1,7 +1,8 @@
+import 'package:nabeelaljirbi_app/feature/common/operations/payout_screen.dart';
+import 'package:nabeelaljirbi_app/feature/common/operations/operations_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
 import 'package:nabeelaljirbi_app/core/const/icons_path.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/core/utils/currency_util.dart';
@@ -44,6 +45,7 @@ class DoctorWalletScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildBalanceCard(controller),
+              const OperationsMenu(),
               const SizedBox(height: 16),
               _buildReconciliationCard(),
               const SizedBox(height: 16),
@@ -152,15 +154,7 @@ class DoctorWalletScreen extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                // onTap: controller.withdraw,
-                onTap: () {
-                  Get.snackbar(
-                    'withdraw'.tr,
-                    'withdraw_success_desc'.tr,
-                    backgroundColor: AppColors.primaryColor,
-                    colorText: Colors.white,
-                  );
-                },
+                onTap: () => Get.to(() => const PayoutScreen()),
                 borderRadius: BorderRadius.circular(12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

@@ -14,12 +14,14 @@ class DoctorReconciliationController extends GetxController {
   var isMoreLoading = false.obs;
 
   var selectedClinicId = 'all'.obs;
-  var selectedPeriod = 'monthly'.obs; // 'daily', 'weekly', 'monthly', 'last_month', 'custom'
+  var selectedPeriod =
+      'monthly'.obs; // 'daily', 'weekly', 'monthly', 'last_month', 'custom'
   var selectedDate = Rx<DateTime?>(null);
   var customStartDate = Rx<DateTime?>(null);
   var customEndDate = Rx<DateTime?>(null);
   var selectedShift = 'all'.obs; // 'all', 'morning', 'evening'
-  var selectedStatus = 'ALL'.obs; // 'ALL', 'COMPLETE', 'CONFIRMED', 'CANCELLED', 'NOT_SHOW'
+  var selectedStatus =
+      'ALL'.obs; // 'ALL', 'COMPLETE', 'CONFIRMED', 'CANCELLED', 'NOT_SHOW'
   var searchQuery = ''.obs;
 
   var reconciliationData = Rx<DoctorReconciliationData?>(null);
@@ -52,7 +54,10 @@ class DoctorReconciliationController extends GetxController {
   void _scrollListener() {
     if (scrollController.position.pixels >=
         scrollController.position.maxScrollExtent - 200) {
-      if (hasMore.value && !isMoreLoading.value && !isFiltering.value && !isInitialLoading.value) {
+      if (hasMore.value &&
+          !isMoreLoading.value &&
+          !isFiltering.value &&
+          !isInitialLoading.value) {
         loadMoreReports();
       }
     }
@@ -184,10 +189,7 @@ class DoctorReconciliationController extends GetxController {
 
       final response = await http.get(
         Uri.parse(url),
-        headers: {
-          'Authorization': token,
-          'Content-Type': 'application/json',
-        },
+        headers: {'Authorization': token, 'Content-Type': 'application/json'},
       );
 
       debugPrint('Reconciliation Status Code: ${response.statusCode}');
@@ -198,7 +200,9 @@ class DoctorReconciliationController extends GetxController {
 
         if (reportResponse.success == true && reportResponse.data != null) {
           reconciliationData.value = reportResponse.data;
-          availableClinics.assignAll(reportResponse.data!.availableClinics ?? []);
+          availableClinics.assignAll(
+            reportResponse.data!.availableClinics ?? [],
+          );
 
           final list = reportResponse.data!.appointments ?? [];
           appointments.assignAll(list);
@@ -228,10 +232,7 @@ class DoctorReconciliationController extends GetxController {
 
       final response = await http.get(
         Uri.parse(url),
-        headers: {
-          'Authorization': token,
-          'Content-Type': 'application/json',
-        },
+        headers: {'Authorization': token, 'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {
@@ -259,7 +260,8 @@ class DoctorReconciliationController extends GetxController {
   }
 
   String _buildUrl({required int page}) {
-    String url = '${Urls.baseUrl}/doctor/reconciliation-reports?page=$page&limit=$limit';
+    String url =
+        '${Urls.baseUrl}/doctor/reconciliation-reports?page=$page&limit=$limit';
 
     if (selectedClinicId.value != 'all' && selectedClinicId.value.isNotEmpty) {
       url += '&clinicId=${selectedClinicId.value}';
@@ -292,4 +294,8 @@ class DoctorReconciliationController extends GetxController {
 
     return url;
   }
+
+  Map<String, dynamic> get exportFilters =>
+      Uri.parse(_buildUrl(page: 1)).queryParameters;
+  final isExporting = false.obs;
 }

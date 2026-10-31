@@ -1,3 +1,4 @@
+import 'package:nabeelaljirbi_app/feature/common/operations/operations_menu.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -56,6 +57,7 @@ class DoctorProfileScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             child: Column(
               children: [
+                const OperationsMenu(),
                 // Profile Header
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -102,14 +104,21 @@ class DoctorProfileScreen extends StatelessWidget {
                               crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Text(
-                                  controller.doctorProfile.value?.fullName ?? '',
+                                  controller.doctorProfile.value?.fullName ??
+                                      '',
                                   style: globalTextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
                                     color: const Color(0xff101010),
                                   ),
                                 ),
-                                if (controller.badgeActive.value || controller.doctorProfile.value?.doctor?.badgeActive == true) ...[
+                                if (controller.badgeActive.value ||
+                                    controller
+                                            .doctorProfile
+                                            .value
+                                            ?.doctor
+                                            ?.badgeActive ==
+                                        true) ...[
                                   const SizedBox(width: 4),
                                   const BlueBadgeWidget(size: 18),
                                 ],

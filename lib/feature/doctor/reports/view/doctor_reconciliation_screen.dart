@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nabeelaljirbi_app/feature/common/operations/report_share.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -36,11 +37,40 @@ class DoctorReconciliationScreen extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
         actions: [
+          for (final format in ['pdf', 'xlsx'])
+            Obx(
+              () => TextButton(
+                onPressed: controller.isExporting.value
+                    ? null
+                    : () async {
+                        controller.isExporting.value = true;
+                        try {
+                          await sharePhaseReport(
+                            context,
+                            'bookings',
+                            format,
+                            controller.exportFilters,
+                          );
+                        } catch (error) {
+                          Get.snackbar('error'.tr, '$error');
+                        } finally {
+                          controller.isExporting.value = false;
+                        }
+                      },
+                child: Text(format == 'pdf' ? 'PDF' : 'Excel'),
+              ),
+            ),
           Obx(() {
-            if (controller.activeFilterCount == 0) return const SizedBox.shrink();
+            if (controller.activeFilterCount == 0) {
+              return const SizedBox.shrink();
+            }
             return TextButton.icon(
               onPressed: controller.resetFilters,
-              icon: const Icon(Icons.refresh_rounded, size: 16, color: Color(0xffDC2626)),
+              icon: const Icon(
+                Icons.refresh_rounded,
+                size: 16,
+                color: Color(0xffDC2626),
+              ),
               label: Text(
                 'reset_filters'.tr,
                 style: globalTextStyle(
@@ -59,9 +89,7 @@ class DoctorReconciliationScreen extends StatelessWidget {
           if (controller.isInitialLoading.value &&
               controller.reconciliationData.value == null) {
             return const Center(
-              child: CircularProgressIndicator(
-                color: AppColors.primaryColor,
-              ),
+              child: CircularProgressIndicator(color: AppColors.primaryColor),
             );
           }
 
@@ -106,7 +134,13 @@ class DoctorReconciliationScreen extends StatelessWidget {
                             }),
                             _buildSummaryCards(controller),
                             const SizedBox(height: 16),
-                            if ((controller.reconciliationData.value?.clinicBreakdown ?? []).length > 1) ...[
+                            if ((controller
+                                            .reconciliationData
+                                            .value
+                                            ?.clinicBreakdown ??
+                                        [])
+                                    .length >
+                                1) ...[
                               _buildClinicBreakdown(controller),
                               const SizedBox(height: 16),
                             ],
@@ -139,7 +173,8 @@ class DoctorReconciliationScreen extends StatelessWidget {
                       ),
                     ),
                     Obx(() {
-                      if (controller.appointments.isEmpty && !controller.isFiltering.value) {
+                      if (controller.appointments.isEmpty &&
+                          !controller.isFiltering.value) {
                         return SliverToBoxAdapter(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 40.0),
@@ -172,17 +207,17 @@ class DoctorReconciliationScreen extends StatelessWidget {
                       return SliverPadding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         sliver: SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              final item = controller.appointments[index];
-                              return AnimatedOpacity(
-                                duration: const Duration(milliseconds: 200),
-                                opacity: controller.isFiltering.value ? 0.6 : 1.0,
-                                child: _buildAppointmentCard(item),
-                              );
-                            },
-                            childCount: controller.appointments.length,
-                          ),
+                          delegate: SliverChildBuilderDelegate((
+                            context,
+                            index,
+                          ) {
+                            final item = controller.appointments[index];
+                            return AnimatedOpacity(
+                              duration: const Duration(milliseconds: 200),
+                              opacity: controller.isFiltering.value ? 0.6 : 1.0,
+                              child: _buildAppointmentCard(item),
+                            );
+                          }, childCount: controller.appointments.length),
                         ),
                       );
                     }),
@@ -197,9 +232,7 @@ class DoctorReconciliationScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                    const SliverToBoxAdapter(
-                      child: SizedBox(height: 30),
-                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 30)),
                   ],
                 ),
               ],
@@ -283,7 +316,11 @@ class DoctorReconciliationScreen extends StatelessWidget {
                     return const SizedBox.shrink();
                   }
                   return IconButton(
-                    icon: const Icon(Icons.close_rounded, size: 18, color: Color(0xff94A3B8)),
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      size: 18,
+                      color: Color(0xff94A3B8),
+                    ),
                     onPressed: controller.clearSearch,
                   );
                 }),
@@ -312,12 +349,16 @@ class DoctorReconciliationScreen extends StatelessWidget {
                   color: hasFilters ? AppColors.primaryColor : Colors.white,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: hasFilters ? AppColors.primaryColor : const Color(0xffE2E8F0),
+                    color: hasFilters
+                        ? AppColors.primaryColor
+                        : const Color(0xffE2E8F0),
                   ),
                   boxShadow: hasFilters
                       ? [
                           BoxShadow(
-                            color: AppColors.primaryColor.withValues(alpha: 0.25),
+                            color: AppColors.primaryColor.withValues(
+                              alpha: 0.25,
+                            ),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
@@ -330,7 +371,9 @@ class DoctorReconciliationScreen extends StatelessWidget {
                     Icon(
                       Icons.tune_rounded,
                       size: 18,
-                      color: hasFilters ? Colors.white : const Color(0xff475569),
+                      color: hasFilters
+                          ? Colors.white
+                          : const Color(0xff475569),
                     ),
                     const SizedBox(width: 6),
                     Text(
@@ -338,13 +381,18 @@ class DoctorReconciliationScreen extends StatelessWidget {
                       style: globalTextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: hasFilters ? Colors.white : const Color(0xff475569),
+                        color: hasFilters
+                            ? Colors.white
+                            : const Color(0xff475569),
                       ),
                     ),
                     if (hasFilters) ...[
                       const SizedBox(width: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(10),
@@ -445,7 +493,9 @@ class DoctorReconciliationScreen extends StatelessWidget {
           color: isSelected ? AppColors.primaryColor : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? AppColors.primaryColor : const Color(0xffE2E8F0),
+            color: isSelected
+                ? AppColors.primaryColor
+                : const Color(0xffE2E8F0),
           ),
           boxShadow: isSelected
               ? [
@@ -498,7 +548,8 @@ class DoctorReconciliationScreen extends StatelessWidget {
             children: [
               if (clinicId != 'all')
                 _buildActiveTag(
-                  label: '${'clinic'.tr}: ${controller.getClinicName(clinicId)}',
+                  label:
+                      '${'clinic'.tr}: ${controller.getClinicName(clinicId)}',
                   icon: Icons.local_hospital_outlined,
                   onRemove: () => controller.setClinic('all'),
                 ),
@@ -608,7 +659,8 @@ class DoctorReconciliationScreen extends StatelessWidget {
       context: context,
       firstDate: DateTime(2023),
       lastDate: DateTime(2030),
-      initialDateRange: controller.customStartDate.value != null &&
+      initialDateRange:
+          controller.customStartDate.value != null &&
               controller.customEndDate.value != null
           ? DateTimeRange(
               start: controller.customStartDate.value!,
@@ -704,7 +756,11 @@ class DoctorReconciliationScreen extends StatelessWidget {
                         );
                       }),
                       IconButton(
-                        icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xff64748B)),
+                        icon: const Icon(
+                          Icons.close_rounded,
+                          size: 20,
+                          color: Color(0xff64748B),
+                        ),
                         onPressed: () => Navigator.pop(ctx),
                       ),
                     ],
@@ -884,7 +940,9 @@ class DoctorReconciliationScreen extends StatelessWidget {
           color: isSelected ? AppColors.primaryColor : const Color(0xffF8FAFC),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? AppColors.primaryColor : const Color(0xffE2E8F0),
+            color: isSelected
+                ? AppColors.primaryColor
+                : const Color(0xffE2E8F0),
           ),
         ),
         child: Row(
@@ -960,7 +1018,10 @@ class DoctorReconciliationScreen extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(6),
@@ -1196,7 +1257,9 @@ class DoctorReconciliationScreen extends StatelessWidget {
     final dateStr = item.consultDate != null
         ? DateFormat('EEE, MMM dd, yyyy').format(item.consultDate!)
         : '';
-    final timeStr = item.startTime != null ? '${item.startTime} - ${item.endTime}' : '';
+    final timeStr = item.startTime != null
+        ? '${item.startTime} - ${item.endTime}'
+        : '';
 
     Color statusColor;
     Color statusBgColor;
@@ -1358,7 +1421,9 @@ class DoctorReconciliationScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    item.status.toUpperCase() == 'COMPLETE' ? 'settled'.tr : 'consultation_fee'.tr,
+                    item.status.toUpperCase() == 'COMPLETE'
+                        ? 'settled'.tr
+                        : 'consultation_fee'.tr,
                     style: globalTextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w400,

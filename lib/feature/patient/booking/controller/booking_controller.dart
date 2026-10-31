@@ -8,6 +8,7 @@ import 'package:nabeelaljirbi_app/core/route/routes.dart';
 import 'package:nabeelaljirbi_app/feature/patient/doctor_details/controller/doctor_details_controller.dart';
 import 'package:nabeelaljirbi_app/feature/patient/doctor_details/model/doctor_details_model.dart';
 import 'package:flutter/material.dart';
+import 'package:nabeelaljirbi_app/core/utils/currency_util.dart';
 import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/feature/patient/wallet/view/patient_wallet_screen.dart';
@@ -127,6 +128,9 @@ class BookingController extends GetxController {
 
   String get collectionMode =>
       doctorController.doctorDetails.value?.clinicCollectionMode ?? 'MODE_A';
+  String get bookingCurrencySymbol => CurrencyUtil.getCurrencySymbol(
+    doctorController.doctorDetails.value?.clinicCountry ?? '',
+  );
 
   double get requiredPatientHoldAmount {
     final consultationFee =

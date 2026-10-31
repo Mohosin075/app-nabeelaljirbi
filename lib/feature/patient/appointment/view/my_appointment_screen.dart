@@ -92,12 +92,14 @@ class MyAppointmentScreen extends StatelessWidget {
                   final completedCount = controller.allAppointments
                       .where((apt) => apt.status?.toUpperCase() == 'COMPLETE')
                       .length;
-                  final cancelledCount = controller.allAppointments
-                      .where((apt) {
-                        final s = apt.status?.toUpperCase() ?? '';
-                        return s == 'CANCELLED' || s == 'REJECTED' || s == 'NOT_SHOW';
-                      })
-                      .length;
+                  final cancelledCount = controller.allAppointments.where((
+                    apt,
+                  ) {
+                    final s = apt.status?.toUpperCase() ?? '';
+                    return s == 'CANCELLED' ||
+                        s == 'REJECTED' ||
+                        s == 'NOT_SHOW';
+                  }).length;
 
                   return Row(
                     children: [
@@ -252,7 +254,7 @@ class MyAppointmentScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildStatusBadge(status),
+                _buildStatusBadge(apt.displayStatus),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -349,7 +351,8 @@ class MyAppointmentScreen extends StatelessWidget {
                 ),
               ],
             ),
-            if (apt.clinic?.location != null && apt.clinic!.location!.isNotEmpty) ...[
+            if (apt.clinic?.location != null &&
+                apt.clinic!.location!.isNotEmpty) ...[
               const SizedBox(height: 12),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,7 +381,10 @@ class MyAppointmentScreen extends StatelessWidget {
                 apt.approximateEstimatedTime!.isNotEmpty) ...[
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFEBF5FF),
                   borderRadius: BorderRadius.circular(8),
@@ -500,7 +506,9 @@ class MyAppointmentScreen extends StatelessWidget {
                                     ElevatedButton(
                                       onPressed: () {
                                         Navigator.pop(context);
-                                        controller.markAppointmentArrived(apt.id!);
+                                        controller.markAppointmentArrived(
+                                          apt.id!,
+                                        );
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: AppColors.primaryColor,
@@ -558,99 +566,105 @@ class MyAppointmentScreen extends StatelessWidget {
               const SizedBox(height: 8),
               SizedBox(
                 width: double.infinity,
-                child: Builder(builder: (context) {
-                  final hoursUntil = _calculateHoursUntilAppointment(apt);
-                  final canCancel = hoursUntil >= 12.0;
+                child: Builder(
+                  builder: (context) {
+                    final hoursUntil = _calculateHoursUntilAppointment(apt);
+                    final canCancel = hoursUntil >= 12.0;
 
-                  return Obx(() {
-                    final isCancelling =
-                        controller.cancellingAppointmentId.value == apt.id;
-                    return OutlinedButton(
-                      onPressed: isCancelling
-                          ? null
-                          : () {
-                              if (!canCancel) {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    title: Text(
-                                      'cancellation_locked_title'.tr,
-                                      style: globalTextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                        color: const Color(0xff2D2D2D),
+                    return Obx(() {
+                      final isCancelling =
+                          controller.cancellingAppointmentId.value == apt.id;
+                      return OutlinedButton(
+                        onPressed: isCancelling
+                            ? null
+                            : () {
+                                if (!canCancel) {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
                                       ),
-                                    ),
-                                    content: Text(
-                                      'cancellation_locked_desc'.tr,
-                                      style: globalTextStyle(
-                                        fontSize: 14,
-                                        color: const Color(0xff636F85),
-                                      ),
-                                    ),
-                                    actions: [
-                                      ElevatedButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.primaryColor,
-                                        ),
-                                        child: Text(
-                                          'ok'.tr,
-                                          style: const TextStyle(color: Colors.white),
+                                      title: Text(
+                                        'cancellation_locked_title'.tr,
+                                        style: globalTextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0xff2D2D2D),
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                );
-                                return;
-                              }
+                                      content: Text(
+                                        'cancellation_locked_desc'.tr,
+                                        style: globalTextStyle(
+                                          fontSize: 14,
+                                          color: const Color(0xff636F85),
+                                        ),
+                                      ),
+                                      actions: [
+                                        ElevatedButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                AppColors.primaryColor,
+                                          ),
+                                          child: Text(
+                                            'ok'.tr,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                  return;
+                                }
 
-                              if (apt.id != null) {
-                                _showCancelConfirmationDialog(
-                                  context,
-                                  apt.id!,
-                                  isConfirmed: true,
-                                );
-                              }
-                            },
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                          color: canCancel
-                              ? Colors.red.shade300
-                              : const Color(0xFFE5E9F2),
+                                if (apt.id != null) {
+                                  _showCancelConfirmationDialog(
+                                    context,
+                                    apt.id!,
+                                    isConfirmed: true,
+                                  );
+                                }
+                              },
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            color: canCancel
+                                ? Colors.red.shade300
+                                : const Color(0xFFE5E9F2),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      child: isCancelling
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppColors.primaryColor,
+                        child: isCancelling
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.primaryColor,
+                                ),
+                              )
+                            : Text(
+                                canCancel
+                                    ? 'cancel_appointment'.tr
+                                    : '${'cancel_appointment'.tr} (<12h ${'locked'.tr.isNotEmpty ? 'locked'.tr : 'Locked'})',
+                                style: globalTextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: canCancel
+                                      ? Colors.red.shade700
+                                      : const Color(0xffA0AEC0),
+                                ),
                               ),
-                            )
-                          : Text(
-                              canCancel
-                                  ? 'cancel_appointment'.tr
-                                  : '${'cancel_appointment'.tr} (<12h ${'locked'.tr.isNotEmpty ? 'locked'.tr : 'Locked'})',
-                              style: globalTextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: canCancel
-                                    ? Colors.red.shade700
-                                    : const Color(0xffA0AEC0),
-                              ),
-                            ),
-                    );
-                  });
-                }),
+                      );
+                    });
+                  },
+                ),
               ),
             ],
             if (apt.bookedFor == 'FAMILY' &&
@@ -670,13 +684,13 @@ class MyAppointmentScreen extends StatelessWidget {
                 apt.noShowReason?.isNotEmpty == true
                     ? 'no_show_reason'.tr
                     : apt.rejectionReason?.isNotEmpty == true
-                        ? 'rejection_reason'.tr
-                        : 'cancellation_reason'.tr,
+                    ? 'rejection_reason'.tr
+                    : 'cancellation_reason'.tr,
                 apt.noShowReason?.isNotEmpty == true
                     ? apt.noShowReason!
                     : apt.rejectionReason?.isNotEmpty == true
-                        ? apt.rejectionReason!
-                        : apt.cancellationReason!,
+                    ? apt.rejectionReason!
+                    : apt.cancellationReason!,
                 Icons.info_outline,
               ),
             ],
@@ -695,7 +709,10 @@ class MyAppointmentScreen extends StatelessWidget {
         Expanded(
           child: Text(
             '$label: $value',
-            style: globalTextStyle(fontSize: 12, color: const Color(0xff636F85)),
+            style: globalTextStyle(
+              fontSize: 12,
+              color: const Color(0xff636F85),
+            ),
           ),
         ),
       ],
@@ -711,9 +728,7 @@ class MyAppointmentScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           'cancel_appointment'.tr,
           style: globalTextStyle(
@@ -746,10 +761,7 @@ class MyAppointmentScreen extends StatelessWidget {
                   fontSize: 12,
                   color: const Color(0xff636F85),
                 ),
-                hintStyle: globalTextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
+                hintStyle: globalTextStyle(fontSize: 12, color: Colors.grey),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 10,
@@ -789,10 +801,7 @@ class MyAppointmentScreen extends StatelessWidget {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -838,65 +847,65 @@ class MyAppointmentScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildStatusBadge(status),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (status.toUpperCase() == 'COMPLETE' ||
-                        status.toUpperCase() == 'COMPLETED')
-                      Builder(
-                        builder: (context) {
-                          final hasReview =
-                              (apt.doctorRatings != null &&
-                              apt.doctorRatings!.isNotEmpty);
-                          if (hasReview) {
-                            return const SizedBox.shrink();
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: TextButton(
-                              onPressed: () {
-                                controller.selectedReviewRating.value = 0;
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.transparent,
-                                  builder: (context) =>
-                                      ReviewBottomSheet(appointment: apt),
-                                );
-                              },
-                              style: TextButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 14,
-                                  vertical: 6,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                  side: const BorderSide(
-                                    color: AppColors.primaryColor,
-                                  ),
-                                ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildStatusBadge(apt.displayStatus),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (status.toUpperCase() == 'COMPLETE' ||
+                      status.toUpperCase() == 'COMPLETED')
+                    Builder(
+                      builder: (context) {
+                        final hasReview =
+                            (apt.doctorRatings != null &&
+                            apt.doctorRatings!.isNotEmpty);
+                        if (hasReview) {
+                          return const SizedBox.shrink();
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: TextButton(
+                            onPressed: () {
+                              controller.selectedReviewRating.value = 0;
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) =>
+                                    ReviewBottomSheet(appointment: apt),
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 6,
                               ),
-                              child: Text(
-                                'review'.tr,
-                                style: globalTextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                side: const BorderSide(
                                   color: AppColors.primaryColor,
                                 ),
                               ),
                             ),
-                          );
-                        },
-                      ),
-                    _buildComplaintButton(context, apt),
-                  ],
-                ),
-              ],
-            ),
+                            child: Text(
+                              'review'.tr,
+                              style: globalTextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  _buildComplaintButton(context, apt),
+                ],
+              ),
+            ],
+          ),
           const SizedBox(height: 16),
 
           Text(
@@ -966,7 +975,8 @@ class MyAppointmentScreen extends StatelessWidget {
               ),
             ],
           ),
-          if (apt.clinic?.location != null && apt.clinic!.location!.isNotEmpty) ...[
+          if (apt.clinic?.location != null &&
+              apt.clinic!.location!.isNotEmpty) ...[
             const SizedBox(height: 12),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1056,19 +1066,23 @@ class MyAppointmentScreen extends StatelessWidget {
       dotColor = const Color(0xFF4CAF50);
       borderColor = const Color(0xFF4CAF50);
       label = (statusUpper == 'FINISHED') ? 'finished'.tr : 'completed'.tr;
-    } else if (statusUpper == 'CANCELLED') {
+    } else if (statusUpper == 'CANCELLED' || statusUpper == 'DOCTOR_ABSENT') {
       // Red for cancelled
       bgColor = const Color(0xFFFFEBEE);
       dotColor = const Color(0xFFEF5350);
       borderColor = const Color(0xFFEF5350);
-      label = 'cancelled'.tr;
+      label = statusUpper == 'DOCTOR_ABSENT'
+          ? (Get.locale?.languageCode == 'ar' ? 'غياب الطبيب' : 'Doctor absent')
+          : 'cancelled'.tr;
     } else if (statusUpper == 'REJECTED') {
       // Dark Red for rejected
       bgColor = const Color(0xFFFFEBEE);
       dotColor = const Color(0xFFD32F2F);
       borderColor = const Color(0xFFD32F2F);
       label = 'rejected'.tr;
-    } else if (statusUpper == 'NOT_SHOW' || statusUpper == 'NO_SHOW') {
+    } else if (statusUpper == 'NOT_SHOW' ||
+        statusUpper == 'NO_SHOW' ||
+        statusUpper == 'PATIENT_NO_SHOW') {
       // Orange for no show
       bgColor = const Color(0xFFFFF3E0);
       dotColor = const Color(0xFFF57C00);
@@ -1191,11 +1205,7 @@ class MyAppointmentScreen extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.flag_outlined,
-              size: 13,
-              color: Color(0xFFD32F2F),
-            ),
+            const Icon(Icons.flag_outlined, size: 13, color: Color(0xFFD32F2F)),
             const SizedBox(width: 4),
             Text(
               'complaint'.tr,
@@ -1282,28 +1292,30 @@ class MyAppointmentScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              Obx(() => Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: reasons.map((reason) {
-                      final isSelected = selectedReason.value == reason;
-                      return ChoiceChip(
-                        label: Text(reason.tr),
-                        selected: isSelected,
-                        selectedColor: AppColors.primaryColor,
-                        labelStyle: globalTextStyle(
-                          fontSize: 12,
-                          color: isSelected ? Colors.white : Colors.black87,
-                          fontWeight: isSelected
-                              ? FontWeight.w600
-                              : FontWeight.w400,
-                        ),
-                        onSelected: (val) {
-                          if (val) selectedReason.value = reason;
-                        },
-                      );
-                    }).toList(),
-                  )),
+              Obx(
+                () => Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: reasons.map((reason) {
+                    final isSelected = selectedReason.value == reason;
+                    return ChoiceChip(
+                      label: Text(reason.tr),
+                      selected: isSelected,
+                      selectedColor: AppColors.primaryColor,
+                      labelStyle: globalTextStyle(
+                        fontSize: 12,
+                        color: isSelected ? Colors.white : Colors.black87,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                      ),
+                      onSelected: (val) {
+                        if (val) selectedReason.value = reason;
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
               const SizedBox(height: 16),
               Text(
                 'complaint_desc'.tr,
@@ -1319,10 +1331,7 @@ class MyAppointmentScreen extends StatelessWidget {
                 maxLines: 3,
                 decoration: InputDecoration(
                   hintText: 'enter_complaint_details'.tr,
-                  hintStyle: globalTextStyle(
-                    fontSize: 13,
-                    color: Colors.grey,
-                  ),
+                  hintStyle: globalTextStyle(fontSize: 13, color: Colors.grey),
                   filled: true,
                   fillColor: const Color(0xFFF8F9FA),
                   border: OutlineInputBorder(
@@ -1376,8 +1385,8 @@ class MyAppointmentScreen extends StatelessWidget {
                                   response.statusCode == 201) {
                                 Get.back();
                                 final resBody = jsonDecode(response.body);
-                                final refId = resBody['data']
-                                        ?['complaintNumber'] ??
+                                final refId =
+                                    resBody['data']?['complaintNumber'] ??
                                     'CMP-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
 
                                 Get.dialog(

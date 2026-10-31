@@ -1,3 +1,4 @@
+import 'package:nabeelaljirbi_app/feature/common/operations/operations_menu.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -56,6 +57,7 @@ class PatientProfileScreen extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
+                      const OperationsMenu(),
                       // Profile Header
                       Container(
                         padding: const EdgeInsets.all(16),

@@ -10,7 +10,9 @@ import 'package:nabeelaljirbi_app/feature/patient/doctor_details/controller/doct
 import 'package:nabeelaljirbi_app/feature/patient/doctor_details/model/doctor_details_model.dart';
 
 class OfflineDoctorController extends DoctorDetailsController {
+  // The production initializer fetches the network; this fixture is offline.
   @override
+  // ignore: must_call_super
   void onInit() {}
 }
 
@@ -34,6 +36,7 @@ DoctorDetailData doctor(String clinic, String slot, {bool modelB = false}) {
     ],
   );
   result.clinicCollectionMode = modelB ? 'MODE_B' : 'MODE_A';
+  result.clinicCountry = modelB ? 'EGYPT' : 'LIBYA';
   result.clinicServiceFeePercentage = 10;
   result.fixedPatientServiceFee = 75;
   result.patientServiceFeeAmount = modelB ? 10.08 : 75;
@@ -58,6 +61,7 @@ void main() {
       details.doctorDetails.value = doctor('a', 'slot-a');
       final booking = Get.put<BookingController>(OfflineBookingController());
       expect(booking.serviceFee.value, 75);
+      expect(booking.bookingCurrencySymbol, 'currency_libya');
       booking.selectedSlotIndex.value = 0;
       details.doctorDetails.value = doctor('b', 'slot-b', modelB: true);
       await Future<void>.delayed(Duration.zero);
@@ -67,6 +71,7 @@ void main() {
       expect(booking.collectionMode, 'MODE_B');
       expect(booking.serviceFee.value, 10.08);
       expect(booking.requiredPatientHoldAmount, 110.83);
+      expect(booking.bookingCurrencySymbol, 'currency_egypt');
     },
   );
 

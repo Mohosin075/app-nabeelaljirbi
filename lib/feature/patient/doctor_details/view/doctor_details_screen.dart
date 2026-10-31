@@ -240,9 +240,11 @@ class DoctorDetailsScreen extends StatelessWidget {
     bool isCurrency = false,
   }) {
     // Add logic to format currency if needed, or simply append symbol if not present
-    final displayValue =
-        isCurrency && !value.contains(CurrencyUtil.getUserCurrencySymbol())
-        ? '${CurrencyUtil.getUserCurrencySymbol()} $value'
+    final currency = CurrencyUtil.getCurrencySymbol(
+      controller.doctorDetails.value?.clinicCountry ?? '',
+    );
+    final displayValue = isCurrency && !value.contains(currency)
+        ? '$currency $value'
         : value;
 
     return Column(

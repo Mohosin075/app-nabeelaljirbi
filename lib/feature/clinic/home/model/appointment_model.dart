@@ -19,6 +19,7 @@ class AppointmentModel {
   final DateTime? appointmentDate;
   final String doctorName;
   final AppointmentStatus status;
+  final String? absenceType;
   final int queueNo;
   final double? rating;
   final String? approximateEstimatedTime;
@@ -39,6 +40,7 @@ class AppointmentModel {
     this.appointmentDate,
     required this.doctorName,
     required this.status,
+    this.absenceType,
     required this.queueNo,
     this.rating,
     this.approximateEstimatedTime,

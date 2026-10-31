@@ -48,6 +48,12 @@ class Appointment {
   int? serialNumber;
   String? consultDate;
   String? status;
+  String? absenceType;
+  String get displayStatus => absenceType == 'DOCTOR_ABSENT'
+      ? 'DOCTOR_ABSENT'
+      : status == 'NOT_SHOW'
+      ? 'PATIENT_NO_SHOW'
+      : status ?? '';
   String? startTime;
   String? endTime;
   String? approximateEstimatedTime;
@@ -85,6 +91,7 @@ class Appointment {
     serialNumber = json['serialNumber'];
     consultDate = json['consultDate'];
     status = json['status'];
+    absenceType = json['absenceType'];
     startTime = json['startTime'];
     endTime = json['endTime'];
     approximateEstimatedTime = json['approximateEstimatedTime'];
@@ -93,7 +100,8 @@ class Appointment {
     familyMemberRelation = json['familyMemberRelation'];
     cancellationReason = json['cancellationReason'] ?? json['noShowReason'];
     rejectionReason = json['rejectionReason'];
-    noShowReason = json['noShowReason'] ??
+    noShowReason =
+        json['noShowReason'] ??
         (json['status'] == 'NOT_SHOW' ? json['cancellationReason'] : null);
     doctor = json['doctor'] != null ? Doctor.fromJson(json['doctor']) : null;
     if (json['doctorRatings'] != null) {

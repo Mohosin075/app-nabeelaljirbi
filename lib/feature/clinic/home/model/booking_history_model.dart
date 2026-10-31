@@ -60,6 +60,7 @@ class BookingItem {
   final String id;
   final DateTime? consultDate;
   final String status;
+  final String? absenceType;
   final int serialNumber;
   final String? startTime;
   final String? endTime;
@@ -77,6 +78,7 @@ class BookingItem {
     required this.id,
     this.consultDate,
     required this.status,
+    this.absenceType,
     required this.serialNumber,
     this.startTime,
     this.endTime,
@@ -98,6 +100,7 @@ class BookingItem {
           ? DateTime.tryParse(json['consultDate'])
           : null,
       status: json['status'] ?? 'PENDING',
+      absenceType: json['absenceType'],
       serialNumber: json['serialNumber'] ?? 0,
       startTime: json['startTime'],
       endTime: json['endTime'],
@@ -161,6 +164,7 @@ class BookingItem {
       appointmentDate: consultDate,
       doctorName: doctor?.user?.fullName ?? 'Unknown Doctor',
       status: appointmentStatus,
+      absenceType: absenceType,
       queueNo: serialNumber,
       approximateEstimatedTime: approximateEstimatedTime,
       cancellationReason: cancellationReason,
