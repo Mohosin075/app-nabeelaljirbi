@@ -36,6 +36,7 @@ class DoctorDetailData {
   String? clinicName;
   String? clinicLogo;
   String? clinicCountry;
+  String? clinicLocalDate;
   List<ClinicPhoto>? clinicPhoto;
   num? rating;
   int? reviewCount;
@@ -88,6 +89,7 @@ class DoctorDetailData {
     clinicName = json['clinicName'];
     clinicLogo = json['clinicLogo'];
     clinicCountry = json['clinicCountry'];
+    clinicLocalDate = json['clinicLocalDate'];
     if (json['clinicPhoto'] != null) {
       clinicPhoto = <ClinicPhoto>[];
       json['clinicPhoto'].forEach((v) {
@@ -131,6 +133,7 @@ class DoctorDetailData {
     data['clinicName'] = clinicName;
     data['clinicLogo'] = clinicLogo;
     data['clinicCountry'] = clinicCountry;
+    data['clinicLocalDate'] = clinicLocalDate;
     if (clinicPhoto != null) {
       data['clinicPhoto'] = clinicPhoto!.map((v) => v.toJson()).toList();
     }

@@ -14,6 +14,8 @@ import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/feature/patient/wallet/view/patient_wallet_screen.dart';
 
 class BookingController extends GetxController {
+  BookingController({http.Client? client}) : _client = client;
+  final http.Client? _client;
   late final Worker _doctorWorker;
   final DoctorDetailsController doctorController =
       Get.find<DoctorDetailsController>();
@@ -59,6 +61,7 @@ class BookingController extends GetxController {
       selectedDateIndex.value = 0;
       selectedSlotIndex.value = -1;
       availableSlots.clear();
+      _generateDates();
       if (dates.isNotEmpty) _updateAvailableSlots(0);
       _updateServiceFeeFromClinic();
     });
@@ -141,11 +144,12 @@ class BookingController extends GetxController {
   }
 
   void _generateDates() {
-    final now = DateTime.now();
+    final clinicDate = doctorController.doctorDetails.value?.clinicLocalDate;
+    final now = DateTime.tryParse(clinicDate ?? '') ?? DateTime.now();
     final List<Map<String, dynamic>> generatedDates = [];
     // Advance-booking window (Phase 1 default is 14 days)
     for (int i = 0; i <= advanceBookingDays.value; i++) {
-      final date = now.add(Duration(days: i));
+      final date = DateTime(now.year, now.month, now.day + i);
       generatedDates.add({
         'day': DateFormat('EEE').format(date),
         'date': DateFormat('dd').format(date),
@@ -181,7 +185,9 @@ class BookingController extends GetxController {
           .firstWhere((element) => element.day?.toLowerCase() == dayName);
 
       if (schedule.slots != null) {
-        availableSlots.value = List.from(schedule.slots!);
+        availableSlots.value = schedule.slots!
+            .where((slot) => slot.isActive != false && slot.id != null)
+            .toList();
       } else {
         availableSlots.value = [];
       }
@@ -216,7 +222,12 @@ class BookingController extends GetxController {
   }
 
   Future<void> bookAppointment() async {
-    if (selectedSlotIndex.value == -1) {
+    if (isLoading.value) return;
+    if (selectedSlotIndex.value < 0 ||
+        selectedSlotIndex.value >= availableSlots.length ||
+        selectedDateIndex.value < 0 ||
+        selectedDateIndex.value >= dates.length ||
+        doctorController.doctorDetails.value == null) {
       Get.snackbar('error'.tr, 'please_select_time_slot'.tr);
       return;
     }
@@ -267,9 +278,9 @@ class BookingController extends GetxController {
 
       debugPrint('Booking Appointment: $url');
       debugPrint('Clinic ID: ${doctor.clinicId}');
-      debugPrint('Body: $body');
 
-      final response = await http.post(
+      final post = _client?.post ?? http.post;
+      final response = await post(
         Uri.parse(url),
         headers: {
           'Authorization': token ?? '',
@@ -279,13 +290,17 @@ class BookingController extends GetxController {
       );
 
       debugPrint('Response Status: ${response.statusCode}');
-      debugPrint('Response Body: ${response.body}');
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      Map<String, dynamic>? result;
+      try {
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map<String, dynamic>) result = decoded;
+      } catch (_) {}
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          result?['success'] == true) {
         if (Get.isBottomSheetOpen == true) {
           Get.back();
         }
-        Get.offNamed(AppRoutes.bookingConfirmation);
+        Get.offNamed(AppRoutes.bookingConfirmation, arguments: result?['data']);
       } else {
         String rawMsg = 'booking_failed_generic'.tr;
         try {
@@ -309,8 +324,9 @@ class BookingController extends GetxController {
     }
 
     final lower = rawMsg.toLowerCase();
-    if (lower.contains('insufficient wallet balance') ||
-        (lower.contains('wallet') && lower.contains('balance'))) {
+    if (!lower.contains('clinic wallet') &&
+        (lower.contains('insufficient wallet balance') ||
+            (lower.contains('wallet') && lower.contains('balance')))) {
       String? requiredHold;
       String? availableBal;
       final holdMatch = RegExp(
@@ -394,7 +410,7 @@ class BookingController extends GetxController {
                                 ),
                               ),
                               Text(
-                                '$requiredHold ${'lyd'.tr}',
+                                '$requiredHold $bookingCurrencySymbol',
                                 style: globalTextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
@@ -417,7 +433,7 @@ class BookingController extends GetxController {
                                 ),
                               ),
                               Text(
-                                '$availableBal ${'lyd'.tr}',
+                                '$availableBal $bookingCurrencySymbol',
                                 style: globalTextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
