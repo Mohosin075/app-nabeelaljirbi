@@ -7,6 +7,7 @@ import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/feature/common/operations/operations_menu.dart';
+import 'package:nabeelaljirbi_app/feature/common/operations/receptionist_home_screen.dart';
 import 'package:nabeelaljirbi_app/feature/common/operations/phase_one_api.dart';
 import 'package:nabeelaljirbi_app/feature/common/operations/profile_changes_screen.dart';
 import 'package:nabeelaljirbi_app/feature/patient/appointment/model/appointment_history_model.dart';
@@ -20,6 +21,21 @@ void main() {
     Get.testMode = true;
   });
   tearDown(() => Get.reset());
+  testWidgets(
+    'receptionist home exposes booking operations without owner finance or profile controls',
+    (tester) async {
+      await SharedPrefHelper.saveRole('MANAGER');
+      await tester.pumpWidget(
+        const GetMaterialApp(home: ReceptionistHomeScreen()),
+      );
+      expect(find.text('Manage bookings'), findsOneWidget);
+      expect(find.text('Log out'), findsOneWidget);
+      expect(find.text('Ledger & reports'), findsNothing);
+      expect(find.text('Bank details & withdrawals'), findsNothing);
+      expect(find.text('Profile change requests'), findsNothing);
+      expect(find.text('Receptionists'), findsNothing);
+    },
+  );
   test(
     'approved public-profile edit submits only public fields to the existing upload endpoint',
     () async {

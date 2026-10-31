@@ -7,6 +7,7 @@ import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/feature/auth/login/view/login_screen.dart';
 import 'package:nabeelaljirbi_app/feature/auth/on_boarding/view/on_boarding_screen.dart';
 import 'package:nabeelaljirbi_app/feature/clinic/nav_bar/view/clinic_nav_bar_screen.dart';
+import 'package:nabeelaljirbi_app/feature/common/operations/receptionist_home_screen.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/nav_bar/view/doctor_nav_bar_screen.dart';
 import 'package:nabeelaljirbi_app/feature/patient/nav_bar/view/patient_nav_bar_screen.dart';
 
@@ -21,7 +22,6 @@ class SplashScreenController extends GetxController {
   void checkIsLogin() async {
     Timer(const Duration(seconds: 2), () async {
       final String? token = SharedPrefHelper.getAccessToken();
-      debugPrint("🔥 TOKEN: $token");
       final String? role = SharedPrefHelper.getUserRole();
       debugPrint("🔥 ROLE: $role");
 
@@ -32,6 +32,8 @@ class SplashScreenController extends GetxController {
           Get.offAll(() => DoctorNavBarScreen());
         } else if (role.toLowerCase() == 'clinic') {
           Get.offAll(() => ClinicNavBarScreen());
+        } else if (role.toLowerCase() == 'manager') {
+          Get.offAll(() => const ReceptionistHomeScreen());
         } else {
           Get.offAll(() => LoginScreen());
         }

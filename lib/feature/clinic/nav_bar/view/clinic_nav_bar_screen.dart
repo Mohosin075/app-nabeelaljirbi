@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
+import 'package:nabeelaljirbi_app/feature/common/operations/receptionist_home_screen.dart';
 import 'package:nabeelaljirbi_app/core/const/app_colors.dart';
 import 'package:nabeelaljirbi_app/feature/clinic/appointment/view/clinic_appointment_screen.dart';
 import 'package:nabeelaljirbi_app/feature/clinic/doctors/view/clinic_doctor_screen.dart';
@@ -24,6 +26,9 @@ class ClinicNavBarScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (SharedPrefHelper.getUserRole() == 'MANAGER') {
+      return const ReceptionistHomeScreen();
+    }
     return Obx(
       () => PopScope(
         canPop: controller.currentIndex.value == 0,

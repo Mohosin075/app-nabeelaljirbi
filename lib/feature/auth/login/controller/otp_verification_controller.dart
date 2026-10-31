@@ -10,6 +10,8 @@ import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/feature/patient/nav_bar/view/patient_nav_bar_screen.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/nav_bar/view/doctor_nav_bar_screen.dart';
 import 'package:nabeelaljirbi_app/feature/clinic/nav_bar/view/clinic_nav_bar_screen.dart';
+import 'package:nabeelaljirbi_app/feature/common/operations/receptionist_home_screen.dart';
+import 'package:nabeelaljirbi_app/feature/auth/login/view/login_screen.dart';
 import 'package:nabeelaljirbi_app/feature/auth/setup_profile/patient/view/patient_profile_setup_screen.dart';
 import 'package:nabeelaljirbi_app/feature/auth/setup_profile/doctor/view/doctor_profile_setup_screen.dart';
 import 'package:nabeelaljirbi_app/feature/auth/setup_profile/clinic/view/clinic_profile_setup_screen.dart';
@@ -187,19 +189,27 @@ class OtpVerificationController extends GetxController {
                 Get.offAll(() => DoctorNavBarScreen());
                 break;
               case 'CLINIC':
-              case 'MANAGER':
                 Get.offAll(() => ClinicNavBarScreen());
                 break;
+              case 'MANAGER':
+                Get.offAll(() => const ReceptionistHomeScreen());
+                break;
               default:
-                // Default fallback is Patient experience
-                Get.offAll(() => PatientNavBarScreen());
+                await SharedPrefHelper.removeAccessToken();
+                await SharedPrefHelper.removeRefreshToken();
+                await SharedPrefHelper.removeUserRole();
+                Get.offAll(() => LoginScreen());
+                Get.snackbar(
+                  'Sign in',
+                  'Use the web dashboard for this account role.',
+                );
             }
           } else {
             // Profile not completed: Route to specific setup screen, defaulting to Patient
             final String effectiveRole =
                 (targetRole != null && targetRole!.isNotEmpty)
-                    ? targetRole!.toLowerCase()
-                    : (role != null ? role.toLowerCase() : 'patient');
+                ? targetRole!.toLowerCase()
+                : (role != null ? role.toLowerCase() : 'patient');
 
             if (effectiveRole == 'doctor') {
               Get.offAll(() => DoctorProfileSetupScreen());
