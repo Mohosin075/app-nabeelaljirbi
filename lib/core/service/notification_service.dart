@@ -206,6 +206,13 @@ class FCMNotificationService {
           arguments: {'appointmentId': appointmentId},
         );
       }
+    } else if (role == 'clinic') {
+      if (Get.currentRoute != AppRoutes.clinicNotification) {
+        Get.toNamed(
+          AppRoutes.clinicNotification,
+          arguments: {'appointmentId': appointmentId},
+        );
+      }
     } else {
       // Default to patient notification screen
       if (Get.currentRoute != AppRoutes.patientNotification) {

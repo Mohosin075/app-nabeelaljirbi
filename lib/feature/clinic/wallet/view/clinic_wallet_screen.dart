@@ -8,7 +8,7 @@ import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/core/utils/currency_util.dart';
 import '../controller/clinic_wallet_controller.dart';
 import '../model/top_up_history_model.dart';
-import 'package:nabeelaljirbi_app/feature/patient/subscription/view/patient_subscription_screen.dart';
+import 'package:nabeelaljirbi_app/feature/clinic/subscription/view/clinic_subscription_screen.dart';
 import 'package:intl/intl.dart';
 
 class ClinicWalletScreen extends StatelessWidget {
@@ -112,7 +112,7 @@ class ClinicWalletScreen extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () => Get.to(() => const PatientSubscriptionScreen()),
+                onTap: () => Get.to(() => const ClinicSubscriptionScreen()),
                 borderRadius: BorderRadius.circular(12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

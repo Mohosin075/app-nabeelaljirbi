@@ -11,6 +11,11 @@ import 'package:nabeelaljirbi_app/feature/doctor/home/view/doctor_notification_s
 import 'package:nabeelaljirbi_app/feature/patient/notification/view/patient_notification_screen.dart';
 import 'package:nabeelaljirbi_app/feature/patient/subscription/view/patient_subscription_screen.dart';
 import 'package:nabeelaljirbi_app/feature/clinic/subscription/view/clinic_subscription_screen.dart';
+import 'package:nabeelaljirbi_app/feature/doctor/nav_bar/view/doctor_nav_bar_screen.dart';
+import 'package:nabeelaljirbi_app/feature/clinic/nav_bar/view/clinic_nav_bar_screen.dart';
+import 'package:nabeelaljirbi_app/feature/common/operations/receptionist_home_screen.dart';
+import 'package:nabeelaljirbi_app/feature/clinic/home/view/clinic_notification_screen.dart';
+import 'package:nabeelaljirbi_app/feature/doctor/subscription/view/doctor_subscription_screen.dart';
 
 class AppRoutes {
   static const String splash = '/splash';
@@ -24,6 +29,11 @@ class AppRoutes {
   static const String patientNotification = '/patientNotification';
   static const String patientSubscription = '/patientSubscription';
   static const String clinicSubscription = '/clinicSubscription';
+  static const String doctorNavBar = '/doctorNavBar';
+  static const String clinicNavBar = '/clinicNavBar';
+  static const String receptionistHome = '/receptionistHome';
+  static const String clinicNotification = '/clinicNotification';
+  static const String doctorSubscription = '/doctorSubscription';
 
   static List<GetPage> routes = [
     GetPage(
@@ -66,6 +76,31 @@ class AppRoutes {
     GetPage(
       name: clinicSubscription,
       page: () => const ClinicSubscriptionScreen(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: doctorNavBar,
+      page: () => DoctorNavBarScreen(),
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: clinicNavBar,
+      page: () => ClinicNavBarScreen(),
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: receptionistHome,
+      page: () => const ReceptionistHomeScreen(),
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: clinicNotification,
+      page: () => ClinicNotificationScreen(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: doctorSubscription,
+      page: () => const DoctorSubscriptionScreen(),
       transition: Transition.rightToLeft,
     ),
   ];

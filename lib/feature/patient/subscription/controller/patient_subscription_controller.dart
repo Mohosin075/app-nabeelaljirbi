@@ -107,10 +107,12 @@ class PatientSubscriptionController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final profileController = Get.put(PatientProfileController());
         await profileController.fetchProfile();
-        final subscriptionController = Get.put(DoctorProfileController());
-        await subscriptionController.fetchProfile();
-        final walletController = Get.put(ClinicProfileController());
-        await walletController.fetchClinicProfile();
+        if (Get.isRegistered<DoctorProfileController>()) {
+          await Get.find<DoctorProfileController>().fetchProfile();
+        }
+        if (Get.isRegistered<ClinicProfileController>()) {
+          await Get.find<ClinicProfileController>().fetchClinicProfile();
+        }
 
         isLoading.value = false;
         cardNumberController.clear();
