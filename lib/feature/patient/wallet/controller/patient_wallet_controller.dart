@@ -1,3 +1,4 @@
+import 'dart:math' show Random;
 import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
@@ -144,13 +145,46 @@ class PatientWalletController extends GetxController {
     }
   }
 
+  String? _topUpRequestId;
+  double? _topUpAmount;
+  String? _topUpPaymentMethod;
   Future<void> processTopUp(double amount) async {
+    if (isLoading.value) return;
+    final currency = {
+      'EGYPT': 'EGP',
+      'ALGERIA': 'DZD',
+    }[_profileController.patientProfile.value?.user?.country?.toUpperCase()];
+    if (currency == null) {
+      Get.snackbar(
+        'error'.tr,
+        Get.locale?.languageCode == 'ar'
+            ? 'الشحن المباشر بالبطاقة غير متاح لعملة المحفظة. استخدم البطاقات مسبقة الدفع.'
+            : 'Direct card top-up is unavailable for this wallet currency. Use prepaid cards.',
+      );
+      return;
+    }
+    if (!amount.isFinite ||
+        amount <= 0 ||
+        amount > 999999.99 ||
+        (amount * 100 - (amount * 100).round()).abs() > 0.000001) {
+      return;
+    }
+    if (_topUpAmount != amount || _topUpRequestId == null) {
+      _topUpAmount = amount;
+      final randomId = List.generate(
+        24,
+        (_) => Random.secure().nextInt(16).toRadixString(16),
+      ).join();
+      _topUpRequestId = '${DateTime.now().millisecondsSinceEpoch}-$randomId';
+      _topUpPaymentMethod = null;
+    }
     isLoading.value = true;
     try {
       // 1. Create Payment Method (Tokenize Card via CardField)
       // This requires the CardField to be present and populated in the UI.
-      final String? paymentMethodId = await StripeService.instance
-          .createPaymentMethod();
+      final String? paymentMethodId =
+          _topUpPaymentMethod ??
+          await StripeService.instance.createPaymentMethod();
 
       if (paymentMethodId == null) {
         Get.snackbar(
@@ -162,11 +196,17 @@ class PatientWalletController extends GetxController {
         return;
       }
 
+      _topUpPaymentMethod = paymentMethodId;
       // 2. Call Backend API
       final String token = SharedPrefHelper.getAccessToken() ?? '';
       final String url = '${Urls.baseUrl}/payment/patient-top-up';
 
-      final bodyToSend = {"amount": amount, "paymentMethodId": paymentMethodId};
+      final bodyToSend = {
+        "amount": amount,
+        "paymentMethodId": paymentMethodId,
+        "currency": currency,
+        "requestId": _topUpRequestId,
+      };
 
       debugPrint('📤 Sending to API: $bodyToSend');
 
@@ -178,7 +218,11 @@ class PatientWalletController extends GetxController {
 
       log('📥 API Response: ${response.body}');
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      final result = jsonDecode(response.body);
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          result['data']?['success'] == true) {
+        _topUpRequestId = null;
+        _topUpPaymentMethod = null;
         Get.back(); // Close BottomSheet
         Get.snackbar(
           'Success',
@@ -191,7 +235,11 @@ class PatientWalletController extends GetxController {
         final responseData = jsonDecode(response.body);
         Get.snackbar(
           'Error',
-          responseData['message'] ?? 'Top up failed',
+          (response.statusCode == 200 || response.statusCode == 201)
+              ? (Get.locale?.languageCode == 'ar'
+                    ? 'لم تكتمل عملية الدفع. لم تتم إضافة رصيد إلى المحفظة.'
+                    : 'Payment has not completed. Your wallet has not been credited.')
+              : responseData['message'] ?? 'Top up failed',
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
@@ -267,9 +315,7 @@ class PatientWalletController extends GetxController {
 
   void shareReferralCode() {
     if (referralCode.value.isNotEmpty) {
-      Share.share(
-        'Use my referral code: ${referralCode.value} to sign up!',
-      );
+      Share.share('Use my referral code: ${referralCode.value} to sign up!');
     } else {
       Get.snackbar(
         'Error',
