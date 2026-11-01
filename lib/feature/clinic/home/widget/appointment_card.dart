@@ -882,7 +882,15 @@ class AppointmentCard extends StatelessWidget {
         break;
       case AppointmentStatus.notShown:
         color = const Color(0xFFD97706);
-        text = 'no_show'.tr;
+        text =
+            appointment.absenceType == 'AUTO_UNRESOLVED' ||
+                (appointment.cancellationReason ?? '').startsWith(
+                  'Auto-settled: Neglected (no arrival recorded)',
+                )
+            ? (Get.locale?.languageCode == 'ar'
+                  ? 'تسوية تلقائية دون تسجيل الحضور'
+                  : 'Unresolved / auto-settled')
+            : 'no_show'.tr;
         bgColor = const Color(0xFFFEF3C7);
         break;
       case AppointmentStatus.notUpdated:

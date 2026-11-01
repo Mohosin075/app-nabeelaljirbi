@@ -52,7 +52,12 @@ class Appointment {
   String get displayStatus => absenceType == 'DOCTOR_ABSENT'
       ? 'DOCTOR_ABSENT'
       : status == 'NOT_SHOW'
-      ? 'PATIENT_NO_SHOW'
+      ? (absenceType == 'AUTO_UNRESOLVED' ||
+                (noShowReason ?? cancellationReason ?? '').startsWith(
+                  'Auto-settled: Neglected (no arrival recorded)',
+                )
+            ? 'AUTO_UNRESOLVED'
+            : 'PATIENT_NO_SHOW')
       : status ?? '';
   String? startTime;
   String? endTime;

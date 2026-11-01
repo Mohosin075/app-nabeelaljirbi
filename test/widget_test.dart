@@ -21,6 +21,37 @@ void main() {
     Get.testMode = true;
   });
   tearDown(() => Get.reset());
+  test(
+    'automatic unresolved history stays distinct from manual patient no-show',
+    () {
+      for (final patch in [
+        {'absenceType': 'AUTO_UNRESOLVED'},
+        {
+          'noShowReason':
+              'Auto-settled: Neglected (no arrival recorded). Historic',
+        },
+        {
+          'cancellationReason':
+              'Auto-settled: Neglected (no arrival recorded). Historic',
+        },
+      ]) {
+        final booking = Appointment.fromJson({'status': 'NOT_SHOW', ...patch});
+        expect(booking.displayStatus, 'AUTO_UNRESOLVED');
+        expect(booking.status, 'NOT_SHOW');
+      }
+      expect(
+        Appointment.fromJson({'status': 'NOT_SHOW'}).displayStatus,
+        'PATIENT_NO_SHOW',
+      );
+      expect(
+        Appointment.fromJson({
+          'status': 'CANCELLED',
+          'absenceType': 'DOCTOR_ABSENT',
+        }).displayStatus,
+        'DOCTOR_ABSENT',
+      );
+    },
+  );
   testWidgets(
     'receptionist home exposes booking operations without owner finance or profile controls',
     (tester) async {

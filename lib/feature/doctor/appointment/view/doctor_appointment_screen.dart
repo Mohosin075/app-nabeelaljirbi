@@ -315,7 +315,15 @@ class DoctorAppointmentScreen extends StatelessWidget {
       case 'NO_SHOW':
         statusColor = const Color(0xFFD97706);
         statusBgColor = const Color(0xFFFEF3C7);
-        statusDisplayLabel = 'no_show'.tr;
+        statusDisplayLabel =
+            apt.absenceType == 'AUTO_UNRESOLVED' ||
+                (apt.noShowReason ?? apt.cancellationReason ?? '').startsWith(
+                  'Auto-settled: Neglected (no arrival recorded)',
+                )
+            ? (Get.locale?.languageCode == 'ar'
+                  ? 'تسوية تلقائية دون تسجيل الحضور'
+                  : 'Unresolved / auto-settled')
+            : 'no_show'.tr;
         break;
       case 'CANCELLED':
         statusColor = const Color(0xFFEF4444);

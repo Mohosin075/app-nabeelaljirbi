@@ -1080,6 +1080,13 @@ class MyAppointmentScreen extends StatelessWidget {
       dotColor = const Color(0xFFD32F2F);
       borderColor = const Color(0xFFD32F2F);
       label = 'rejected'.tr;
+    } else if (statusUpper == 'AUTO_UNRESOLVED') {
+      bgColor = const Color(0xFFFFF3E0);
+      dotColor = const Color(0xFFF57C00);
+      borderColor = const Color(0xFFF57C00);
+      label = Get.locale?.languageCode == 'ar'
+          ? 'تسوية تلقائية دون تسجيل الحضور'
+          : 'Unresolved / auto-settled';
     } else if (statusUpper == 'NOT_SHOW' ||
         statusUpper == 'NO_SHOW' ||
         statusUpper == 'PATIENT_NO_SHOW') {

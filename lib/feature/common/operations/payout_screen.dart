@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'phase_one_api.dart';
 import 'report_share.dart';
@@ -20,6 +19,7 @@ class _PayoutScreenState extends State<PayoutScreen> {
   DateTime? start, end;
   List<dynamic> rows = [];
   bool busy = false, eligible = false;
+  String eligibilityReason = 'Withdrawal is unavailable.';
   String method = 'BANK', status = 'ALL';
   String? error, message;
   int page = 1, total = 0, limit = 25;
@@ -92,9 +92,10 @@ class _PayoutScreenState extends State<PayoutScreen> {
       if (profile) {
         final data = await PhaseOneApi.call('payout-profile');
         if (!mounted) return;
-        eligible =
-            SharedPrefHelper.getUserRole() == 'CLINIC' ||
-            data['remoteConsultationsEnabled'] == true;
+        eligible = data['withdrawalEligible'] == true;
+        eligibilityReason =
+            data['withdrawalEligibilityReason']?.toString() ??
+            'Withdrawal is unavailable.';
         for (final e in bank.entries) {
           e.value.text = '${data['bankDetails']?[e.key] ?? ''}';
         }
@@ -250,13 +251,7 @@ class _PayoutScreenState extends State<PayoutScreen> {
             phaseText('Request withdrawal', 'طلب السحب'),
             style: Theme.of(context).textTheme.titleLarge,
           ),
-          if (!eligible)
-            Text(
-              phaseText(
-                'Doctor withdrawals require Main Admin to enable remote consultations.',
-                'يتطلب سحب الطبيب تفعيل الاستشارات عن بعد من الإدارة.',
-              ),
-            ),
+          if (!eligible) Text(eligibilityReason),
           const SizedBox(height: 12),
           TextField(
             controller: amount,

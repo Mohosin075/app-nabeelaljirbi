@@ -215,6 +215,7 @@ class _ManagedBookingsScreenState extends State<ManagedBookingsScreen> {
                 'CANCELLED',
                 'REJECTED',
                 'PATIENT_NO_SHOW',
+                'AUTO_UNRESOLVED',
                 'DOCTOR_ABSENT',
               ])
                 DropdownMenuItem(value: s, child: Text(s)),

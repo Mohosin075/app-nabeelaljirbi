@@ -140,6 +140,7 @@ class _HistoryReportsScreenState extends State<HistoryReportsScreen> {
             'CANCELLED',
             'REJECTED',
             'PATIENT_NO_SHOW',
+            'AUTO_UNRESOLVED',
             'DOCTOR_ABSENT',
           ];
     return Scaffold(
