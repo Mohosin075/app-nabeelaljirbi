@@ -200,8 +200,8 @@ class OtpVerificationController extends GetxController {
                 await SharedPrefHelper.removeUserRole();
                 Get.offAll(() => LoginScreen());
                 Get.snackbar(
-                  'Sign in',
-                  'Use the web dashboard for this account role.',
+                  'sign_in'.tr,
+                  'use_web_dashboard_for_role'.tr,
                 );
             }
           } else {

@@ -33,7 +33,9 @@ class DoctorReconciliationScreen extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: SvgPicture.asset(IconsPath.backArrow),
+          icon: SvgPicture.asset(
+            IconsPath.backArrow,
+            matchTextDirection: true),
           onPressed: () => Get.back(),
         ),
         actions: [

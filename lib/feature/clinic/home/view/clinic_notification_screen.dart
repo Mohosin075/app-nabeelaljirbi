@@ -23,7 +23,9 @@ class ClinicNotificationScreen extends StatelessWidget {
           onTap: () => Get.back(),
           child: Padding(
             padding: const EdgeInsets.only(left: 20, top: 14, bottom: 14),
-            child: SvgPicture.asset(IconsPath.backArrow),
+            child: SvgPicture.asset(
+            IconsPath.backArrow,
+            matchTextDirection: true),
           ),
         ),
         title: Text(

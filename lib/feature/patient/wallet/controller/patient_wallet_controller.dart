@@ -61,8 +61,8 @@ class PatientWalletController extends GetxController {
   Future<void> claimBonus() async {
     if (currentEarnings.value <= 0) {
       Get.snackbar(
-        'Error',
-        'No earnings to claim',
+        'error'.tr,
+        'no_earnings_to_claim'.tr,
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -90,16 +90,16 @@ class PatientWalletController extends GetxController {
       final data = jsonDecode(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
         Get.snackbar(
-          'Success',
-          data['message'] ?? 'Bonus claimed successfully',
+          'success'.tr,
+          data['message'] ?? 'referral_applied_successfully'.tr,
           backgroundColor: AppColors.primaryColor,
           colorText: Colors.white,
         );
         _profileController.fetchProfile(); // Refresh to update earnings/wallet
       } else {
         Get.snackbar(
-          'Error',
-          data['message'] ?? 'Failed to claim bonus',
+          'error'.tr,
+          data['message'] ?? 'failed_to_apply_referral'.tr,
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
@@ -107,8 +107,8 @@ class PatientWalletController extends GetxController {
     } catch (e) {
       debugPrint('Error claiming bonus: $e');
       Get.snackbar(
-        'Error',
-        'Something went wrong: $e',
+        'error'.tr,
+        '${'something_went_wrong'.tr}: $e',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -188,8 +188,8 @@ class PatientWalletController extends GetxController {
 
       if (paymentMethodId == null) {
         Get.snackbar(
-          'Error',
-          'Failed to create payment method. Please check card details.',
+          'error'.tr,
+          'failed_to_create_payment_method'.tr,
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
@@ -225,8 +225,8 @@ class PatientWalletController extends GetxController {
         _topUpPaymentMethod = null;
         Get.back(); // Close BottomSheet
         Get.snackbar(
-          'Success',
-          'Wallet topped up successfully',
+          'success'.tr,
+          'wallet_topped_up_successfully'.tr,
           backgroundColor: AppColors.primaryColor,
           colorText: Colors.white,
         );
@@ -234,7 +234,7 @@ class PatientWalletController extends GetxController {
       } else {
         final responseData = jsonDecode(response.body);
         Get.snackbar(
-          'Error',
+          'error'.tr,
           (response.statusCode == 200 || response.statusCode == 201)
               ? (Get.locale?.languageCode == 'ar'
                     ? 'لم تكتمل عملية الدفع. لم تتم إضافة رصيد إلى المحفظة.'
@@ -248,7 +248,7 @@ class PatientWalletController extends GetxController {
       log('Top Up Error: $e');
       if (e is StripeException) {
         Get.snackbar(
-          'Payment Error',
+          'payment_error'.tr,
           '${e.error.localizedMessage}',
           backgroundColor: Colors.red,
           colorText: Colors.white,
@@ -306,8 +306,8 @@ class PatientWalletController extends GetxController {
   void copyReferralCode() {
     Clipboard.setData(ClipboardData(text: referralCode.value));
     Get.snackbar(
-      'Copied',
-      'Referral code copied to clipboard',
+      'copied'.tr,
+      'referral_code_copied'.tr,
       backgroundColor: AppColors.primaryColor,
       colorText: Colors.white,
     );
@@ -318,8 +318,8 @@ class PatientWalletController extends GetxController {
       Share.share('Use my referral code: ${referralCode.value} to sign up!');
     } else {
       Get.snackbar(
-        'Error',
-        'No referral code available to share',
+        'error'.tr,
+        'no_referral_code_to_share'.tr,
         backgroundColor: AppColors.primaryColor,
         colorText: Colors.white,
       );

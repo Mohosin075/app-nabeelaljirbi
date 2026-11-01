@@ -35,7 +35,9 @@ class DoctorEditProfileScreen extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: SvgPicture.asset(IconsPath.backArrow),
+          icon: SvgPicture.asset(
+            IconsPath.backArrow,
+            matchTextDirection: true),
           onPressed: () => Get.back(),
         ),
       ),
@@ -753,7 +755,7 @@ class DoctorEditProfileScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'Qualification #${index + 1}',
+                                '${'qualification_number'.tr}${index + 1}',
                                 style: globalTextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,

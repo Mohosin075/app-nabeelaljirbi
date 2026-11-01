@@ -37,8 +37,8 @@ class DoctorBiographyController extends GetxController {
   Future<void> uploadBiography() async {
     if (selectedFile.value == null) {
       Get.snackbar(
-        'Error',
-        'Please select a CV / Biography file first.',
+        'error'.tr,
+        'please_select_cv_first'.tr,
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -112,8 +112,8 @@ class DoctorBiographyController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         Get.snackbar(
-          'Success',
-          'CV / Biography uploaded successfully.',
+          'success'.tr,
+          'cv_uploaded_successfully'.tr,
           backgroundColor: AppColors.primaryColor,
           colorText: Colors.white,
         );
@@ -122,16 +122,16 @@ class DoctorBiographyController extends GetxController {
       } else {
         final responseData = jsonDecode(response.body);
         Get.snackbar(
-          'Error',
-          responseData['message'] ?? 'Failed to upload CV / Biography.',
+          'error'.tr,
+          responseData['message'] ?? 'cv_upload_failed'.tr,
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
       }
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'Something went wrong while uploading the file.',
+        'error'.tr,
+        'cv_upload_failed'.tr,
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );

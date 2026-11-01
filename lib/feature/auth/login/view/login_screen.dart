@@ -65,7 +65,8 @@ class LoginScreen extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: SvgPicture.asset(
-                                      IconsPath.backArrow,
+            IconsPath.backArrow,
+            matchTextDirection: true,
                                       width: 20,
                                       height: 20,
                                     ),

@@ -36,7 +36,7 @@ class OtpVerificationScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "${'verification_code_message'.tr} ${loginController.selectedCountryCode.value} ${loginController.phoneController.text.length > 3 ? '*' * (loginController.phoneController.text.length - 3) + loginController.phoneController.text.substring(loginController.phoneController.text.length - 3) : loginController.phoneController.text}.",
+                  "${'verification_code_message'.tr} \u202A${loginController.selectedCountryCode.value} ${loginController.phoneController.text.length > 3 ? '*' * (loginController.phoneController.text.length - 3) + loginController.phoneController.text.substring(loginController.phoneController.text.length - 3) : loginController.phoneController.text}\u202C.",
                   textAlign: TextAlign.center,
                   style: globalTextStyle(
                     fontSize: 16,

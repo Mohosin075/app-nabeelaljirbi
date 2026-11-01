@@ -32,7 +32,8 @@ class PatientReferScreen extends StatelessWidget {
                         GestureDetector(
                           onTap: () => Get.back(),
                           child: SvgPicture.asset(
-                            IconsPath.backArrow,
+            IconsPath.backArrow,
+            matchTextDirection: true,
                             width: 24,
                             height: 24,
                           ),

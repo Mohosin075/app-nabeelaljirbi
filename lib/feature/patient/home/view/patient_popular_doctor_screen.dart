@@ -34,7 +34,8 @@ class PatientPopularDoctorScreen extends StatelessWidget {
           elevation: 0,
           leading: IconButton(
             icon: SvgPicture.asset(
-              IconsPath.backArrow,
+            IconsPath.backArrow,
+            matchTextDirection: true,
               width: 24,
               height: 24,
               colorFilter: const ColorFilter.mode(

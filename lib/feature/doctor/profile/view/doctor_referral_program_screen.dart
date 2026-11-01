@@ -29,7 +29,9 @@ class DoctorReferralProgramScreen extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: SvgPicture.asset(IconsPath.backArrow),
+          icon: SvgPicture.asset(
+            IconsPath.backArrow,
+            matchTextDirection: true),
           onPressed: () => Get.back(),
         ),
       ),
@@ -148,7 +150,7 @@ class DoctorReferralProgramScreen extends StatelessWidget {
             controller,
             0xFFFFF8E1,
             IconsPath.refarrelBonus,
-            'Unclaimed Earnings',
+            'unclaimed_earnings'.tr,
             controller.currentEarnings,
             isCurrency: true,
             showClaimButton: true,
@@ -225,7 +227,7 @@ class DoctorReferralProgramScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              'Claim',
+                              'claim'.tr,
                               style: globalTextStyle(
                                 color: Colors.white,
                                 fontSize: 13,

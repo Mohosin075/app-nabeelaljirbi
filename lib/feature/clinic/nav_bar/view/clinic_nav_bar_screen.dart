@@ -40,7 +40,7 @@ class ClinicNavBarScreen extends StatelessWidget {
           backgroundColor: AppColors.scaffoldBgColor,
           body: controller.currentIndex.value < pages.length
               ? pages[controller.currentIndex.value]
-              : const Center(child: Text("Page not found")),
+              : Center(child: Text("page_not_found".tr)),
           bottomNavigationBar: ClinicCustomNavBar(
             currentIndex: controller.currentIndex.value,
             onTap: controller.changeTab,

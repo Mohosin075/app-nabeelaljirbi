@@ -26,6 +26,7 @@ class AppointmentBookingScreen extends StatelessWidget {
         leading: IconButton(
           icon: SvgPicture.asset(
             IconsPath.backArrow,
+            matchTextDirection: true,
             width: 24,
             height: 24,
             colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
