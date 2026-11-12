@@ -122,7 +122,7 @@ class _BannerSliderState extends State<BannerSlider> {
                           right: 16,
                           bottom: 16,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () => Get.to(() => PatientPopularDoctorScreen()),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xff137CCF),
                               shape: RoundedRectangleBorder(

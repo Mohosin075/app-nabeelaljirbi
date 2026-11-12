@@ -44,7 +44,7 @@ class ClinicWalletScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildBalanceCard(controller),
-              const OperationsMenu(),
+              const OperationsMenu(financialOnly: true),
               const SizedBox(height: 16),
               _buildReferralSection(controller),
               const SizedBox(height: 24),

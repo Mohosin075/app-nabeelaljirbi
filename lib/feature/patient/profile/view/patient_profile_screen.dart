@@ -173,7 +173,7 @@ class PatientProfileScreen extends StatelessWidget {
                                 title: 'country'.tr,
                                 trailingText: controller
                                     .getSelectedCountryFlag(),
-                                onTap: () {},
+                                onTap: null,
                                 hasTrailingIcon: false,
                               ),
                               const Divider(color: Color(0xffF3F4F6)),
@@ -298,7 +298,7 @@ class PatientProfileScreen extends StatelessWidget {
     required String icon,
     required String title,
     String? trailingText,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
     bool hasSubtitle = false,
     bool hasTrailingIcon = true,
   }) {

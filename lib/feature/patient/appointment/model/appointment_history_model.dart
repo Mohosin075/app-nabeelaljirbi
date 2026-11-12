@@ -95,7 +95,7 @@ class Appointment {
     id = json['id'];
     serialNumber = json['serialNumber'];
     consultDate = json['consultDate'];
-    status = json['status'];
+    status = json['status'] == 'INPROGRESS' ? 'ARRIVED' : json['status'];
     absenceType = json['absenceType'];
     startTime = json['startTime'];
     endTime = json['endTime'];

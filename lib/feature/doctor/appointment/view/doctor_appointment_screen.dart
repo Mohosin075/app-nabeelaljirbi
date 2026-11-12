@@ -139,9 +139,6 @@ class DoctorAppointmentScreen extends StatelessWidget {
         final arrivedCount = controller.allAppointments
             .where((apt) => apt.status?.toUpperCase() == 'ARRIVED')
             .length;
-        final inProgressCount = controller.allAppointments
-            .where((apt) => apt.status?.toUpperCase() == 'INPROGRESS')
-            .length;
         final completedCount = controller.allAppointments
             .where(
               (apt) =>
@@ -170,7 +167,6 @@ class DoctorAppointmentScreen extends StatelessWidget {
           {'label': 'pending'.tr, 'count': pendingCount, 'index': 0},
           {'label': 'confirmed'.tr, 'count': confirmedCount, 'index': 1},
           {'label': 'arrived'.tr, 'count': arrivedCount, 'index': 2},
-          {'label': 'in_progress'.tr, 'count': inProgressCount, 'index': 3},
           {'label': 'completed'.tr, 'count': completedCount, 'index': 4},
           {'label': 'no_show'.tr, 'count': noShowCount, 'index': 5},
           {'label': 'cancelled'.tr, 'count': cancelledCount, 'index': 6},

@@ -9,14 +9,15 @@ import 'managed_bookings_screen.dart';
 import 'receptionists_screen.dart';
 
 class OperationsMenu extends StatelessWidget {
-  const OperationsMenu({super.key});
+  final bool financialOnly;
+  const OperationsMenu({super.key, this.financialOnly = false});
   @override
   Widget build(BuildContext context) {
     final role = SharedPrefHelper.getUserRole();
     return Card(
       child: Column(
         children: [
-          if (['PATIENT', 'DOCTOR', 'CLINIC'].contains(role))
+          if (!financialOnly && ['PATIENT', 'DOCTOR', 'CLINIC'].contains(role))
             ListTile(
               title: Text(
                 phaseText('Profile change requests', 'طلبات تعديل الملف'),
@@ -35,7 +36,7 @@ class OperationsMenu extends StatelessWidget {
               title: Text(phaseText('Ledger & reports', 'السجل والتقارير')),
               onTap: () => Get.to(() => const HistoryReportsScreen()),
             ),
-          if (role == 'PATIENT')
+          if (!financialOnly && role == 'PATIENT')
             ListTile(
               title: Text(
                 phaseText('My complaints & responses', 'شكاواي والردود'),
@@ -43,12 +44,12 @@ class OperationsMenu extends StatelessWidget {
               onTap: () =>
                   Get.to(() => const HistoryReportsScreen(complaints: true)),
             ),
-          if (['CLINIC', 'MANAGER'].contains(role))
+          if (!financialOnly && ['CLINIC', 'MANAGER'].contains(role))
             ListTile(
               title: Text(phaseText('Manage bookings', 'إدارة الحجوزات')),
               onTap: () => Get.to(() => const ManagedBookingsScreen()),
             ),
-          if (role == 'CLINIC')
+          if (!financialOnly && role == 'CLINIC')
             ListTile(
               title: Text(phaseText('Receptionists', 'موظفو الاستقبال')),
               onTap: () => Get.to(() => const ReceptionistsScreen()),

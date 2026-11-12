@@ -30,7 +30,10 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
   bool _isReverseGeocoding = false;
   bool _isSearching = false;
   bool _isMoving = false;
+  int _geocodeVersion = 0;
+  int _searchVersion = 0;
 
+  final TextEditingController _addressController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
   final List<Map<String, dynamic>> _predictions = [];
   Timer? _searchDebounce;
@@ -42,6 +45,7 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
     _mapController = MapController();
     _currentCenter = widget.initialLocation;
     _currentAddress = widget.initialAddress;
+    _addressController.text = _currentAddress;
     _searchController.text = widget.initialAddress;
   }
 
@@ -49,6 +53,7 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
   void dispose() {
     _mapController.dispose();
     _searchController.dispose();
+    _addressController.dispose();
     _searchDebounce?.cancel();
     _geocodeDebounce?.cancel();
     super.dispose();
@@ -83,6 +88,7 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
         ),
       );
 
+      if (!mounted) return;
       final newLatLng = LatLng(position.latitude, position.longitude);
       _mapController.move(newLatLng, 16.0);
       setState(() {
@@ -97,6 +103,7 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
   // Reverse Geocoding with a debounce to prevent excessive API hits
   void _triggerReverseGeocode(LatLng target) {
     _geocodeDebounce?.cancel();
+    final version = ++_geocodeVersion;
     setState(() {
       _isReverseGeocoding = true;
     });
@@ -115,21 +122,22 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
           headers: {
             'User-Agent': 'NabeelAljirbi-FlutterApp/1.0.0 (admin@nabeelaljirbi.com)',
             'Accept': 'application/json',
-            'Accept-Language': 'en-US,en;q=0.9,ar;q=0.8',
+            'Accept-Language': Get.locale?.languageCode == 'ar' ? 'ar,en;q=0.8' : 'en,ar;q=0.8',
           },
-        );
+        ).timeout(const Duration(seconds: 10));
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> data = json.decode(response.body);
           final displayName = data['display_name'] ?? '';
-          if (mounted) {
+          if (mounted && version == _geocodeVersion) {
             setState(() {
               _currentAddress = displayName;
+              _addressController.text = _currentAddress;
               _isReverseGeocoding = false;
             });
           }
         } else {
-          if (mounted) {
+          if (mounted && version == _geocodeVersion) {
             setState(() {
               _isReverseGeocoding = false;
             });
@@ -137,7 +145,7 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
         }
       } catch (e) {
         debugPrint('Error reverse geocoding: $e');
-        if (mounted) {
+        if (mounted && version == _geocodeVersion) {
           setState(() {
             _isReverseGeocoding = false;
           });
@@ -149,6 +157,7 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
   // Search Address Location
   void _searchLocation(String query) {
     _searchDebounce?.cancel();
+    final version = ++_searchVersion;
     if (query.trim().isEmpty) {
       setState(() {
         _predictions.clear();
@@ -175,13 +184,13 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
           headers: {
             'User-Agent': 'NabeelAljirbi-FlutterApp/1.0.0 (admin@nabeelaljirbi.com)',
             'Accept': 'application/json',
-            'Accept-Language': 'en-US,en;q=0.9,ar;q=0.8',
+            'Accept-Language': Get.locale?.languageCode == 'ar' ? 'ar,en;q=0.8' : 'en,ar;q=0.8',
           },
-        );
+        ).timeout(const Duration(seconds: 10));
 
         if (response.statusCode == 200) {
           final List<dynamic> data = json.decode(response.body);
-          if (mounted) {
+          if (mounted && version == _searchVersion) {
             setState(() {
               _predictions.clear();
               _predictions.addAll(data.cast<Map<String, dynamic>>());
@@ -189,7 +198,7 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
             });
           }
         } else {
-          if (mounted) {
+          if (mounted && version == _searchVersion) {
             setState(() {
               _isSearching = false;
             });
@@ -197,7 +206,7 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
         }
       } catch (e) {
         debugPrint('Error searching location: $e');
-        if (mounted) {
+        if (mounted && version == _searchVersion) {
           setState(() {
             _isSearching = false;
           });
@@ -238,6 +247,11 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
               options: MapOptions(
                 initialCenter: _currentCenter,
                 initialZoom: 15.0,
+                onTap: (_, point) {
+                  _mapController.move(point, _mapController.camera.zoom);
+                  setState(() => _currentCenter = point);
+                  _triggerReverseGeocode(point);
+                },
                 interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.all,
                 ),
@@ -406,11 +420,17 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                             final lat = double.tryParse(item['lat']?.toString() ?? '');
                             final lon = double.tryParse(item['lon']?.toString() ?? '');
                             if (lat != null && lon != null) {
+                              _geocodeDebounce?.cancel();
+                              _geocodeVersion++;
+                              _searchVersion++;
                               final selectedLatLng = LatLng(lat, lon);
                               _mapController.move(selectedLatLng, 16.0);
                               setState(() {
                                 _currentCenter = selectedLatLng;
+                                _isReverseGeocoding = false;
+                                _isSearching = false;
                                 _currentAddress = item['display_name'] ?? '';
+                                _addressController.text = _currentAddress;
                                 _searchController.text = item['display_name'] ?? '';
                                 _predictions.clear();
                               });
@@ -510,6 +530,17 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                     ),
                     const SizedBox(height: 20),
 
+                    TextFormField(
+                      controller: _addressController,
+                      decoration: InputDecoration(labelText: 'enter_location'.tr),
+                      onChanged: (value) {
+                        _geocodeDebounce?.cancel();
+                        _geocodeVersion++;
+                        _currentAddress = value;
+                        if (_isReverseGeocoding) setState(() => _isReverseGeocoding = false);
+                      },
+                    ),
+                    const SizedBox(height: 12),
                     // Confirm Selection Button
                     SizedBox(
                       width: double.infinity,

@@ -383,9 +383,6 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
       {'name': 'clinic', 'icon': IconsPath.clinicIcon},
       {'name': 'tunisia', 'icon': IconsPath.tunisia},
       {'name': 'egypt', 'icon': IconsPath.egypt},
-      {'name': 'ambulance', 'icon': IconsPath.ambulanceIcon},
-      {'name': 'pharmacy', 'icon': IconsPath.pharmacy},
-      {'name': 'consultation', 'icon': IconsPath.consultation},
     ];
 
     return SingleChildScrollView(
@@ -688,8 +685,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   //sdfdf
                   if (doctor.profileImage != null &&
                       doctor.profileImage!.isNotEmpty)
-                    Image.network(
-                      doctor.profileImage!,
+                    Image(
+                      image: CachedNetworkImageProvider(doctor.profileImage!),
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Container(
                         color: const Color(0xFFF5F8FF),

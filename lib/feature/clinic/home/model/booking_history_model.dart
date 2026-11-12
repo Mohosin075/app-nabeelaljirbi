@@ -99,7 +99,7 @@ class BookingItem {
       consultDate: json['consultDate'] != null
           ? DateTime.tryParse(json['consultDate'])
           : null,
-      status: json['status'] ?? 'PENDING',
+      status: json['status'] == 'INPROGRESS' ? 'ARRIVED' : json['status'] ?? 'PENDING',
       absenceType: json['absenceType'],
       serialNumber: json['serialNumber'] ?? 0,
       startTime: json['startTime'],

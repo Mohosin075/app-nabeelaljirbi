@@ -497,31 +497,6 @@ class AppointmentCard extends StatelessWidget {
                 ),
               ),
             ),
-            ElevatedButton(
-              onPressed: () => _confirmDialog(
-                context,
-                title: 'start_consultation'.tr,
-                message: 'start_consultation_message'.tr,
-                actionLabel: 'yes_start'.tr,
-                actionColor: const Color(0xFF137CCF),
-                onConfirm: () =>
-                    _invokeUpdateStatus(appointment.id, 'INPROGRESS'),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF137CCF),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                'start_consultation'.tr,
-                style: globalTextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-            ),
           ],
         );
 

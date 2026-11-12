@@ -35,7 +35,6 @@ class ClinicAppointmentController extends GetxController {
     'pending',
     'confirmed',
     'arrived',
-    'in_progress',
     'completed',
     'no_show',
     'cancelled',
@@ -116,7 +115,7 @@ class ClinicAppointmentController extends GetxController {
       case 'confirmed':
         return ['CONFIRMED'];
       case 'arrived':
-        return ['ARRIVED'];
+        return ['ARRIVED', 'INPROGRESS'];
       case 'in_progress':
         return ['INPROGRESS'];
       case 'completed':

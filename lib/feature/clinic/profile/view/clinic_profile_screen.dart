@@ -265,7 +265,7 @@ class ClinicProfileScreen extends StatelessWidget {
                             icon: IconsPath.country,
                             title: 'country'.tr,
                             flagIcon: controller.getSelectedCountryFlag(),
-                            onTap: () {},
+                            onTap: null,
                           ),
                         ),
                         const Divider(color: Color(0xffF3F4F6)),
@@ -390,7 +390,7 @@ class ClinicProfileScreen extends StatelessWidget {
     required String icon,
     required String title,
     String? trailingText,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
     bool hasSubtitle = false,
     bool hasTrailingIcon = true,
   }) {
@@ -437,7 +437,7 @@ class ClinicProfileScreen extends StatelessWidget {
     required String icon,
     required String title,
     required String flagIcon,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
   }) {
     return ListTile(
       onTap: onTap,

@@ -272,7 +272,10 @@ class Clinic {
     clinicName = json['clinicName'];
     about = json['about'];
     contactPhone = json['contactPhone'];
-    location = json['location'];
+    final clinicUser = json['user'];
+    final address = clinicUser is Map ? clinicUser['address']?.toString().trim() : null;
+    final city = clinicUser is Map ? clinicUser['city']?.toString().trim() : null;
+    location = address?.isNotEmpty == true ? address : city?.isNotEmpty == true ? city : json['location'];
     latitude = json['latitude']?.toDouble();
     longitude = json['longitude']?.toDouble();
     adminVerified = json['adminVerified'];

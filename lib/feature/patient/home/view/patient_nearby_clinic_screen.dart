@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -206,8 +207,8 @@ class PatientNearbyClinicScreen extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: clinic.logo != null && clinic.logo!.isNotEmpty
-                    ? Image.network(
-                        clinic.logo!,
+                    ? Image(
+                      image: CachedNetworkImageProvider(clinic.logo!),
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) =>
                             SvgPicture.asset(IconsPath.clinicIcon), // Fallback

@@ -206,7 +206,7 @@ class DoctorProfileScreen extends StatelessWidget {
                             icon: IconsPath.country,
                             title: 'country'.tr,
                             trailingText: controller.getSelectedCountryFlag(),
-                            onTap: () {},
+                            onTap: null,
                             hasTrailingIcon: false,
                           ),
                         ),
@@ -332,7 +332,7 @@ class DoctorProfileScreen extends StatelessWidget {
     required String icon,
     required String title,
     String? trailingText,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
     bool hasSubtitle = false,
     bool hasTrailingIcon = true,
   }) {

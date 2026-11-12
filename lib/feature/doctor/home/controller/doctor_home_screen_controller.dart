@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/core/network_caller/endpoints.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/appointment/model/doctor_appointment_model.dart';
@@ -39,12 +38,11 @@ class DoctorHomeScreenController extends GetxController {
   Future<void> getTodayAppointments() async {
     try {
       final token = SharedPrefHelper.getAccessToken();
-      final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
       final collected = <Appointment>[];
       for (var page = 1; page <= 1000; page++) {
         final response = await http.get(
           Uri.parse(
-            '${Urls.baseUrl}/doctor/appointments?consultDate=$today&page=$page&limit=100',
+            '${Urls.baseUrl}/doctor/appointments?today=true&page=$page&limit=100',
           ),
           headers: {
             'Authorization': token ?? '',

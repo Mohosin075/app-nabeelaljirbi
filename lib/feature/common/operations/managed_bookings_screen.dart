@@ -60,6 +60,7 @@ class _ManagedBookingsScreenState extends State<ManagedBookingsScreen> {
           'page': page,
           'limit': limit,
           'status': status,
+          'statusView': 'simple',
           'sort': sort,
           'doctorId': doctorId,
           'searchTerm': search.text.trim(),
@@ -210,15 +211,12 @@ class _ManagedBookingsScreenState extends State<ManagedBookingsScreen> {
                 'PENDING',
                 'CONFIRMED',
                 'ARRIVED',
-                'INPROGRESS',
                 'COMPLETE',
                 'CANCELLED',
-                'REJECTED',
                 'PATIENT_NO_SHOW',
-                'AUTO_UNRESOLVED',
                 'DOCTOR_ABSENT',
               ])
-                DropdownMenuItem(value: s, child: Text(s)),
+                DropdownMenuItem(value: s, child: Text(phaseBookingStatus(s))),
             ],
             onChanged: busy
                 ? null
@@ -347,7 +345,7 @@ class _ManagedBookingsScreenState extends State<ManagedBookingsScreen> {
                         'DOCTOR_ABSENT',
                         'PATIENT_NO_SHOW',
                       ])
-                        DropdownMenuItem(value: s, child: Text(s)),
+                        DropdownMenuItem(value: s, child: Text(phaseBookingStatus(s))),
                     ],
                     onChanged: busy
                         ? null
@@ -399,7 +397,7 @@ class _ManagedBookingsScreenState extends State<ManagedBookingsScreen> {
                   '${r['patient']['user']['fullName'] ?? ''} · #${r['serialNumber']}',
                 ),
                 subtitle: Text(
-                  '${r['patient']['user']['phoneNumber']}\n${r['doctor']['user']['fullName']}\n${r['consultDate'].toString().substring(0, 10)} · ${r['displayStatus']}\n${r['clinic']['clinicName']}',
+                  '${r['patient']['user']['phoneNumber']}\n${r['doctor']['user']['fullName']}\n${r['consultDate'].toString().substring(0, 10)} · ${phaseBookingStatus(r['displayStatus'] ?? r['status'])}\n${r['clinic']['clinicName']}',
                 ),
               ),
             ),

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -310,8 +311,8 @@ class PatientSearchScreen extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(25),
-              child: Image.network(
-                specialty.image ?? '',
+              child: Image(
+                      image: CachedNetworkImageProvider(specialty.image ?? ''),
                 width: 32,
                 height: 32,
                 fit: BoxFit.cover,
@@ -379,8 +380,8 @@ class PatientSearchScreen extends StatelessWidget {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        image,
+                      child: Image(
+                      image: CachedNetworkImageProvider(image),
                         width: 80,
                         height: 80,
                         fit: BoxFit.cover,
@@ -593,8 +594,8 @@ class PatientSearchScreen extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Image.network(
-                  logo,
+                child: Image(
+                      image: CachedNetworkImageProvider(logo),
                   errorBuilder: (context, error, stackTrace) =>
                       SvgPicture.asset('assets/icons/app_icon.svg'), // Fallback
                 ),

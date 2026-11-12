@@ -13,6 +13,27 @@ import 'package:nabeelaljirbi_app/feature/doctor/profile/model/doctor_profile_mo
 class DoctorProfileController extends GetxController {
   final LanguageService _languageService = Get.find<LanguageService>();
 
+  final leavingClinic = false.obs;
+  Future<void> leaveClinic(String clinicId) async {
+    if (leavingClinic.value) return;
+    leavingClinic.value = true;
+    try {
+      final token = SharedPrefHelper.getAccessToken() ?? '';
+      final response = await http.delete(
+        Uri.parse('${Urls.baseUrl}/doctor/clinics/$clinicId'),
+        headers: {'Authorization': token.startsWith('Bearer ') ? token : 'Bearer $token'},
+      ).timeout(const Duration(seconds: 30));
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw Exception(jsonDecode(response.body)['message']);
+      }
+      await fetchProfile();
+    } catch (error) {
+      Get.snackbar('error'.tr, error.toString());
+    } finally {
+      leavingClinic.value = false;
+    }
+  }
+
   // Profile Data
   var isLoading = false.obs;
   var doctorProfile = Rxn<DoctorProfileData>();

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -204,9 +205,8 @@ class PatientPopularDoctorScreen extends StatelessWidget {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        doctor.profileImage ??
-                            'https://placehold.co/80x80/png', // Placeholder if null
+                      child: Image(
+                        image: CachedNetworkImageProvider(doctor.profileImage ?? 'https://placehold.co/80x80/png'), // Placeholder if null
                         width: 80,
                         height: 80,
                         fit: BoxFit.cover,
@@ -357,7 +357,7 @@ class PatientPopularDoctorScreen extends StatelessWidget {
                   ],
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () => Get.to(() => DoctorDetailsScreen(), arguments: doctor.doctorId),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor,
                     foregroundColor: Colors.white,

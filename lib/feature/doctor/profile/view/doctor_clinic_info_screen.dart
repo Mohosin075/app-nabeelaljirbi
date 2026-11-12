@@ -9,6 +9,7 @@ import 'package:nabeelaljirbi_app/feature/doctor/profile/controller/doctor_clini
 import 'package:intl/intl.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/profile/controller/doctor_profile_controller.dart';
 import 'dart:ui' as ui;
+import 'package:nabeelaljirbi_app/feature/common/operations/phase_one_api.dart';
 
 class DoctorClinicInfoScreen extends StatelessWidget {
   const DoctorClinicInfoScreen({super.key});
@@ -17,6 +18,18 @@ class DoctorClinicInfoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(DoctorClinicInfoController());
     final profileController = Get.find<DoctorProfileController>();
+
+    Future<void> endRelationship(String clinicId, String name) async {
+      final confirmed = await Get.dialog<bool>(AlertDialog(
+        title: Text(phaseText('End clinic relationship?', 'إنهاء العلاقة مع العيادة؟')),
+        content: Text(name),
+        actions: [
+          TextButton(onPressed: () => Get.back(result: false), child: Text('cancel'.tr)),
+          TextButton(onPressed: () => Get.back(result: true), child: Text(phaseText('End relationship', 'إنهاء العلاقة'))),
+        ],
+      ));
+      if (confirmed == true) await profileController.leaveClinic(clinicId);
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -76,9 +89,11 @@ class DoctorClinicInfoScreen extends StatelessWidget {
                       : const Icon(Icons.local_hospital),
                   title: Text(link.clinic?.clinicName ?? ''),
                   subtitle: Text(link.clinic?.location ?? ''),
-                  trailing: const Icon(
-                    Icons.check_circle,
-                    color: AppColors.primaryColor,
+                  trailing: TextButton(
+                    onPressed: profileController.leavingClinic.value || link.clinicId == null
+                        ? null
+                        : () => endRelationship(link.clinicId!, link.clinic?.clinicName ?? ''),
+                    child: Text(phaseText('End relationship', 'إنهاء العلاقة')),
                   ),
                 ),
               for (final request in requests.where(
@@ -89,6 +104,13 @@ class DoctorClinicInfoScreen extends StatelessWidget {
                   subtitle: Text('pending'.tr),
                 ),
 
+              if (linked.isEmpty && clinic?.id != null)
+                TextButton(
+                  onPressed: profileController.leavingClinic.value
+                      ? null
+                      : () => endRelationship(clinic!.id!, clinic.clinicName ?? ''),
+                  child: Text(phaseText('End relationship', 'إنهاء العلاقة')),
+                ),
               if (linked.isEmpty)
                 Container(
                   padding: const EdgeInsets.all(16),
