@@ -1,3 +1,4 @@
+import 'package:nabeelaljirbi_app/feature/patient/doctor_details/view/doctor_details_screen.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
@@ -333,4 +334,24 @@ void main() {
       details.onClose();
     },
   );
+  testWidgets('doctor clinic details show the city and readable legacy slot times', (tester) async {
+    final details = Get.put<DoctorDetailsController>(OfflineDoctorController());
+    details.isLoading.value = false;
+    details.doctorDetails.value = DoctorDetailData(
+      doctorId: 'doctor', clinicId: 'clinic', name: 'Test doctor', specialty: 'General',
+    )..doctorClinics = [{
+      'id': 'clinic', 'clinicName': 'Test clinic', 'city': 'Tripoli',
+      'location': 'Airport Highway, Al Antisar, Abu Salim, Tripoli, Libya',
+      'schedule': [{'day': 'WEDNESDAY', 'slots': [{
+        'startTime': '09:00.000Z', 'endTime': '17:00.000Z', 'isActive': true,
+      }]}],
+    }];
+    await tester.pumpWidget(GetMaterialApp(home: DoctorDetailsScreen()));
+    await tester.pump();
+    expect(find.text('Tripoli'), findsOneWidget);
+    expect(find.textContaining('Airport Highway'), findsNothing);
+    expect(find.textContaining('.000Z'), findsNothing);
+    expect(find.textContaining('9:00'), findsOneWidget);
+  });
+
 }

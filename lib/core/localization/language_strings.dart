@@ -4,6 +4,7 @@ class AppLanguages extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
     'en_US': {
+      'General': 'General',
       'language': 'Language',
       'select_language': 'Select Language',
       'english': 'English',
@@ -1424,6 +1425,7 @@ class AppLanguages extends Translations {
       'qualification_number': 'Qualification #',
     },
     'ar_SA': {
+      'General': 'طب عام',
       'language': 'اللغة',
       'select_language': 'اختر اللغة',
       'english': 'الإنجليزية',

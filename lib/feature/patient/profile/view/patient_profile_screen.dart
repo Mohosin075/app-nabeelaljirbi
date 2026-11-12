@@ -57,7 +57,6 @@ class PatientProfileScreen extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      const OperationsMenu(),
                       // Profile Header
                       Container(
                         padding: const EdgeInsets.all(16),
@@ -142,6 +141,8 @@ class PatientProfileScreen extends StatelessWidget {
                           ),
                           child: Column(
                             children: [
+                              const OperationsMenu(embedded: true),
+                              const Divider(color: Color(0xffF3F4F6)),
                               _buildMenuItem(
                                 icon: IconsPath.profile,
                                 title: 'profile_info'.tr,

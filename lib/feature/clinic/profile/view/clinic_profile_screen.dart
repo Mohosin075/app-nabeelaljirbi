@@ -58,7 +58,6 @@ class ClinicProfileScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             child: Column(
               children: [
-                const OperationsMenu(),
                 // Profile Header
                 Obx(
                   () => Container(
@@ -190,6 +189,8 @@ class ClinicProfileScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
+                        const OperationsMenu(embedded: true),
+                        const Divider(color: Color(0xffF3F4F6)),
                         _buildMenuItem(
                           icon: IconsPath.profile,
                           title: 'clinic_info'.tr,

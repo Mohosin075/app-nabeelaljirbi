@@ -187,7 +187,7 @@ class DoctorDetailsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  doctor.specialty ?? '',
+                  doctor.specialty?.tr ?? '',
                   style: globalTextStyle(
                     fontSize: 14,
                     color: const Color(0xff636F85),
@@ -305,6 +305,8 @@ class DoctorDetailsScreen extends StatelessWidget {
         final selected = clinic['id'] == doctor.clinicId;
         final days = clinic['schedule'] as List? ?? [];
         final photos = clinic['galleries'] as List? ?? [];
+        final city = (clinic['city'] ?? '').toString().trim();
+        final address = city.isNotEmpty ? city : (clinic['location'] ?? '').toString();
         return Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -321,7 +323,7 @@ class DoctorDetailsScreen extends StatelessWidget {
                   clinic['clinicName'] ?? 'clinic'.tr,
                   style: globalTextStyle(fontWeight: FontWeight.w600),
                 ),
-                subtitle: Text(clinic['location'] ?? ''),
+                subtitle: Text(address, maxLines: 2, overflow: TextOverflow.ellipsis),
                 trailing: selected
                     ? const Icon(
                         Icons.check_circle,
@@ -364,7 +366,7 @@ class DoctorDetailsScreen extends StatelessWidget {
                 for (final slot in (day['slots'] as List? ?? []))
                   if (slot['isActive'] != false)
                     Text(
-                      '${slot['startTime']} - ${slot['endTime']}',
+                      '${_formatTime(slot['startTime']?.toString() ?? '')} - ${_formatTime(slot['endTime']?.toString() ?? '')}',
                       style: globalTextStyle(fontSize: 13),
                     ),
               ],

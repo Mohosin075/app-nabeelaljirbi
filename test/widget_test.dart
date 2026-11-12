@@ -290,4 +290,14 @@ void main() {
     expect(find.text('Receptionists'), findsOneWidget);
     expect(find.text('My complaints & responses'), findsNothing);
   });
+  testWidgets('profile operations fit inside the existing menu without another card', (tester) async {
+    await SharedPrefHelper.saveRole('PATIENT');
+    await tester.pumpWidget(const GetMaterialApp(
+      home: Scaffold(body: Card(child: OperationsMenu(embedded: true))),
+    ));
+    expect(find.byType(Card), findsOneWidget);
+    expect(find.text('Profile change requests'), findsOneWidget);
+    expect(find.text('My complaints & responses'), findsOneWidget);
+  });
+
 }
