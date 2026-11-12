@@ -1,3 +1,4 @@
+import 'package:nabeelaljirbi_app/core/utils/clinic_time.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -589,16 +590,7 @@ class DoctorHomeScreen extends StatelessWidget {
     );
   }
 
-  String _formatTime(String? time) {
-    if (time == null) return "";
-    try {
-      final cleanTime = time.split('.').first;
-      final dt = DateFormat("HH:mm").parse(cleanTime);
-      return DateFormat("h a").format(dt);
-    } catch (e) {
-      return time;
-    }
-  }
+  String _formatTime(String? time) => formatClinicTime(time);
 
   String _formatDate(String? dateStr) {
     if (dateStr == null) return "";

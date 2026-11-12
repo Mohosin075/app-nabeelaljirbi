@@ -4,6 +4,9 @@ class AppLanguages extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
     'en_US': {
+      'currency_unspecified': 'Currency unspecified',
+      'see_country_totals': 'See country totals',
+      'historical_country_unspecified': 'Historical country unspecified',
       'General': 'General',
       'language': 'Language',
       'select_language': 'Select Language',
@@ -1425,6 +1428,9 @@ class AppLanguages extends Translations {
       'qualification_number': 'Qualification #',
     },
     'ar_SA': {
+      'currency_unspecified': 'العملة غير محددة',
+      'see_country_totals': 'راجع إجماليات الدول',
+      'historical_country_unspecified': 'دولة السجل السابق غير محددة',
       'General': 'طب عام',
       'language': 'اللغة',
       'select_language': 'اختر اللغة',

@@ -243,7 +243,7 @@ class _ProfileChangesScreenState extends State<ProfileChangesScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${r['status']} · ${r['createdAt'].toString().substring(0, 10)}',
+                      '${phaseRecordStatus(r['status'])} · ${r['createdAt'].toString().substring(0, 10)}',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text('${r['reason'] ?? ''}'),

@@ -403,7 +403,7 @@ class _PayoutScreenState extends State<PayoutScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${r['amount']} · ${r['status'] == 'COMPLETED' ? phaseText('PAID', 'مدفوع') : r['status']}',
+                      '${r['amount']} · ${phaseRecordStatus(r['status'])}',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(

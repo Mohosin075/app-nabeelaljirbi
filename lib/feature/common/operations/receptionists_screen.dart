@@ -126,7 +126,7 @@ class _ReceptionistsScreenState extends State<ReceptionistsScreen> {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      '${s['user']['email']}\n${s['user']['phoneNumber']} · ${s['user']['status']}',
+                      '${s['user']['email']}\n${s['user']['phoneNumber']} · ${phaseRecordStatus(s['user']['status'])}',
                     ),
                     TextButton(
                       onPressed: busy

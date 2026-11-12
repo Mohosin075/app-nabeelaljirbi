@@ -88,7 +88,7 @@ class DoctorClinicInfoScreen extends StatelessWidget {
                         )
                       : const Icon(Icons.local_hospital),
                   title: Text(link.clinic?.clinicName ?? ''),
-                  subtitle: Text(link.clinic?.location ?? ''),
+                  subtitle: Text(link.clinic?.location ?? '', maxLines: 2, overflow: TextOverflow.ellipsis),
                   trailing: TextButton(
                     onPressed: profileController.leavingClinic.value || link.clinicId == null
                         ? null

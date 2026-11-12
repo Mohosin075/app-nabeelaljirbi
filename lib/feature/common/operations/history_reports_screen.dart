@@ -279,7 +279,7 @@ class _HistoryReportsScreenState extends State<HistoryReportsScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Text('${r['complaintNumber']} · ${r['status']}'),
+                            Text('${r['complaintNumber']} · ${phaseRecordStatus(r['status'])}'),
                             Text('${r['description']}'),
                             if (r['resolution'] != null)
                               Text(

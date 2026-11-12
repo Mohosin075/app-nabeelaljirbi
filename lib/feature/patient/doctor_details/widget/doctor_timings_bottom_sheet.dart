@@ -1,6 +1,6 @@
+import 'package:nabeelaljirbi_app/core/utils/clinic_time.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'package:nabeelaljirbi_app/feature/patient/doctor_details/model/doctor_details_model.dart';
 
@@ -9,30 +9,7 @@ class DoctorTimingsBottomSheet extends StatelessWidget {
 
   const DoctorTimingsBottomSheet({super.key, required this.schedules});
 
-  String _formatTime(String time) {
-    try {
-      DateTime dateTime;
-      try {
-        dateTime = DateFormat("HH:mm:ss").parse(time);
-      } catch (e) {
-        dateTime = DateFormat("HH:mm").parse(time);
-      }
-
-      final hour = dateTime.hour;
-      final minute = dateTime.minute;
-      final period = hour < 12 ? 'am'.tr : 'pm'.tr;
-      final displayHour = hour > 12
-          ? hour - 12
-          : hour == 0
-          ? 12
-          : hour;
-      final displayMinute = minute.toString().padLeft(2, '0');
-
-      return "$displayHour:$displayMinute $period";
-    } catch (e) {
-      return time;
-    }
-  }
+  String _formatTime(String? time) => formatClinicTime(time);
 
   @override
   Widget build(BuildContext context) {

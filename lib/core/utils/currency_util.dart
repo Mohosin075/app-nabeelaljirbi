@@ -5,7 +5,7 @@ import 'package:nabeelaljirbi_app/feature/patient/profile/controller/patient_pro
 
 class CurrencyUtil {
   /// Returns the currency symbol for the given country.
-  /// Defaults to Libya's currency if the country is not recognized.
+  /// Historical records without a country retain an unspecified currency.
   static String getCurrencySymbol(String country) {
     switch (country.toLowerCase()) {
       case 'libya':
@@ -18,7 +18,7 @@ class CurrencyUtil {
       case 'egypt':
         return 'currency_egypt'.tr; // Egyptian Pound
       default:
-        return 'currency_libya'.tr; // Default to Libya
+        return 'currency_unspecified'.tr;
     }
   }
 

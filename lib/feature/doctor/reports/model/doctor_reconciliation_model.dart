@@ -69,8 +69,11 @@ class ReconciliationSummary {
   final int noShowAppointments;
   final int pendingAppointments;
   final double consultFeePerSession;
-  final double totalEarnedAmount;
-  final double totalPotentialAmount;
+  final double? totalEarnedAmount;
+  final double? totalPotentialAmount;
+  final String? currency;
+  final String? consultFeeCurrency;
+  final List<ReconciliationCountryTotal> byCountry;
 
   ReconciliationSummary({
     this.totalAppointments = 0,
@@ -82,6 +85,9 @@ class ReconciliationSummary {
     this.consultFeePerSession = 0.0,
     this.totalEarnedAmount = 0.0,
     this.totalPotentialAmount = 0.0,
+    this.currency,
+    this.consultFeeCurrency,
+    this.byCountry = const [],
   });
 
   factory ReconciliationSummary.fromJson(Map<String, dynamic> json) {
@@ -93,10 +99,28 @@ class ReconciliationSummary {
       noShowAppointments: json['noShowAppointments'] as int? ?? 0,
       pendingAppointments: json['pendingAppointments'] as int? ?? 0,
       consultFeePerSession: (json['consultFeePerSession'] as num?)?.toDouble() ?? 0.0,
-      totalEarnedAmount: (json['totalEarnedAmount'] as num?)?.toDouble() ?? 0.0,
-      totalPotentialAmount: (json['totalPotentialAmount'] as num?)?.toDouble() ?? 0.0,
+      totalEarnedAmount: (json['totalEarnedAmount'] as num?)?.toDouble(),
+      totalPotentialAmount: (json['totalPotentialAmount'] as num?)?.toDouble(),
+      currency: json['currency'] as String?,
+      consultFeeCurrency: json['consultFeeCurrency'] as String?,
+      byCountry: (json['byCountry'] as List? ?? [])
+          .map((row) => ReconciliationCountryTotal.fromJson(row))
+          .toList(),
     );
   }
+}
+
+class ReconciliationCountryTotal {
+  final String country;
+  final String currency;
+  final double totalEarnedAmount;
+  final double totalPotentialAmount;
+
+  ReconciliationCountryTotal.fromJson(Map<String, dynamic> json)
+      : country = json['country'] as String? ?? 'HISTORICAL_UNSPECIFIED',
+        currency = json['currency'] as String? ?? 'Unspecified',
+        totalEarnedAmount = (json['totalEarnedAmount'] as num?)?.toDouble() ?? 0,
+        totalPotentialAmount = (json['totalPotentialAmount'] as num?)?.toDouble() ?? 0;
 }
 
 class AvailableClinic {
@@ -123,6 +147,7 @@ class AvailableClinic {
 }
 
 class ClinicBreakdownItem {
+  final String? currency;
   final String clinicId;
   final String clinicName;
   final String? logo;
@@ -131,6 +156,7 @@ class ClinicBreakdownItem {
   final double totalAmount;
 
   ClinicBreakdownItem({
+    this.currency,
     required this.clinicId,
     required this.clinicName,
     this.logo,
@@ -141,6 +167,7 @@ class ClinicBreakdownItem {
 
   factory ClinicBreakdownItem.fromJson(Map<String, dynamic> json) {
     return ClinicBreakdownItem(
+      currency: json['currency'] as String?,
       clinicId: json['clinicId'] as String? ?? '',
       clinicName: json['clinicName'] as String? ?? '',
       logo: json['logo'] as String?,
@@ -198,6 +225,8 @@ class ReconciliationMeta {
 }
 
 class ReconciliationAppointment {
+  final String? feeCountry;
+  final String? displayStatus;
   final String id;
   final int serialNumber;
   final DateTime? consultDate;
@@ -210,6 +239,8 @@ class ReconciliationAppointment {
   final DateTime? createdAt;
 
   ReconciliationAppointment({
+    this.feeCountry,
+    this.displayStatus,
     required this.id,
     this.serialNumber = 0,
     this.consultDate,
@@ -224,6 +255,8 @@ class ReconciliationAppointment {
 
   factory ReconciliationAppointment.fromJson(Map<String, dynamic> json) {
     return ReconciliationAppointment(
+      feeCountry: json['feeCountry'] as String?,
+      displayStatus: json['displayStatus'] as String?,
       id: json['id'] as String? ?? '',
       serialNumber: json['serialNumber'] as int? ?? 0,
       consultDate: json['consultDate'] != null

@@ -1,3 +1,4 @@
+import 'package:nabeelaljirbi_app/core/utils/clinic_time.dart';
 import 'package:nabeelaljirbi_app/feature/clinic/home/model/appointment_model.dart';
 
 class BookingHistoryResponse {
@@ -179,10 +180,7 @@ class BookingItem {
 
   String _formatTimeRange() {
     if (startTime == null) return '';
-    // Handle time format like "10:51.000Z"
-    final start = startTime!.replaceAll('.000Z', '');
-    final end = endTime?.replaceAll('.000Z', '') ?? '';
-    return '$start - $end';
+    return '${formatClinicTime(startTime)} - ${formatClinicTime(endTime)}';
   }
 
   String _formatDate() {

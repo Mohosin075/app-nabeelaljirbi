@@ -1,3 +1,4 @@
+import 'package:nabeelaljirbi_app/core/utils/clinic_time.dart';
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -206,20 +207,7 @@ class BookingController extends GetxController {
     return "${formatTime(slot.startTime)} - ${formatTime(slot.endTime)}";
   }
 
-  String formatTime(String? time) {
-    if (time == null) return "";
-    try {
-      final dateTime = DateFormat("HH:mm:ss").parse(time);
-      return DateFormat("h:mm a").format(dateTime);
-    } catch (e) {
-      try {
-        final dateTime = DateFormat("HH:mm").parse(time);
-        return DateFormat("h:mm a").format(dateTime);
-      } catch (e) {
-        return time;
-      }
-    }
-  }
+  String formatTime(String? time) => formatClinicTime(time);
 
   Future<void> bookAppointment() async {
     if (isLoading.value) return;

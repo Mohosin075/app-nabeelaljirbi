@@ -1,3 +1,5 @@
+import 'package:nabeelaljirbi_app/feature/common/operations/phase_one_api.dart';
+import 'package:nabeelaljirbi_app/core/utils/clinic_time.dart';
 import 'package:flutter/material.dart';
 import 'package:nabeelaljirbi_app/feature/common/operations/report_share.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -975,17 +977,24 @@ class DoctorReconciliationScreen extends StatelessWidget {
   Widget _buildSummaryCards(DoctorReconciliationController controller) {
     return Obx(() {
       final summary = controller.reconciliationData.value?.summary;
-      final earned = summary?.totalEarnedAmount ?? 0.0;
-      final potential = summary?.totalPotentialAmount ?? 0.0;
+      final earned = summary == null ? 0.0 : summary.totalEarnedAmount;
+      final potential = summary == null ? 0.0 : summary.totalPotentialAmount;
       final completed = summary?.completedAppointments ?? 0;
       final confirmed = summary?.confirmedAppointments ?? 0;
       final cancelled = summary?.cancelledAppointments ?? 0;
       final noShow = summary?.noShowAppointments ?? 0;
       final feeRate = summary?.consultFeePerSession ?? 0.0;
-      final currency = CurrencyUtil.getUserCurrencySymbol();
+      final currency = summary?.currency == null || summary?.currency == 'Unspecified' ? 'currency_unspecified'.tr : summary!.currency!;
+      final rateCurrency = summary?.consultFeeCurrency == null || summary?.consultFeeCurrency == 'Unspecified' ? 'currency_unspecified'.tr : summary!.consultFeeCurrency!;
 
       return Column(
         children: [
+          for (final total in summary?.byCountry ?? <ReconciliationCountryTotal>[])
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(total.country == 'HISTORICAL_UNSPECIFIED' ? 'historical_country_unspecified'.tr : total.country.toLowerCase().tr),
+              subtitle: Text('${total.totalEarnedAmount.toStringAsFixed(2)} ${total.currency == 'Unspecified' ? 'currency_unspecified'.tr : total.currency}'),
+            ),
           // Primary Revenue Card
           Container(
             width: double.infinity,
@@ -1041,7 +1050,7 @@ class DoctorReconciliationScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${earned.toStringAsFixed(1)} $currency',
+                  earned == null ? 'see_country_totals'.tr : '${earned.toStringAsFixed(2)} $currency',
                   style: globalTextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w700,
@@ -1055,7 +1064,7 @@ class DoctorReconciliationScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${'potential_amount'.tr}: ${potential.toStringAsFixed(1)} $currency',
+                      '${'potential_amount'.tr}: ${potential == null ? 'see_country_totals'.tr : potential.toStringAsFixed(2) + ' ' + currency}',
                       style: globalTextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -1063,7 +1072,7 @@ class DoctorReconciliationScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${'consult_fee_rate'.tr}: ${feeRate.toStringAsFixed(0)} $currency',
+                      '${'consult_fee_rate'.tr}: ${feeRate.toStringAsFixed(2)} $rateCurrency',
                       style: globalTextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -1237,7 +1246,7 @@ class DoctorReconciliationScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${item.totalAmount.toStringAsFixed(1)} $currency',
+                      '${item.totalAmount.toStringAsFixed(2)} ${item.currency == null || item.currency == 'Unspecified' ? 'currency_unspecified'.tr : item.currency}',
                       style: globalTextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -1255,12 +1264,12 @@ class DoctorReconciliationScreen extends StatelessWidget {
   }
 
   Widget _buildAppointmentCard(ReconciliationAppointment item) {
-    final currency = CurrencyUtil.getUserCurrencySymbol();
+    final currency = CurrencyUtil.getCurrencySymbol(item.feeCountry ?? '');
     final dateStr = item.consultDate != null
         ? DateFormat('EEE, MMM dd, yyyy').format(item.consultDate!)
         : '';
     final timeStr = item.startTime != null
-        ? '${item.startTime} - ${item.endTime}'
+        ? '${formatClinicTime(item.startTime)} - ${formatClinicTime(item.endTime)}'
         : '';
 
     Color statusColor;
@@ -1295,6 +1304,8 @@ class DoctorReconciliationScreen extends StatelessWidget {
         statusBgColor = const Color(0xffF1F5F9);
         statusText = item.status;
     }
+
+    statusText = phaseBookingStatus(item.displayStatus ?? item.status);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),

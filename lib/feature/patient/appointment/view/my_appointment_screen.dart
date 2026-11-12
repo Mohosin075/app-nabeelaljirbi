@@ -1,3 +1,4 @@
+import 'package:nabeelaljirbi_app/core/utils/clinic_time.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -1149,30 +1150,7 @@ class MyAppointmentScreen extends StatelessWidget {
     );
   }
 
-  String _formatTime(String? time) {
-    if (time == null) return "";
-    try {
-      DateTime dt;
-      try {
-        dt = DateFormat("HH:mm:ss").parse(time);
-      } catch (e) {
-        dt = DateFormat("HH:mm").parse(time);
-      }
-
-      final hour = dt.hour;
-      final minute = dt.minute;
-      final period = hour < 12 ? 'am'.tr : 'pm'.tr;
-      final displayHour = hour > 12
-          ? hour - 12
-          : hour == 0
-          ? 12
-          : hour;
-
-      return "$displayHour:${minute.toString().padLeft(2, '0')} $period";
-    } catch (e) {
-      return time;
-    }
-  }
+  String _formatTime(String? time) => formatClinicTime(time);
 
   double _calculateHoursUntilAppointment(Appointment apt) {
     if (apt.consultDate == null) return 0;

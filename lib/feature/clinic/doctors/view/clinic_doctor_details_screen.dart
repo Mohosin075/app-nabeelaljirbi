@@ -1,3 +1,4 @@
+import 'package:nabeelaljirbi_app/core/utils/clinic_time.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -855,24 +856,5 @@ class ClinicDoctorDetailsScreen extends StatelessWidget {
     );
   }
 
-  String _formatTime(String time) {
-    if (time == 'na'.tr) return time;
-    try {
-      DateTime dateTime;
-      try {
-        dateTime = DateFormat("HH:mm:ss").parse(time);
-      } catch (e) {
-        dateTime = DateFormat("HH:mm").parse(time);
-      }
-
-      final hour = dateTime.hour;
-      final minute = dateTime.minute;
-      final period = hour >= 12 ? 'pm'.tr : 'am'.tr;
-      final hour12 = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
-
-      return "$hour12:${minute.toString().padLeft(2, '0')} $period";
-    } catch (e) {
-      return time;
-    }
-  }
+  String _formatTime(String? time) => formatClinicTime(time);
 }

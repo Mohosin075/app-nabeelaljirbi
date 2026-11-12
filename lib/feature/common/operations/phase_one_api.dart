@@ -9,6 +9,24 @@ import 'package:nabeelaljirbi_app/core/network_caller/endpoints.dart';
 String phaseText(String en, String ar) =>
     Get.locale?.languageCode == 'ar' ? ar : en;
 
+String phaseRecordStatus(String status) {
+  final labels = <String, List<String>>{
+    'ACTIVE': ['Active', 'نشط'],
+    'SUSPENDED': ['Suspended', 'موقوف'],
+    'PENDING': ['Pending', 'قيد الانتظار'],
+    'UNDER_REVIEW': ['Under Review', 'قيد المراجعة'],
+    'APPROVED': ['Approved', 'معتمد'],
+    'REJECTED': ['Rejected', 'مرفوض'],
+    'COMPLETED': ['Paid', 'مدفوع'],
+    'OPEN': ['Open', 'مفتوح'],
+    'IN_PROGRESS': ['Under Review', 'قيد المراجعة'],
+    'RESOLVED': ['Resolved', 'تم الحل'],
+    'DISMISSED': ['Dismissed', 'مرفوض'],
+  };
+  final label = labels[status];
+  return label == null ? status.replaceAll('_', ' ') : phaseText(label[0], label[1]);
+}
+
 String phaseBookingStatus(String status) {
   final labels = <String, List<String>>{
     "ALL": ["All statuses","جميع الحالات"],
