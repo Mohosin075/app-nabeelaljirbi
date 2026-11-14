@@ -4,7 +4,6 @@ import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
 import 'package:nabeelaljirbi_app/core/style/global_text_style.dart';
 import 'phase_one_api.dart';
 import 'profile_changes_screen.dart';
-import 'payout_screen.dart';
 import 'history_reports_screen.dart';
 import 'managed_bookings_screen.dart';
 import 'receptionists_screen.dart';
@@ -26,15 +25,7 @@ class OperationsMenu extends StatelessWidget {
               ),
               onTap: () => Get.to(() => const ProfileChangesScreen()),
             ),
-          if (['DOCTOR', 'CLINIC'].contains(role))
-            ListTile(
-              leading: const Icon(Icons.account_balance_outlined),
-              title: Text(
-                phaseText('Bank details & withdrawals', 'بيانات البنك والسحب'),
-              ),
-              onTap: () => Get.to(() => const PayoutScreen()),
-            ),
-          if (['PATIENT', 'DOCTOR', 'CLINIC'].contains(role))
+          if (financialOnly && ['PATIENT', 'DOCTOR', 'CLINIC'].contains(role))
             ListTile(
               leading: const Icon(Icons.receipt_long_outlined),
               title: Text(phaseText('Ledger & reports', 'السجل والتقارير')),

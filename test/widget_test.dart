@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
+import 'package:nabeelaljirbi_app/core/utils/feedback_email.dart';
 import 'package:nabeelaljirbi_app/feature/common/operations/operations_menu.dart';
 import 'package:nabeelaljirbi_app/feature/common/operations/receptionist_home_screen.dart';
 import 'package:nabeelaljirbi_app/feature/common/operations/phase_one_api.dart';
@@ -21,6 +23,29 @@ void main() {
     Get.testMode = true;
   });
   tearDown(() => Get.reset());
+  testWidgets('feedback opens the support email draft and reports a failed launch', (tester) async {
+    const channel = MethodChannel('plugins.flutter.io/url_launcher');
+    final calls = <MethodCall>[];
+    var launched = true;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, (call) async {
+      calls.add(call);
+      return launched;
+    });
+    addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, null));
+    await tester.pumpWidget(const GetMaterialApp(home: Scaffold(body: Text('Profile'))));
+    await openFeedbackEmail();
+    final uri = Uri.parse((calls.last.arguments as Map)['url'] as String);
+    expect(uri.scheme, 'mailto');
+    expect(uri.path, 'info@spidertech.ly');
+    expect(uri.queryParameters['subject'], 'Salama feedback');
+    expect(uri.toString(), contains('subject=Salama%20feedback'));
+    launched = false;
+    await openFeedbackEmail();
+    await tester.pumpAndSettle();
+    expect(find.text('could_not_open_email'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pumpAndSettle();
+  });
   test(
     'automatic unresolved history stays distinct from manual patient no-show',
     () {
@@ -278,14 +303,15 @@ void main() {
       expect(find.text('Receptionists'), findsNothing);
     },
   );
-  testWidgets('clinic owner menu exposes bank, booking and staff flows', (
+  testWidgets('clinic profile menu exposes booking and staff flows', (
     tester,
   ) async {
     await SharedPrefHelper.saveRole('CLINIC');
     await tester.pumpWidget(
       const GetMaterialApp(home: Scaffold(body: OperationsMenu())),
     );
-    expect(find.text('Bank details & withdrawals'), findsOneWidget);
+    expect(find.text('Bank details & withdrawals'), findsNothing);
+    expect(find.text('Ledger & reports'), findsNothing);
     expect(find.text('Manage bookings'), findsOneWidget);
     expect(find.text('Receptionists'), findsOneWidget);
     expect(find.text('My complaints & responses'), findsNothing);
@@ -299,5 +325,17 @@ void main() {
     expect(find.text('Profile change requests'), findsOneWidget);
     expect(find.text('My complaints & responses'), findsOneWidget);
   });
+
+  for (final role in ['PATIENT', 'DOCTOR', 'CLINIC', 'MANAGER']) {
+    testWidgets('$role wallet menu contains financial flows only', (tester) async {
+      await SharedPrefHelper.saveRole(role);
+      await tester.pumpWidget(const GetMaterialApp(home: Scaffold(body: OperationsMenu(financialOnly: true))));
+      expect(find.text('Ledger & reports'), role == 'MANAGER' ? findsNothing : findsOneWidget);
+      expect(find.text('Profile change requests'), findsNothing);
+      expect(find.text('Manage bookings'), findsNothing);
+      expect(find.text('Receptionists'), findsNothing);
+    });
+  }
+
 
 }

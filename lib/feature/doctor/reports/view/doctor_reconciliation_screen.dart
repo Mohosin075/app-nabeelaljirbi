@@ -870,26 +870,12 @@ class DoctorReconciliationScreen extends StatelessWidget {
                               isSelected: status == 'ALL',
                               onTap: () => controller.setStatus('ALL'),
                             ),
-                            _buildModalFilterChip(
-                              label: 'completed'.tr,
-                              isSelected: status == 'COMPLETE',
-                              onTap: () => controller.setStatus('COMPLETE'),
-                            ),
-                            _buildModalFilterChip(
-                              label: 'confirmed'.tr,
-                              isSelected: status == 'CONFIRMED',
-                              onTap: () => controller.setStatus('CONFIRMED'),
-                            ),
-                            _buildModalFilterChip(
-                              label: 'cancelled'.tr,
-                              isSelected: status == 'CANCELLED',
-                              onTap: () => controller.setStatus('CANCELLED'),
-                            ),
-                            _buildModalFilterChip(
-                              label: 'no_show'.tr,
-                              isSelected: status == 'NOT_SHOW',
-                              onTap: () => controller.setStatus('NOT_SHOW'),
-                            ),
+                            for (final value in ['PENDING', 'CONFIRMED', 'ARRIVED', 'COMPLETE', 'CANCELLED', 'DOCTOR_ABSENT', 'PATIENT_NO_SHOW'])
+                              _buildModalFilterChip(
+                                label: phaseBookingStatus(value),
+                                isSelected: status == value,
+                                onTap: () => controller.setStatus(value),
+                              ),
                           ],
                         );
                       }),
@@ -1064,7 +1050,7 @@ class DoctorReconciliationScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${'potential_amount'.tr}: ${potential == null ? 'see_country_totals'.tr : potential.toStringAsFixed(2) + ' ' + currency}',
+                      '${'potential_amount'.tr}: ${potential == null ? 'see_country_totals'.tr : '${potential.toStringAsFixed(2)} $currency'}',
                       style: globalTextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -1182,7 +1168,6 @@ class DoctorReconciliationScreen extends StatelessWidget {
   Widget _buildClinicBreakdown(DoctorReconciliationController controller) {
     return Obx(() {
       final list = controller.reconciliationData.value?.clinicBreakdown ?? [];
-      final currency = CurrencyUtil.getUserCurrencySymbol();
 
       return Container(
         padding: const EdgeInsets.all(14),

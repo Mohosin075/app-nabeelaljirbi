@@ -261,7 +261,7 @@ class DoctorReconciliationController extends GetxController {
 
   String _buildUrl({required int page}) {
     String url =
-        '${Urls.baseUrl}/doctor/reconciliation-reports?page=$page&limit=$limit';
+        '${Urls.baseUrl}/doctor/reconciliation-reports?page=$page&limit=$limit&statusView=simple';
 
     if (selectedClinicId.value != 'all' && selectedClinicId.value.isNotEmpty) {
       url += '&clinicId=${selectedClinicId.value}';

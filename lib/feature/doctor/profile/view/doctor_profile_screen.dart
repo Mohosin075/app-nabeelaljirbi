@@ -1,5 +1,5 @@
+import 'package:nabeelaljirbi_app/core/utils/feedback_email.dart';
 import 'package:nabeelaljirbi_app/feature/common/operations/operations_menu.dart';
-import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -16,7 +16,6 @@ import 'package:nabeelaljirbi_app/feature/doctor/profile/view/doctor_help_center
 import 'package:nabeelaljirbi_app/feature/doctor/profile/view/doctor_legal_screen.dart';
 import 'package:nabeelaljirbi_app/feature/doctor/reports/view/doctor_reconciliation_screen.dart';
 import 'package:nabeelaljirbi_app/feature/common/verification/view/verification_screen.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class DoctorProfileScreen extends StatelessWidget {
   const DoctorProfileScreen({super.key});
@@ -241,22 +240,7 @@ class DoctorProfileScreen extends StatelessWidget {
                         _buildMenuItem(
                           icon: IconsPath.feedback,
                           title: 'send_feedback'.tr,
-                          onTap: () {
-                            String url = '';
-                            if (Platform.isAndroid) {
-                              url =
-                                  'https://play.google.com/store/apps/details?id=com.nabeelaljirbi.salama';
-                            } else if (Platform.isIOS) {
-                              url = 'https://apps.apple.com';
-                            }
-
-                            if (url.isNotEmpty) {
-                              launchUrl(
-                                Uri.parse(url),
-                                mode: LaunchMode.externalApplication,
-                              );
-                            }
-                          },
+                          onTap: openFeedbackEmail,
                         ),
                       ],
                     ),
