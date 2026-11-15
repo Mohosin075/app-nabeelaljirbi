@@ -4,6 +4,14 @@ class AppLanguages extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
     'en_US': {
+      'OTP sent successfully': 'OTP sent successfully',
+      'User verified successfully': 'User verified successfully',
+      'Invalid or expired OTP': 'Invalid or expired OTP',
+      'Unable to send OTP. Please try again later.': 'Unable to send OTP. Please try again later.',
+      'OTP delivery is currently disabled': 'OTP delivery is currently disabled',
+      'Account is inactive or banned': 'Account is inactive or banned',
+      'User is banned': 'User is banned',
+      'Phone number must start with + and country code': 'Phone number must start with + and country code',
       'currency_unspecified': 'Currency unspecified',
       'see_country_totals': 'See country totals',
       'historical_country_unspecified': 'Historical country unspecified',
@@ -1428,6 +1436,14 @@ class AppLanguages extends Translations {
       'qualification_number': 'Qualification #',
     },
     'ar_SA': {
+      'OTP sent successfully': 'تم إرسال رمز التحقق بنجاح',
+      'User verified successfully': 'تم التحقق من المستخدم بنجاح',
+      'Invalid or expired OTP': 'رمز التحقق غير صالح أو منتهي الصلاحية',
+      'Unable to send OTP. Please try again later.': 'تعذر إرسال رمز التحقق. يرجى المحاولة لاحقاً.',
+      'OTP delivery is currently disabled': 'إرسال رمز التحقق معطل حالياً',
+      'Account is inactive or banned': 'الحساب غير نشط أو محظور',
+      'User is banned': 'الحساب محظور',
+      'Phone number must start with + and country code': 'يجب أن يبدأ رقم الهاتف بعلامة + ورمز الدولة',
       'currency_unspecified': 'العملة غير محددة',
       'see_country_totals': 'راجع إجماليات الدول',
       'historical_country_unspecified': 'دولة السجل السابق غير محددة',

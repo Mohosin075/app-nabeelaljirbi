@@ -10,8 +10,6 @@ import 'package:nabeelaljirbi_app/core/const/icons_path.dart';
 import 'package:nabeelaljirbi_app/core/localization/language_service.dart';
 import 'package:nabeelaljirbi_app/core/network_caller/endpoints.dart';
 import 'package:nabeelaljirbi_app/feature/auth/login/view/otp_verification_screen.dart';
-import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
-import 'package:nabeelaljirbi_app/feature/patient/nav_bar/view/patient_nav_bar_screen.dart';
 import '../model/otp_system_model.dart';
 
 class LoginController extends GetxController {
@@ -252,27 +250,13 @@ class LoginController extends GetxController {
       );
 
       debugPrint('Response Status Code: ${response.statusCode}');
-      debugPrint('Response Body: ${response.body}');
 
       final Map<String, dynamic> responseData = jsonDecode(response.body);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        if (fullPhoneNumber == '+8801763170733') {
-          final data = responseData['data'];
-          if (data != null && data['accessToken'] != null) {
-            await SharedPrefHelper.saveToken(
-              data['accessToken'],
-              data['refreshToken'],
-            );
-            await SharedPrefHelper.saveRole('PATIENT');
-            Get.offAll(() => PatientNavBarScreen());
-            return;
-          }
-        }
-
         Get.snackbar(
           'success'.tr,
-          responseData['message'] ?? 'otp_sent_successfully'.tr,
+          (responseData['message']?.toString() ?? 'otp_sent_successfully').tr,
           backgroundColor: AppColors.primaryColor,
           colorText: Colors.white,
         );
@@ -289,7 +273,7 @@ class LoginController extends GetxController {
       } else {
         Get.snackbar(
           'error'.tr,
-          responseData['message'] ?? 'failed_to_send_otp'.tr,
+          (responseData['message']?.toString() ?? 'failed_to_send_otp').tr,
         );
       }
     } catch (e) {

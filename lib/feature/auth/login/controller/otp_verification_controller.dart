@@ -84,7 +84,6 @@ class OtpVerificationController extends GetxController {
       };
 
       debugPrint('Resending OTP Request to: $url');
-      debugPrint('Request Body: ${jsonEncode(body)}');
 
       final response = await http.post(
         Uri.parse(url),
@@ -100,7 +99,7 @@ class OtpVerificationController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         Get.snackbar(
           'success'.tr,
-          responseData['message'] ?? 'otp_sent_successfully'.tr,
+          (responseData['message']?.toString() ?? 'otp_sent_successfully').tr,
           backgroundColor: AppColors.primaryColor,
           colorText: Colors.white,
         );
@@ -108,7 +107,7 @@ class OtpVerificationController extends GetxController {
       } else {
         Get.snackbar(
           'error'.tr,
-          responseData['message'] ?? 'failed_to_send_otp'.tr,
+          (responseData['message']?.toString() ?? 'failed_to_send_otp').tr,
         );
       }
     } catch (e) {
@@ -136,7 +135,6 @@ class OtpVerificationController extends GetxController {
       };
 
       debugPrint('Verifying OTP Request to: $url');
-      debugPrint('Request Body: ${jsonEncode(body)}');
 
       final response = await http.post(
         Uri.parse(url),
@@ -145,7 +143,6 @@ class OtpVerificationController extends GetxController {
       );
 
       debugPrint('Verify Response Status Code: ${response.statusCode}');
-      debugPrint('Verify Response Body: ${response.body}');
 
       final Map<String, dynamic> responseData = jsonDecode(response.body);
 
@@ -164,7 +161,7 @@ class OtpVerificationController extends GetxController {
 
           Get.snackbar(
             'success'.tr,
-            responseData['message'] ?? 'otp_verified_successfully'.tr,
+            (responseData['message']?.toString() ?? 'otp_verified_successfully').tr,
             backgroundColor: AppColors.primaryColor,
             colorText: Colors.white,
           );
@@ -224,8 +221,8 @@ class OtpVerificationController extends GetxController {
           Get.snackbar('error'.tr, 'something_went_wrong'.tr);
         }
       } else {
-        otpError.value = responseData['message'] ?? 'invalid_otp'.tr;
-        Get.snackbar('error'.tr, responseData['message'] ?? 'invalid_otp'.tr);
+        otpError.value = (responseData['message']?.toString() ?? 'invalid_otp').tr;
+        Get.snackbar('error'.tr, (responseData['message']?.toString() ?? 'invalid_otp').tr);
       }
     } catch (e) {
       debugPrint('Error verifying OTP: $e');
