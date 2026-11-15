@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nabeelaljirbi_app/core/const/shared_pref_helper.dart';
+import 'package:nabeelaljirbi_app/core/localization/language_strings.dart';
 import 'package:nabeelaljirbi_app/core/utils/feedback_email.dart';
 import 'package:nabeelaljirbi_app/feature/common/operations/operations_menu.dart';
 import 'package:nabeelaljirbi_app/feature/common/operations/receptionist_home_screen.dart';
@@ -23,6 +24,20 @@ void main() {
     Get.testMode = true;
   });
   tearDown(() => Get.reset());
+  test('OTP provider responses have readable Arabic translations', () {
+    final translations = AppLanguages().keys['ar_SA']!;
+    for (final message in [
+      'OTP sent successfully',
+      'User verified successfully',
+      'Invalid or expired OTP',
+      'Unable to send OTP. Please try again later.',
+      'OTP delivery is currently disabled',
+      'Account is inactive or banned',
+    ]) {
+      expect(translations[message], matches(RegExp(r'[\u0600-\u06ff]')));
+      expect(translations[message], isNot(contains('?')));
+    }
+  });
   testWidgets('feedback opens the support email draft and reports a failed launch', (tester) async {
     const channel = MethodChannel('plugins.flutter.io/url_launcher');
     final calls = <MethodCall>[];

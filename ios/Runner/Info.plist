@@ -40,9 +40,9 @@
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>نحتاج إلى معرفة موقعك لعرض العيادات والأطباء القريبين منك.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app needs access to location when in the background to suggest nearby cities.</string>
+	<string>يحتاج التطبيق إلى الوصول إلى موقعك في الخلفية لاقتراح المدن القريبة.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs access to location when open to suggest nearby cities.</string>
+	<string>يحتاج التطبيق إلى الوصول إلى موقعك أثناء الاستخدام لاقتراح المدن القريبة.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>يحتاج هذا التطبيق إلى الوصول إلى الميكروفون إذا اخترت تسجيل فيديو لملفك الشخصي.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
